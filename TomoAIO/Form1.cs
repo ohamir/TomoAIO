@@ -57,6 +57,7 @@ namespace TomoAIO
             ConfigureMenuButtons();
             ConfigureActionButtons();
             ConfigureInputStyles();
+            EnsureDiscordButtonVisible();
         }
 
         private void EnableSmoothRendering()
@@ -141,7 +142,38 @@ namespace TomoAIO
 
             PinLogoTopRight();
             LayoutMainMenuButtons();
+            EnsureDiscordButtonVisible();
             pictureBox1.Refresh();
+        }
+
+        private void EnsureDiscordButtonVisible()
+        {
+            if (btnDiscord.BackgroundImage == null)
+            {
+                string logoPath = Path.Combine(Application.StartupPath, "Resources", "discord-logo.png");
+                if (File.Exists(logoPath))
+                {
+                    using (var stream = new MemoryStream(File.ReadAllBytes(logoPath)))
+                    using (var image = Image.FromStream(stream))
+                    {
+                        btnDiscord.BackgroundImage = new Bitmap(image);
+                    }
+                }
+                else
+                {
+                    btnDiscord.BackgroundImage = Properties.Resources.discord;
+                }
+            }
+
+            btnDiscord.Text = string.Empty;
+            btnDiscord.BackgroundImageLayout = ImageLayout.Zoom;
+            btnDiscord.FlatStyle = FlatStyle.Flat;
+            btnDiscord.FlatAppearance.BorderSize = 0;
+            btnDiscord.FlatAppearance.MouseDownBackColor = Color.Transparent;
+            btnDiscord.FlatAppearance.MouseOverBackColor = Color.Transparent;
+            btnDiscord.Visible = true;
+            btnDiscord.Enabled = true;
+            btnDiscord.BringToFront();
         }
 
         private void PinLogoTopRight()
@@ -1226,6 +1258,7 @@ namespace TomoAIO
             panel1.BringToFront();
             PinLogoTopRight();
             LayoutMiiEditorControls();
+            EnsureDiscordButtonVisible();
         }
         private void button3_Click(object sender, EventArgs e) { ShowMainMenu(); }
         private void button2_Click(object sender, EventArgs e)
@@ -1244,6 +1277,7 @@ namespace TomoAIO
                         panelUGC.Visible = true;
                         panelUGC.BringToFront();
                         LayoutUgcEditorControls();
+                        EnsureDiscordButtonVisible();
                     }
                     // If the list is empty, the panel remains hidden and 
                     // the user stays on the main menu.
@@ -1454,6 +1488,7 @@ namespace TomoAIO
                 LayoutMainMenuButtons();
                 LayoutMiiEditorControls();
                 LayoutUgcEditorControls();
+                EnsureDiscordButtonVisible();
             }
             finally
             {

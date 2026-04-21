@@ -124,12 +124,14 @@
             // 
             // btnDiscord
             // 
+            btnDiscord.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnDiscord.BackColor = Color.Transparent;
             btnDiscord.Location = new Point(1335, 745);
             btnDiscord.Name = "btnDiscord";
             btnDiscord.Size = new Size(75, 65);
             btnDiscord.TabIndex = 14;
-            btnDiscord.Text = "button5";
             btnDiscord.UseVisualStyleBackColor = true;
+            btnDiscord.Click += btnDiscord_Click;
             // 
             // btnBrowseMii
             // 
