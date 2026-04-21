@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
-using ZstdSharp;
+using TomoAIO.Services;
 
 namespace TomoAIO
 {
@@ -41,6 +41,8 @@ namespace TomoAIO
         private readonly string[] _miiActions = { "Import Mii (.ltd)", "Export Mii (.ltd)" };
         private readonly Dictionary<Control, (Size size, int radius)> _roundedCache = new Dictionary<Control, (Size size, int radius)>();
         private string _selectedMiiPath = "Choose a Mii file here...";
+        private readonly UgcTextureService _ugcTextureService = new();
+        private readonly MiiSaveService _miiSaveService = new();
 
         // The 18 Hash Markers for Personality, Voice, Gender, and Birthday
         string[] persHashes = {
@@ -729,22 +731,16 @@ namespace TomoAIO
         {
             currentUgcPath = exactUgcPath;
             lstUGC.Items.Clear();
-
-            if (Directory.Exists(exactUgcPath))
+            var files = _ugcTextureService.GetCanvasFiles(exactUgcPath);
+            if (files.Count == 0)
             {
-                string[] files = Directory.GetFiles(exactUgcPath, "*.canvas.zs");
+                MessageBox.Show("Please make sure you selected the right folder", "Folder Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
-                if (files.Length == 0)
-                {
-                    // The error message you wanted
-                    MessageBox.Show("Please make sure you selected the right folder", "Folder Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                foreach (string file in files)
-                {
-                    lstUGC.Items.Add(Path.GetFileName(file));
-                }
+            foreach (string file in files)
+            {
+                lstUGC.Items.Add(file);
             }
         }
         private byte[] EncodeRawTexture(Bitmap bmp)
@@ -885,46 +881,10 @@ namespace TomoAIO
 
             try
             {
-                byte[] fileBytes = File.ReadAllBytes(fullPath);
-                byte[] decompressed;
-                using (var decompressor = new ZstdSharp.Decompressor())
-                {
-                    decompressed = decompressor.Unwrap(fileBytes).ToArray();
-                }
-
                 if (picPreview.Image != null) picPreview.Image.Dispose();
-
-                // 1. Isolate the Canvas files (Raw RGBA, just swizzled)
-                if (selectedFile.EndsWith(".canvas.zs"))
-                {
-                    int size = (int)Math.Sqrt(decompressed.Length / 4);
-                    picPreview.Image = DecodeRawTexture(decompressed, size, size);
-                    lblImageInfo.Text = $"{selectedFile} ({size}x{size} Decoded)";
-                }
-                // 2. Identify the Compressed files
-                else if (selectedFile.EndsWith(".ugctex.zs"))
-                {
-                    // ASTC 4x4 uses ~1 byte per pixel. We check the file size to find the closest standard Switch resolution.
-                    int actualWidth = 256; // Default fallback
-
-                    if (decompressed.Length > 200000) actualWidth = 512;      // 512x512 = 262,144 bytes
-                    else if (decompressed.Length > 100000) actualWidth = 384; // 384x384 = 147,456 bytes
-                    else if (decompressed.Length > 40000) actualWidth = 256;  // 256x256 = 65,536 bytes
-                    else if (decompressed.Length > 10000) actualWidth = 128;  // 128x128 = 16,384 bytes
-
-                    int actualHeight = actualWidth;
-
-                    picPreview.Image = DecodeCompressedAstc(decompressed, actualWidth, actualHeight);
-
-                    if (picPreview.Image == null)
-                    {
-                        lblImageInfo.Text = $"{selectedFile} (ASTC Decode Failed - Check astcenc.exe)";
-                    }
-                    else
-                    {
-                        lblImageInfo.Text = $"{selectedFile} ({actualWidth}x{actualHeight} ASTC Decoded)";
-                    }
-                }
+                var preview = _ugcTextureService.BuildPreview(fullPath, selectedFile);
+                picPreview.Image = preview.image;
+                lblImageInfo.Text = preview.infoText;
             }
             catch (Exception ex)
             {
@@ -1011,7 +971,6 @@ namespace TomoAIO
             SaveFileDialog sfd = new SaveFileDialog { Filter = "LtD Mii (*.ltd)|*.ltd", FileName = name + ".ltd" };
             if (sfd.ShowDialog() == DialogResult.OK)
             {
-                byte[] miiBytes = File.ReadAllBytes(currentMiiSavPath);
                 string? saveDir = Path.GetDirectoryName(currentMiiSavPath);
                 if (string.IsNullOrWhiteSpace(saveDir))
                 {
@@ -1019,44 +978,9 @@ namespace TomoAIO
                     return;
                 }
 
-                using (MemoryStream ms = new MemoryStream())
-                using (BinaryWriter bw = new BinaryWriter(ms))
-                {
-                    bw.Write((byte)3); bw.Write(new byte[] { 1, 1, 0 });
-                    int dO = GetActualOffset(miiBytes, "881CA27A") + 4;
-                    bw.Write(miiBytes, dO + (slot * 156), 156);
-
-                    foreach (string hash in persHashes)
-                    {
-                        int offset = GetActualOffset(miiBytes, hash) + 4;
-                        bw.Write(miiBytes, offset + (slot * 4), 4);
-                    }
-
-                    int nO = GetActualOffset(miiBytes, "2499BFDA") + 4;
-                    int prO = GetActualOffset(miiBytes, "3A5EDA05") + 4;
-                    bw.Write(miiBytes, nO + (slot * 64), 64);
-                    bw.Write(miiBytes, prO + (slot * 128), 128);
-
-                    int sxO = GetActualOffset(miiBytes, "DFC82223") + 4;
-                    List<int> bits = DecodeSexuality(miiBytes.Skip(sxO).Take(27).ToArray());
-                    bw.Write(bits.Skip(slot * 3).Take(3).Select(b => (byte)b).ToArray()); bw.Write((byte)0);
-
-                    int fO = GetActualOffset(miiBytes, "5E32ADF4") + 4;
-                    int faceID = miiBytes[fO + (slot * 4)];
-                    bw.Write(new byte[] { 0xA3, 0xA3, 0xA3, 0xA3 });
-                    if (faceID != 255)
-                    {
-                        string cP = Path.Combine(saveDir, "Ugc", $"UgcFacePaint{faceID:D3}.canvas.zs");
-                        if (File.Exists(cP)) bw.Write(File.ReadAllBytes(cP));
-                    }
-                    bw.Write(new byte[] { 0xA4, 0xA4, 0xA4, 0xA4 });
-                    if (faceID != 255)
-                    {
-                        string tP = Path.Combine(saveDir, "Ugc", $"UgcFacePaint{faceID:D3}.ugctex.zs");
-                        if (File.Exists(tP)) bw.Write(File.ReadAllBytes(tP));
-                    }
-                    File.WriteAllBytes(sfd.FileName, ms.ToArray());
-                }
+                byte[] miiBytes = File.ReadAllBytes(currentMiiSavPath);
+                byte[] payload = _miiSaveService.BuildMiiPackage(miiBytes, slot, persHashes, saveDir);
+                File.WriteAllBytes(sfd.FileName, payload);
                 MessageBox.Show("Mii Identity fully backed up!");
             }
         }
@@ -1069,117 +993,16 @@ namespace TomoAIO
                 return;
             }
 
-            CreateSaveBackup();
-
-            byte[] originalPkg = File.ReadAllBytes(filePath);
-
-            // FIX 2: Version Compatibility (Handle v1 and v2 files!)
-            List<byte> pkgList = originalPkg.ToList();
-            if (pkgList[0] < 3)
+            try
             {
-                pkgList.RemoveAt(4); // Remove the extra header byte
-                if (pkgList[0] == 2)
-                {
-                    pkgList.Insert(427, 0); // Padding fix for v2
-
-                    // Convert v2 marker "A3 A3 A3" to v3 marker "A3 A3 A3 A3"
-                    int cIdx = FindMarker(pkgList.ToArray(), new byte[] { 0xA3, 0xA3, 0xA3 });
-                    if (cIdx != -1) pkgList.Insert(cIdx + 3, 0xA3);
-
-                    // Convert v2 marker for UGC (which was also A3 A3 A3) to "A4 A4 A4 A4"
-                    int uIdx = FindLastMarker(pkgList.ToArray(), new byte[] { 0xA3, 0xA3, 0xA3 });
-                    if (uIdx != -1)
-                    {
-                        pkgList[uIdx] = 0xA4; pkgList[uIdx + 1] = 0xA4; pkgList[uIdx + 2] = 0xA4;
-                        pkgList.Insert(uIdx + 3, 0xA4);
-                    }
-                }
+                _miiSaveService.ImportMii(currentMiiSavPath, slot, filePath, persHashes);
+                RefreshMiiList();
+                MessageBox.Show("Mii Imported Successfully!");
             }
-
-            byte[] pkg = pkgList.ToArray();
-            byte[] miiBytes = File.ReadAllBytes(currentMiiSavPath);
-            string? saveDir = Path.GetDirectoryName(currentMiiSavPath);
-            if (string.IsNullOrWhiteSpace(saveDir))
+            catch (Exception ex)
             {
-                MessageBox.Show("Save folder path is invalid.", "TomoAIO");
-                return;
+                MessageBox.Show(ex.Message, "TomoAIO");
             }
-            byte[] pBytes = File.ReadAllBytes(Path.Combine(saveDir, "Player.sav"));
-
-            int dnaO = GetActualOffset(miiBytes, "881CA27A") + 4;
-
-            using (MemoryStream ms = new MemoryStream(pkg))
-            using (BinaryReader br = new BinaryReader(ms))
-            {
-                br.ReadBytes(4);
-                Array.Copy(br.ReadBytes(156), 0, miiBytes, dnaO + (slot * 156), 156);
-                foreach (string h in persHashes) Array.Copy(br.ReadBytes(4), 0, miiBytes, GetActualOffset(miiBytes, h) + 4 + (slot * 4), 4);
-                Array.Copy(br.ReadBytes(64), 0, miiBytes, GetActualOffset(miiBytes, "2499BFDA") + 4 + (slot * 64), 64);
-                Array.Copy(br.ReadBytes(128), 0, miiBytes, GetActualOffset(miiBytes, "3A5EDA05") + 4 + (slot * 128), 128);
-
-                byte[] mySx = br.ReadBytes(3); br.ReadByte();
-                int sxO = GetActualOffset(miiBytes, "DFC82223") + 4;
-                List<int> bits = DecodeSexuality(miiBytes.Skip(sxO).Take(27).ToArray());
-                for (int i = 0; i < 3; i++) bits[(slot * 3) + i] = mySx[i];
-                Array.Copy(EncodeSexuality(bits), 0, miiBytes, sxO, 27);
-
-                int cS = FindMarker(pkg, new byte[] { 0xA3, 0xA3, 0xA3, 0xA3 }) + 4;
-                int tS = FindMarker(pkg, new byte[] { 0xA4, 0xA4, 0xA4, 0xA4 }) + 4;
-                int fO = GetActualOffset(miiBytes, "5E32ADF4") + 4;
-
-                // Track the original faceID in case we need to clear it!
-                int faceID = miiBytes[fO + (slot * 4)];
-                int oldFaceID = faceID;
-
-                int canvasSize = tS - 4 - cS;
-                int texSize = pkg.Length - tS;
-
-                if (cS > 3 && tS > cS && canvasSize > 0 && texSize > 0)
-                {
-                    if (faceID == 255) // This translates to FF in the first byte
-                    {
-                        for (int i = 0; i < 70; i++)
-                        {
-                            bool used = false;
-                            for (int s = 0; s < 70; s++) if (miiBytes[fO + (s * 4)] == i) used = true;
-                            if (!used) { faceID = i; break; }
-                        }
-
-                        if (faceID < 70)
-                        {
-                            Array.Copy(new byte[] { (byte)faceID, 0, 0, 0 }, 0, miiBytes, fO + (slot * 4), 4);
-                        }
-                    }
-
-                    if (faceID < 70)
-                    {
-                        miiBytes[dnaO + (slot * 156) + 43] = 1;
-                        UpdatePlayerRegistry(pBytes, faceID);
-                        string uD = Path.Combine(saveDir, "Ugc");
-                        Directory.CreateDirectory(uD);
-                        File.WriteAllBytes(Path.Combine(uD, $"UgcFacePaint{faceID:D3}.canvas.zs"), pkg.Skip(cS).Take(canvasSize).ToArray());
-                        File.WriteAllBytes(Path.Combine(uD, $"UgcFacePaint{faceID:D3}.ugctex.zs"), pkg.Skip(tS).ToArray());
-                    }
-                }
-                else
-                {
-                    miiBytes[dnaO + (slot * 156) + 43] = 0;
-
-                    // FIX 1: Use proper 32-bit -1 value (FF FF FF FF)
-                    Array.Copy(new byte[] { 255, 255, 255, 255 }, 0, miiBytes, fO + (slot * 4), 4);
-
-                    // FIX 3: Clear old facepaint registry
-                    if (oldFaceID != 255 && oldFaceID < 70)
-                    {
-                        ClearPlayerRegistry(pBytes, oldFaceID);
-                    }
-                }
-            }
-
-            File.WriteAllBytes(currentMiiSavPath, miiBytes);
-            File.WriteAllBytes(Path.Combine(saveDir, "Player.sav"), pBytes);
-            RefreshMiiList();
-            MessageBox.Show("Mii Imported Successfully!");
         }
 
         // --- HELPERS ---
@@ -1250,16 +1073,10 @@ namespace TomoAIO
         }
         private void RefreshMiiList()
         {
-            if (string.IsNullOrEmpty(currentMiiSavPath) || !File.Exists(currentMiiSavPath)) return;
-            byte[] miiBytes = File.ReadAllBytes(currentMiiSavPath);
-            int nO = GetActualOffset(miiBytes, "2499BFDA") + 4;
-            int dO = GetActualOffset(miiBytes, "881CA27A") + 4;
             listBox1.Items.Clear();
-            for (int i = 0; i < 70; i++)
+            foreach (string entry in _miiSaveService.BuildMiiEntries(currentMiiSavPath))
             {
-                if (miiBytes.Skip(dO + (i * 156)).Take(156).Sum(b => (int)b) == 152) continue;
-                byte[] nameB = new byte[64]; Array.Copy(miiBytes, nO + (i * 64), nameB, 0, 64);
-                listBox1.Items.Add($"{i + 1}: {System.Text.Encoding.Unicode.GetString(nameB).Replace("\0", "")}");
+                listBox1.Items.Add(entry);
             }
         }
 
@@ -1418,50 +1235,9 @@ namespace TomoAIO
                 {
                     try
                     {
-                        // 1. Read the original file to get the exact required dimensions
-                        byte[] originalFileBytes = File.ReadAllBytes(fullPath);
-                        byte[] decompressedOriginal;
-                        using (var decompressor = new ZstdSharp.Decompressor())
-                        {
-                            decompressedOriginal = decompressor.Unwrap(originalFileBytes).ToArray();
-                        }
-
-                        int expectedSize = (int)Math.Sqrt(decompressedOriginal.Length / 4);
-
-                        // 2. Load the user's new PNG image and automatically RESIZE it!
-                        Bitmap originalImport = new Bitmap(ofd.FileName);
-                        Bitmap resizedImage = new Bitmap(expectedSize, expectedSize, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-                        using (Graphics g = Graphics.FromImage(resizedImage))
-                        {
-                            // Use high-quality resizing to keep the image looking crisp
-                            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
-
-                            // Draw the imported image onto our perfectly-sized canvas
-                            g.DrawImage(originalImport, new Rectangle(0, 0, expectedSize, expectedSize));
-                        }
-
-                        // 3. Swizzle the newly resized image into a Switch-compatible byte array
-                        byte[] rawSwizzled = EncodeRawTexture(resizedImage);
-
-                        // Memory cleanup
-                        originalImport.Dispose();
-                        resizedImage.Dispose();
-
-                        // 4. Compress the swizzled bytes using Zstandard (Level 9 is safe/efficient)
-                        byte[] compressedData;
-                        using (var compressor = new ZstdSharp.Compressor(9))
-                        {
-                            compressedData = compressor.Wrap(rawSwizzled).ToArray();
-                        }
-
-                        // 5. Overwrite the original .canvas.zs file!
+                        byte[] compressedData = _ugcTextureService.BuildCompressedCanvasPayload(fullPath, ofd.FileName);
                         File.WriteAllBytes(fullPath, compressedData);
                         MessageBox.Show("Custom texture successfully injected!", "Success");
-
-                        // 6. Refresh the preview to show the new custom image
                         lstUGC_SelectedIndexChanged(null, EventArgs.Empty);
                     }
                     catch (Exception ex)
