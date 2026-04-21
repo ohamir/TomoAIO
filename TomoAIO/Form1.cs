@@ -2,6 +2,7 @@ using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -15,6 +16,31 @@ namespace TomoAIO
         string currentMiiSavPath = "";
         string currentUgcPath = "";
         private const int LogoMargin = 12;
+        private readonly Size _baseLogoSize = new Size(175, 160);
+        private readonly Size _baseClientSize = new Size(1343, 745);
+        private readonly Size _baseButtonSize = new Size(366, 285);
+        private const int BaseButtonGap = 45;
+        private const int MiiToolbarWidth = 760;
+        private const int UgcSidebarWidth = 250;
+        private static readonly Color ButtonPrimaryColor = Color.FromArgb(47, 61, 82);
+        private static readonly Color ButtonPrimaryHoverColor = Color.FromArgb(61, 79, 106);
+        private static readonly Color ButtonPrimaryPressedColor = Color.FromArgb(35, 46, 62);
+        private static readonly Color ButtonSecondaryColor = Color.FromArgb(84, 96, 110);
+        private static readonly Color ButtonSecondaryHoverColor = Color.FromArgb(102, 116, 132);
+        private static readonly Color ButtonSecondaryPressedColor = Color.FromArgb(66, 77, 89);
+        private static readonly Color InputBorderColor = Color.FromArgb(61, 79, 106);
+        private static readonly Color InputSurfaceColor = Color.White;
+        private Panel? _comboHost;
+        private Panel? _pathHost;
+        private Label? _pathDisplay;
+        private Label? _actionDropdownText;
+        private Button? _actionDropdownArrow;
+        private ListBox? _actionDropdownList;
+        private bool _actionDropdownOpen;
+        private string? _selectedMiiAction;
+        private readonly string[] _miiActions = { "Import Mii (.ltd)", "Export Mii (.ltd)" };
+        private readonly Dictionary<Control, (Size size, int radius)> _roundedCache = new Dictionary<Control, (Size size, int radius)>();
+        private string _selectedMiiPath = "Choose a Mii file here...";
 
         // The 18 Hash Markers for Personality, Voice, Gender, and Birthday
         string[] persHashes = {
@@ -27,7 +53,30 @@ namespace TomoAIO
         public Form1()
         {
             InitializeComponent();
+            EnableSmoothRendering();
             ConfigureMenuButtons();
+            ConfigureActionButtons();
+            ConfigureInputStyles();
+        }
+
+        private void EnableSmoothRendering()
+        {
+            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
+            UpdateStyles();
+
+            EnableDoubleBuffer(panel1);
+            EnableDoubleBuffer(panelUGC);
+            EnableDoubleBuffer(panelSidebar);
+            EnableDoubleBuffer(listBox1);
+            EnableDoubleBuffer(lstUGC);
+            EnableDoubleBuffer(picPreview);
+        }
+
+        private static void EnableDoubleBuffer(Control control)
+        {
+            typeof(Control)
+                .GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic)?
+                .SetValue(control, true, null);
         }
 
         private void ConfigureMenuButtons()
@@ -36,20 +85,76 @@ namespace TomoAIO
             button1.Parent = pictureBox1;
             button2.Parent = pictureBox1;
             logo.Parent = pictureBox1;
+            logopanel1.Parent = pictureBox2;
             logo.BackColor = Color.Transparent;
+            logopanel1.BackColor = Color.Transparent;
             pictureBox1.SendToBack();
             logo.BringToFront();
+            pictureBox2.SendToBack();
+            logopanel1.BringToFront();
 
             ConfigureTransparentButton(button1);
             ConfigureTransparentButton(button2);
             MakePictureBackgroundTransparent(logo, Color.FromArgb(255, 190, 0), 38);
+            MakePictureBackgroundTransparent(logopanel1, Color.FromArgb(255, 190, 0), 38);
+            MakePictureBackgroundTransparent(logopanel1, Color.White, 65);
+            logopanel1.BackgroundImageLayout = ImageLayout.Zoom;
             PinLogoTopRight();
+            LayoutMainMenuButtons();
+        }
+
+        private void EnsureMenuImages()
+        {
+            if (pictureBox1.Image == null)
+            {
+                pictureBox1.Image = Properties.Resources._2026_04_20_17_04_43;
+            }
+
+            if (button1.BackgroundImage == null)
+            {
+                button1.BackgroundImage = Properties.Resources.mii_import1;
+            }
+
+            if (button2.BackgroundImage == null)
+            {
+                button2.BackgroundImage = Properties.Resources.UGC_CREATOR;
+            }
+
+            if (logo.BackgroundImage == null)
+            {
+                logo.BackgroundImage = Properties.Resources.tomoaio_logo;
+            }
+        }
+
+        private void ShowMainMenu()
+        {
+            panel1.Visible = false;
+            panelUGC.Visible = false;
+            CloseActionDropdown();
+
+            EnsureMenuImages();
+            pictureBox1.Visible = true;
+            pictureBox1.BringToFront();
+            logo.BringToFront();
+            button1.BringToFront();
+            button2.BringToFront();
+
+            PinLogoTopRight();
+            LayoutMainMenuButtons();
+            pictureBox1.Refresh();
         }
 
         private void PinLogoTopRight()
         {
+            float scaleX = ClientSize.Width / (float)_baseClientSize.Width;
+            float scaleY = ClientSize.Height / (float)_baseClientSize.Height;
+            float logoScale = Math.Max(0.6f, Math.Min(1.35f, Math.Min(scaleX, scaleY)));
+            int logoWidth = Math.Max(110, (int)Math.Round(_baseLogoSize.Width * logoScale));
+            int logoHeight = Math.Max(100, (int)Math.Round(_baseLogoSize.Height * logoScale));
+
             if (logo.Parent != null)
             {
+                logo.Size = new Size(logoWidth, logoHeight);
                 logo.Location = new Point(
                     Math.Max(0, logo.Parent.ClientSize.Width - logo.Width - LogoMargin),
                     LogoMargin);
@@ -57,10 +162,178 @@ namespace TomoAIO
 
             if (logopanel1.Parent != null)
             {
+                logopanel1.Size = new Size(logoWidth, logoHeight);
                 logopanel1.Location = new Point(
                     Math.Max(0, logopanel1.Parent.ClientSize.Width - logopanel1.Width - LogoMargin),
                     LogoMargin);
             }
+        }
+
+        private void LayoutMainMenuButtons()
+        {
+            int clientWidth = ClientSize.Width;
+            int clientHeight = ClientSize.Height;
+            if (clientWidth <= 0 || clientHeight <= 0)
+            {
+                return;
+            }
+
+            float scaleX = clientWidth / (float)_baseClientSize.Width;
+            float scaleY = clientHeight / (float)_baseClientSize.Height;
+            float scale = Math.Max(0.6f, Math.Min(scaleX, scaleY));
+
+            int buttonWidth = (int)Math.Round(_baseButtonSize.Width * scale);
+            int buttonHeight = (int)Math.Round(_baseButtonSize.Height * scale);
+            int gap = (int)Math.Round(BaseButtonGap * scale);
+
+            int totalWidth = (buttonWidth * 2) + gap;
+            int startX = Math.Max(20, (clientWidth - totalWidth) / 2);
+            int y = Math.Max(110, (clientHeight - buttonHeight) / 2);
+
+            button1.Size = new Size(buttonWidth, buttonHeight);
+            button2.Size = new Size(buttonWidth, buttonHeight);
+            button1.Location = new Point(startX, y);
+            button2.Location = new Point(startX + buttonWidth + gap, y);
+        }
+
+        private void LayoutMiiEditorControls()
+        {
+            if (_comboHost == null || _pathHost == null || _pathDisplay == null || _actionDropdownText == null || _actionDropdownArrow == null || _actionDropdownList == null)
+            {
+                return;
+            }
+
+            int panelWidth = Math.Max(1, panel1.ClientSize.Width);
+            int panelHeight = Math.Max(1, panel1.ClientSize.Height);
+
+            float scaleX = panelWidth / 1343f;
+            float scaleY = panelHeight / 745f;
+            float uiScale = Math.Max(0.8f, Math.Min(1.35f, Math.Min(scaleX, scaleY)));
+
+            int outerMargin = Math.Max(14, (int)Math.Round(24 * uiScale));
+            int top = Math.Max(10, (int)Math.Round(12 * uiScale));
+            int rowGap = Math.Max(8, (int)Math.Round(12 * uiScale));
+
+            int maxArea = Math.Max(220, panelWidth - (outerMargin * 2));
+            int areaWidth = Math.Min((int)Math.Round(panelWidth * 0.72f), maxArea);
+            areaWidth = Math.Max(260, areaWidth);
+            areaWidth = Math.Min(areaWidth, maxArea);
+            int left = Math.Max(outerMargin, (panelWidth - areaWidth) / 2);
+
+            int buttonHeight = Math.Max(34, (int)Math.Round(36 * uiScale));
+            int comboHeight = buttonHeight;
+            int labelHeight = Math.Max(18, (int)Math.Round(18 * uiScale));
+            int pathHeight = buttonHeight;
+            int browseWidth = Math.Max(92, (int)Math.Round(116 * uiScale));
+            browseWidth = Math.Min(browseWidth, Math.Max(92, (int)Math.Round(areaWidth * 0.35f)));
+            int goWidth = Math.Max(118, (int)Math.Round(130 * uiScale));
+            int goHeight = Math.Max(40, (int)Math.Round(42 * uiScale));
+            int topButtonWidth = Math.Max(162, (int)Math.Round(170 * uiScale));
+
+            // Top row: back and load buttons aligned to same baseline.
+            button3.Location = new Point(left, top);
+            button3.Size = new Size(topButtonWidth, buttonHeight);
+
+            button4.Location = new Point(left + areaWidth - topButtonWidth, top);
+            button4.Size = new Size(topButtonWidth, buttonHeight);
+
+            int comboWidth = Math.Max(140, Math.Min(340, (int)Math.Round(areaWidth * 0.38f)));
+            _comboHost!.Location = new Point(left, button3.Bottom + rowGap);
+            _comboHost.Size = new Size(comboWidth, comboHeight);
+            int arrowWidth = Math.Max(28, (int)Math.Round(30 * uiScale));
+            _actionDropdownArrow.Size = new Size(arrowWidth, Math.Max(20, _comboHost.Height - 2));
+            _actionDropdownArrow.Location = new Point(_comboHost.Width - arrowWidth - 1, 1);
+            _actionDropdownText.Location = new Point(8, 1);
+            _actionDropdownText.Size = new Size(Math.Max(70, _comboHost.Width - arrowWidth - 10), Math.Max(20, _comboHost.Height - 2));
+            _actionDropdownList.Location = new Point(_comboHost.Left, _comboHost.Bottom + 2);
+            _actionDropdownList.Size = new Size(_comboHost.Width, Math.Max(60, _miiActions.Length * 28));
+            _actionDropdownList.BringToFront();
+
+            label1.Location = new Point(left + 2, _comboHost.Bottom + rowGap);
+            label1.Height = labelHeight;
+
+            _pathHost!.Location = new Point(left, label1.Bottom + 4);
+            _pathHost.Size = new Size(Math.Max(140, areaWidth - browseWidth - 8), pathHeight);
+            PositionPathDisplay();
+
+            bool compactMode = areaWidth < 500;
+            if (compactMode)
+            {
+                _pathHost.Size = new Size(areaWidth, pathHeight);
+                PositionPathDisplay();
+                btnBrowseMii.Location = new Point(left, _pathHost.Bottom + 6);
+                btnBrowseMii.Size = new Size(Math.Max(110, Math.Min(areaWidth, comboWidth)), pathHeight);
+            }
+            else
+            {
+                btnBrowseMii.Location = new Point(_pathHost.Right + 8, _pathHost.Top);
+                btnBrowseMii.Size = new Size(browseWidth, pathHeight);
+            }
+
+            btnGo.Size = new Size(goWidth, goHeight);
+            btnGo.Location = new Point(left + ((areaWidth - goWidth) / 2), btnBrowseMii.Bottom + 14);
+
+            listBox1.Location = new Point(left, btnGo.Bottom + 12);
+            int listHeight = Math.Max(120, panel1.ClientSize.Height - listBox1.Top - 20);
+            listBox1.Size = new Size(areaWidth, listHeight);
+        }
+
+        private void PositionPathDisplay()
+        {
+            if (_pathHost == null || _pathDisplay == null)
+            {
+                return;
+            }
+
+            _pathDisplay.Dock = DockStyle.Fill;
+            _pathDisplay.Padding = new Padding(8, 0, 8, 0);
+        }
+
+        private void LayoutUgcEditorControls()
+        {
+            int panelWidth = panelUGC.ClientSize.Width;
+            int panelHeight = panelUGC.ClientSize.Height;
+            if (panelWidth <= 0 || panelHeight <= 0)
+            {
+                return;
+            }
+
+            panelSidebar.Width = UgcSidebarWidth;
+
+            int contentLeft = panelSidebar.Width + 20;
+            int contentRight = panelWidth - 20;
+            int contentWidth = Math.Max(220, contentRight - contentLeft);
+            int top = 16;
+            int bottomAreaHeight = 70;
+            int gap = 12;
+
+            int availableHeight = Math.Max(200, panelHeight - top - bottomAreaHeight - (gap * 2));
+            int squareSize = Math.Max(180, Math.Min(contentWidth, availableHeight));
+            int squareX = contentLeft + ((contentWidth - squareSize) / 2);
+            int squareY = top;
+
+            picPreview.Location = new Point(squareX, squareY);
+            picPreview.Size = new Size(squareSize, squareSize);
+
+            int buttonY = picPreview.Bottom + gap;
+            int buttonWidth = Math.Max(120, Math.Min(280, (squareSize - gap) / 2));
+            int totalButtonsWidth = (buttonWidth * 2) + gap;
+            int buttonsLeft = squareX + ((squareSize - totalButtonsWidth) / 2);
+
+            btnUgcImport.Location = new Point(buttonsLeft, buttonY);
+            btnUgcImport.Size = new Size(buttonWidth, 44);
+
+            btnUgcExport.Location = new Point(btnUgcImport.Right + gap, buttonY);
+            btnUgcExport.Size = new Size(buttonWidth, 44);
+
+            lblImageInfo.AutoSize = false;
+            lblImageInfo.TextAlign = ContentAlignment.MiddleCenter;
+            lblImageInfo.Location = new Point(squareX, btnUgcImport.Bottom + 6);
+            lblImageInfo.Size = new Size(squareSize, 20);
+
+            btnUgcBack.Size = new Size(154, 38);
+            btnUgcBack.Location = new Point(contentLeft, top);
+            btnUgcBack.BringToFront();
         }
 
         private void ConfigureTransparentButton(Button button)
@@ -72,6 +345,272 @@ namespace TomoAIO
             button.FlatAppearance.MouseOverBackColor = Color.Transparent;
             button.FlatAppearance.MouseDownBackColor = Color.Transparent;
             button.TabStop = false;
+        }
+
+        private void ConfigureActionButtons()
+        {
+            button3.Text = "Back to Menu";
+            btnUgcBack.Text = "Back to Menu";
+
+            StyleActionButton(button4, ButtonPrimaryColor, ButtonPrimaryHoverColor, ButtonPrimaryPressedColor);
+            StyleActionButton(btnBrowseMii, ButtonPrimaryColor, ButtonPrimaryHoverColor, ButtonPrimaryPressedColor);
+            StyleActionButton(btnGo, ButtonPrimaryColor, ButtonPrimaryHoverColor, ButtonPrimaryPressedColor);
+            StyleActionButton(btnUgcImport, ButtonPrimaryColor, ButtonPrimaryHoverColor, ButtonPrimaryPressedColor);
+            StyleActionButton(btnUgcExport, ButtonPrimaryColor, ButtonPrimaryHoverColor, ButtonPrimaryPressedColor);
+            StyleActionButton(button3, ButtonSecondaryColor, ButtonSecondaryHoverColor, ButtonSecondaryPressedColor);
+            StyleActionButton(btnUgcBack, ButtonSecondaryColor, ButtonSecondaryHoverColor, ButtonSecondaryPressedColor);
+        }
+
+        private void StyleActionButton(Button button, Color baseColor, Color hoverColor, Color pressedColor)
+        {
+            button.FlatStyle = FlatStyle.Flat;
+            button.FlatAppearance.BorderSize = 1;
+            button.FlatAppearance.BorderColor = Color.Black;
+            button.FlatAppearance.MouseOverBackColor = hoverColor;
+            button.FlatAppearance.MouseDownBackColor = pressedColor;
+            button.UseVisualStyleBackColor = false;
+            button.BackColor = baseColor;
+            button.ForeColor = Color.White;
+            button.Font = new Font("Segoe UI Semibold", 10F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            button.Cursor = Cursors.Hand;
+            button.TextAlign = ContentAlignment.MiddleCenter;
+            button.Padding = new Padding(8, 3, 8, 3);
+            button.AutoEllipsis = false;
+            ApplyRoundedCorners(button, 8);
+            button.Resize += (_, _) => ApplyRoundedCorners(button, 8);
+        }
+
+        private void ConfigureInputStyles()
+        {
+            CreateInputHosts();
+
+            cmbMiiAction.Visible = false;
+            ConfigureCustomActionDropdown();
+
+            txtMiiPath.BackColor = InputSurfaceColor;
+            txtMiiPath.ForeColor = Color.FromArgb(28, 36, 52);
+            txtMiiPath.BorderStyle = BorderStyle.None;
+            txtMiiPath.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            txtMiiPath.Visible = false;
+
+            label1.Font = new Font("Segoe UI Semibold", 9.5F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label1.ForeColor = Color.FromArgb(32, 39, 55);
+            label1.BackColor = Color.Transparent;
+
+            listBox1.BorderStyle = BorderStyle.FixedSingle;
+            listBox1.Font = new Font("Segoe UI", 9.5F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            listBox1.BackColor = Color.FromArgb(248, 250, 254);
+            listBox1.ForeColor = Color.FromArgb(30, 38, 52);
+        }
+
+        private void CreateInputHosts()
+        {
+            if (_comboHost == null)
+            {
+                _comboHost = new Panel
+                {
+                    BackColor = InputBorderColor
+                };
+                panel1.Controls.Add(_comboHost);
+                _comboHost.BringToFront();
+            }
+
+            if (_pathHost == null)
+            {
+                _pathHost = new Panel
+                {
+                    BackColor = InputBorderColor,
+                    Padding = new Padding(1)
+                };
+                panel1.Controls.Add(_pathHost);
+                _pathHost.BringToFront();
+            }
+
+            if (_pathDisplay == null)
+            {
+                _pathDisplay = new Label
+                {
+                    Text = _selectedMiiPath,
+                    AutoSize = false,
+                    TextAlign = ContentAlignment.MiddleLeft,
+                    BackColor = InputSurfaceColor,
+                    ForeColor = Color.FromArgb(28, 36, 52),
+                    Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0),
+                    AutoEllipsis = true,
+                    Dock = DockStyle.Fill,
+                    Padding = new Padding(8, 0, 8, 0)
+                };
+                _pathHost.Controls.Add(_pathDisplay);
+            }
+
+            _comboHost.BringToFront();
+            _pathHost.BringToFront();
+            label1.BringToFront();
+            btnBrowseMii.BringToFront();
+        }
+
+        private void SetSelectedMiiPath(string path)
+        {
+            _selectedMiiPath = path;
+            txtMiiPath.Text = path;
+            if (_pathDisplay != null)
+            {
+                _pathDisplay.Text = path;
+            }
+        }
+
+        private void ConfigureCustomActionDropdown()
+        {
+            if (_comboHost == null)
+            {
+                return;
+            }
+
+            if (_actionDropdownText == null)
+            {
+                _actionDropdownText = new Label
+                {
+                    Text = "Select Action...",
+                    AutoSize = false,
+                    TextAlign = ContentAlignment.MiddleLeft,
+                    BackColor = InputSurfaceColor,
+                    ForeColor = Color.FromArgb(28, 36, 52),
+                    Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0),
+                    Cursor = Cursors.Hand,
+                    Padding = new Padding(8, 0, 8, 0)
+                };
+                _actionDropdownText.Click += (_, _) => ToggleActionDropdown();
+                _comboHost.Controls.Add(_actionDropdownText);
+            }
+
+            if (_actionDropdownArrow == null)
+            {
+                _actionDropdownArrow = new Button
+                {
+                    Text = "▼",
+                    FlatStyle = FlatStyle.Flat,
+                    BackColor = InputSurfaceColor,
+                    ForeColor = Color.FromArgb(40, 50, 68),
+                    Cursor = Cursors.Hand,
+                    TabStop = false
+                };
+                _actionDropdownArrow.FlatAppearance.BorderSize = 0;
+                _actionDropdownArrow.Click += (_, _) => ToggleActionDropdown();
+                _comboHost.Controls.Add(_actionDropdownArrow);
+            }
+
+            if (_actionDropdownList == null)
+            {
+                _actionDropdownList = new ListBox
+                {
+                    Visible = false,
+                    BackColor = InputSurfaceColor,
+                    ForeColor = Color.FromArgb(28, 36, 52),
+                    BorderStyle = BorderStyle.FixedSingle,
+                    Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0),
+                    IntegralHeight = false
+                };
+                _actionDropdownList.Items.AddRange(_miiActions);
+                _actionDropdownList.Click += (_, _) =>
+                {
+                    if (_actionDropdownList.SelectedItem is string action)
+                    {
+                        _selectedMiiAction = action;
+                        _actionDropdownText!.Text = action;
+                    }
+                    CloseActionDropdown();
+                };
+                panel1.Controls.Add(_actionDropdownList);
+            }
+
+            panel1.MouseDown -= PanelMouseDownCloseDropdown;
+            panel1.MouseDown += PanelMouseDownCloseDropdown;
+        }
+
+        private void PanelMouseDownCloseDropdown(object? sender, MouseEventArgs e)
+        {
+            if (_actionDropdownOpen)
+            {
+                CloseActionDropdown();
+            }
+        }
+
+        private void ToggleActionDropdown()
+        {
+            if (_actionDropdownList == null)
+            {
+                return;
+            }
+
+            _actionDropdownOpen = !_actionDropdownOpen;
+            _actionDropdownList.Visible = _actionDropdownOpen;
+            _actionDropdownList.BringToFront();
+            if (_actionDropdownArrow != null)
+            {
+                _actionDropdownArrow.Text = _actionDropdownOpen ? "▲" : "▼";
+            }
+        }
+
+        private void CloseActionDropdown()
+        {
+            _actionDropdownOpen = false;
+            if (_actionDropdownList != null)
+            {
+                _actionDropdownList.Visible = false;
+            }
+            if (_actionDropdownArrow != null)
+            {
+                _actionDropdownArrow.Text = "▼";
+            }
+        }
+
+        private void cmbMiiAction_DrawItem(object? sender, DrawItemEventArgs e)
+        {
+            if (e.Index < 0)
+            {
+                return;
+            }
+
+            bool isSelected = (e.State & DrawItemState.Selected) == DrawItemState.Selected;
+            Color bgColor = isSelected ? Color.FromArgb(232, 238, 248) : InputSurfaceColor;
+            using SolidBrush bgBrush = new SolidBrush(bgColor);
+            using SolidBrush textBrush = new SolidBrush(Color.FromArgb(28, 36, 52));
+            e.Graphics.FillRectangle(bgBrush, e.Bounds);
+            string itemText = cmbMiiAction.Items[e.Index]?.ToString() ?? string.Empty;
+            Rectangle textRect = new Rectangle(e.Bounds.X + 8, e.Bounds.Y + 1, e.Bounds.Width - 8, e.Bounds.Height - 2);
+            e.Graphics.DrawString(itemText, cmbMiiAction.Font, textBrush, textRect);
+            e.DrawFocusRectangle();
+        }
+
+        private void ApplyRoundedCorners(Control control, int radius)
+        {
+            if (control.Width <= 0 || control.Height <= 0)
+            {
+                return;
+            }
+
+            if (_roundedCache.TryGetValue(control, out var cached) &&
+                cached.size == control.Size &&
+                cached.radius == radius)
+            {
+                return;
+            }
+
+            int maxRadius = Math.Max(2, Math.Min(control.Width, control.Height) / 2);
+            int effectiveRadius = Math.Min(radius, maxRadius);
+            int diameter = effectiveRadius * 2;
+
+            GraphicsPath path = new GraphicsPath();
+            path.AddArc(0, 0, diameter, diameter, 180, 90);
+            path.AddArc(control.Width - diameter, 0, diameter, diameter, 270, 90);
+            path.AddArc(control.Width - diameter, control.Height - diameter, diameter, diameter, 0, 90);
+            path.AddArc(0, control.Height - diameter, diameter, diameter, 90, 90);
+            path.CloseFigure();
+
+            control.Region?.Dispose();
+            control.Region = new Region(path);
+            path.Dispose();
+            _roundedCache[control] = (control.Size, radius);
         }
 
         private void MakePictureBackgroundTransparent(PictureBox pictureBox, Color targetColor, int tolerance)
@@ -428,7 +967,12 @@ namespace TomoAIO
             if (sfd.ShowDialog() == DialogResult.OK)
             {
                 byte[] miiBytes = File.ReadAllBytes(currentMiiSavPath);
-                string saveDir = Path.GetDirectoryName(currentMiiSavPath);
+                string? saveDir = Path.GetDirectoryName(currentMiiSavPath);
+                if (string.IsNullOrWhiteSpace(saveDir))
+                {
+                    MessageBox.Show("Save folder path is invalid.", "TomoAIO");
+                    return;
+                }
 
                 using (MemoryStream ms = new MemoryStream())
                 using (BinaryWriter bw = new BinaryWriter(ms))
@@ -509,7 +1053,12 @@ namespace TomoAIO
 
             byte[] pkg = pkgList.ToArray();
             byte[] miiBytes = File.ReadAllBytes(currentMiiSavPath);
-            string saveDir = Path.GetDirectoryName(currentMiiSavPath);
+            string? saveDir = Path.GetDirectoryName(currentMiiSavPath);
+            if (string.IsNullOrWhiteSpace(saveDir))
+            {
+                MessageBox.Show("Save folder path is invalid.", "TomoAIO");
+                return;
+            }
             byte[] pBytes = File.ReadAllBytes(Path.Combine(saveDir, "Player.sav"));
 
             int dnaO = GetActualOffset(miiBytes, "881CA27A") + 4;
@@ -606,7 +1155,11 @@ namespace TomoAIO
 
         private void CreateSaveBackup()
         {
-            string sD = Path.GetDirectoryName(currentMiiSavPath);
+            string? sD = Path.GetDirectoryName(currentMiiSavPath);
+            if (string.IsNullOrWhiteSpace(sD) || !Directory.Exists(sD))
+            {
+                return;
+            }
             string bD = Path.Combine(Application.StartupPath, "backup", DateTime.Now.ToString("dd_MM_yyyy_HHmmss"));
             Directory.CreateDirectory(bD);
             foreach (string f in Directory.GetFiles(sD)) File.Copy(f, Path.Combine(bD, Path.GetFileName(f)));
@@ -667,8 +1220,14 @@ namespace TomoAIO
 
         // --- NAVIGATION & DESIGNER HANDSHAKES ---
 
-        private void button1_Click(object sender, EventArgs e) { panel1.Visible = true; panel1.BringToFront(); }
-        private void button3_Click(object sender, EventArgs e) { panel1.Visible = false; }
+        private void button1_Click(object sender, EventArgs e)
+        {
+            panel1.Visible = true;
+            panel1.BringToFront();
+            PinLogoTopRight();
+            LayoutMiiEditorControls();
+        }
+        private void button3_Click(object sender, EventArgs e) { ShowMainMenu(); }
         private void button2_Click(object sender, EventArgs e)
         {
             using (FolderBrowserDialog fbd = new FolderBrowserDialog())
@@ -684,6 +1243,7 @@ namespace TomoAIO
                     {
                         panelUGC.Visible = true;
                         panelUGC.BringToFront();
+                        LayoutUgcEditorControls();
                     }
                     // If the list is empty, the panel remains hidden and 
                     // the user stays on the main menu.
@@ -705,24 +1265,29 @@ namespace TomoAIO
 
         private void button5_Click(object sender, EventArgs e)
         {
-            if (listBox1.SelectedItem == null || cmbMiiAction.SelectedItem == null)
+            if (listBox1.SelectedItem == null || string.IsNullOrWhiteSpace(_selectedMiiAction))
             {
                 MessageBox.Show("Please select a Mii and an action!", "Missing Information");
                 return;
             }
 
-            string sel = listBox1.SelectedItem.ToString();
+            string? sel = listBox1.SelectedItem.ToString();
+            if (string.IsNullOrWhiteSpace(sel) || !sel.Contains(':'))
+            {
+                MessageBox.Show("Selected Mii entry is invalid.", "TomoAIO");
+                return;
+            }
             int slot = int.Parse(sel.Split(':')[0]) - 1;
             string name = sel.Split(':')[1].Trim();
 
-            if (cmbMiiAction.SelectedItem.ToString().Contains("Export"))
+            if (_selectedMiiAction.Contains("Export"))
             {
                 ExportMii(slot, name);
             }
             else
             {
                 // Pass the file path from the text box directly into the importer!
-                ImportMii(slot, txtMiiPath.Text);
+                ImportMii(slot, _selectedMiiPath);
             }
         }
 
@@ -731,7 +1296,7 @@ namespace TomoAIO
             using (OpenFileDialog ofd = new OpenFileDialog())
             {
                 ofd.Filter = "Mii Data Files (*.mii;*.ltd;*.sav)|*.mii;*.ltd;*.sav";
-                if (ofd.ShowDialog() == DialogResult.OK) txtMiiPath.Text = ofd.FileName;
+                if (ofd.ShowDialog() == DialogResult.OK) SetSelectedMiiPath(ofd.FileName);
             }
         }
 
@@ -742,16 +1307,32 @@ namespace TomoAIO
             lblImageInfo.Text = "Waiting for selection...";
             label2.BringToFront();
             PinLogoTopRight();
+            LayoutMainMenuButtons();
+            LayoutMiiEditorControls();
+            LayoutUgcEditorControls();
         }
         private void Form1_Shown(object sender, EventArgs e)
         {
             PinLogoTopRight();
+            LayoutMainMenuButtons();
+            LayoutMiiEditorControls();
+            LayoutUgcEditorControls();
         }
         private void pictureBox3_Click(object sender, EventArgs e) { }
         private void pictureBox1_Click(object sender, EventArgs e) { }
-        private void txtMiiPath_TextChanged(object sender, EventArgs e) { }
+        private void txtMiiPath_TextChanged(object sender, EventArgs e)
+        {
+            if (_pathDisplay != null && _pathDisplay.Text != txtMiiPath.Text)
+            {
+                _pathDisplay.Text = txtMiiPath.Text;
+            }
+        }
         private void txtMiiPath_DragEnter(object sender, DragEventArgs e) { if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy; }
-        private void txtMiiPath_DragDrop(object sender, DragEventArgs e) { string[] f = (string[])e.Data.GetData(DataFormats.FileDrop); if (f.Length > 0) txtMiiPath.Text = f[0]; }
+        private void txtMiiPath_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] f = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if (f.Length > 0) SetSelectedMiiPath(f[0]);
+        }
         private void label2_Click(object sender, EventArgs e) { }
         private void btnUgcExport_Click(object sender, EventArgs e)
         {
@@ -855,7 +1436,7 @@ namespace TomoAIO
             lblImageInfo.Text = "Waiting for selection...";
 
             // 2. Simply hide the UGC Editor panel to reveal the main menu underneath!
-            panelUGC.Visible = false;
+            ShowMainMenu();
 
             // (Notice we completely removed the references to panel1 here)
         }
@@ -863,7 +1444,23 @@ namespace TomoAIO
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
-            PinLogoTopRight();
+            CloseActionDropdown();
+            SuspendLayout();
+            panel1.SuspendLayout();
+            panelUGC.SuspendLayout();
+            try
+            {
+                PinLogoTopRight();
+                LayoutMainMenuButtons();
+                LayoutMiiEditorControls();
+                LayoutUgcEditorControls();
+            }
+            finally
+            {
+                panelUGC.ResumeLayout(false);
+                panel1.ResumeLayout(false);
+                ResumeLayout(false);
+            }
         }
     }
 }
