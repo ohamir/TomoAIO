@@ -31,6 +31,7 @@
             button1 = new Button();
             button2 = new Button();
             panel1 = new Panel();
+            btnDiscord = new Button();
             btnBrowseMii = new Button();
             txtMiiPath = new TextBox();
             label1 = new Label();
@@ -42,6 +43,7 @@
             logopanel1 = new PictureBox();
             pictureBox2 = new PictureBox();
             panelUGC = new Panel();
+            pictureBox3 = new PictureBox();
             btnUgcBack = new Button();
             btnUgcExport = new Button();
             btnUgcImport = new Button();
@@ -56,6 +58,7 @@
             ((System.ComponentModel.ISupportInitialize)logopanel1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
             panelUGC.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
             ((System.ComponentModel.ISupportInitialize)picPreview).BeginInit();
             panelSidebar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
@@ -72,7 +75,7 @@
             button1.Cursor = Cursors.Hand;
             button1.FlatAppearance.BorderSize = 0;
             button1.FlatStyle = FlatStyle.Flat;
-            button1.Location = new Point(277, 220);
+            button1.Location = new Point(312, 254);
             button1.Margin = new Padding(3, 2, 3, 2);
             button1.Name = "button1";
             button1.Size = new Size(366, 285);
@@ -89,7 +92,7 @@
             button2.Cursor = Cursors.Hand;
             button2.FlatAppearance.BorderSize = 0;
             button2.FlatStyle = FlatStyle.Flat;
-            button2.Location = new Point(688, 220);
+            button2.Location = new Point(723, 254);
             button2.Margin = new Padding(3, 2, 3, 2);
             button2.Name = "button2";
             button2.Size = new Size(366, 285);
@@ -114,15 +117,24 @@
             panel1.Margin = new Padding(3, 2, 3, 2);
             panel1.MinimumSize = new Size(700, 376);
             panel1.Name = "panel1";
-            panel1.Size = new Size(1343, 745);
+            panel1.Size = new Size(1412, 813);
             panel1.TabIndex = 3;
             panel1.Visible = false;
             panel1.Paint += panel1_Paint;
             // 
+            // btnDiscord
+            // 
+            btnDiscord.Location = new Point(1335, 745);
+            btnDiscord.Name = "btnDiscord";
+            btnDiscord.Size = new Size(75, 65);
+            btnDiscord.TabIndex = 14;
+            btnDiscord.Text = "button5";
+            btnDiscord.UseVisualStyleBackColor = true;
+            // 
             // btnBrowseMii
             // 
             btnBrowseMii.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnBrowseMii.Location = new Point(906, 130);
+            btnBrowseMii.Location = new Point(975, 130);
             btnBrowseMii.Name = "btnBrowseMii";
             btnBrowseMii.Size = new Size(75, 23);
             btnBrowseMii.TabIndex = 10;
@@ -137,7 +149,7 @@
             txtMiiPath.Location = new Point(298, 131);
             txtMiiPath.Name = "txtMiiPath";
             txtMiiPath.ReadOnly = true;
-            txtMiiPath.Size = new Size(602, 23);
+            txtMiiPath.Size = new Size(671, 23);
             txtMiiPath.TabIndex = 9;
             txtMiiPath.Text = "Choose a Mii file here...";
             txtMiiPath.TextChanged += txtMiiPath_TextChanged;
@@ -203,7 +215,7 @@
             listBox1.Location = new Point(152, 214);
             listBox1.Margin = new Padding(3, 2, 3, 2);
             listBox1.Name = "listBox1";
-            listBox1.Size = new Size(1040, 454);
+            listBox1.Size = new Size(1109, 514);
             listBox1.TabIndex = 0;
             // 
             // logopanel1
@@ -212,7 +224,7 @@
             logopanel1.BackColor = Color.Transparent;
             logopanel1.BackgroundImage = Properties.Resources.tomoaio_logo;
             logopanel1.BackgroundImageLayout = ImageLayout.Stretch;
-            logopanel1.Location = new Point(1166, 3);
+            logopanel1.Location = new Point(1235, 3);
             logopanel1.Name = "logopanel1";
             logopanel1.Size = new Size(175, 160);
             logopanel1.TabIndex = 12;
@@ -225,13 +237,15 @@
             pictureBox2.Image = Properties.Resources.tomo1;
             pictureBox2.Location = new Point(0, 0);
             pictureBox2.Name = "pictureBox2";
-            pictureBox2.Size = new Size(1343, 745);
+            pictureBox2.Size = new Size(1412, 813);
             pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox2.TabIndex = 7;
             pictureBox2.TabStop = false;
             // 
             // panelUGC
             // 
+            panelUGC.BackgroundImage = Properties.Resources.tomo1;
+            panelUGC.Controls.Add(pictureBox3);
             panelUGC.Controls.Add(btnUgcBack);
             panelUGC.Controls.Add(btnUgcExport);
             panelUGC.Controls.Add(btnUgcImport);
@@ -241,9 +255,21 @@
             panelUGC.Dock = DockStyle.Fill;
             panelUGC.Location = new Point(0, 0);
             panelUGC.Name = "panelUGC";
-            panelUGC.Size = new Size(1343, 745);
+            panelUGC.Size = new Size(1412, 813);
             panelUGC.TabIndex = 13;
             panelUGC.Visible = false;
+            // 
+            // pictureBox3
+            // 
+            pictureBox3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            pictureBox3.BackColor = Color.Transparent;
+            pictureBox3.BackgroundImage = Properties.Resources.tomoaio_logo;
+            pictureBox3.BackgroundImageLayout = ImageLayout.Stretch;
+            pictureBox3.Location = new Point(1234, 3);
+            pictureBox3.Name = "pictureBox3";
+            pictureBox3.Size = new Size(175, 160);
+            pictureBox3.TabIndex = 12;
+            pictureBox3.TabStop = false;
             // 
             // btnUgcBack
             // 
@@ -258,7 +284,7 @@
             // btnUgcExport
             // 
             btnUgcExport.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            btnUgcExport.Location = new Point(1012, 674);
+            btnUgcExport.Location = new Point(1081, 742);
             btnUgcExport.Name = "btnUgcExport";
             btnUgcExport.Size = new Size(301, 65);
             btnUgcExport.TabIndex = 4;
@@ -269,7 +295,7 @@
             // btnUgcImport
             // 
             btnUgcImport.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            btnUgcImport.Location = new Point(322, 674);
+            btnUgcImport.Location = new Point(322, 742);
             btnUgcImport.Name = "btnUgcImport";
             btnUgcImport.Size = new Size(301, 65);
             btnUgcImport.TabIndex = 3;
@@ -281,7 +307,7 @@
             // 
             lblImageInfo.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             lblImageInfo.AutoSize = true;
-            lblImageInfo.Location = new Point(647, 699);
+            lblImageInfo.Location = new Point(647, 767);
             lblImageInfo.Name = "lblImageInfo";
             lblImageInfo.Size = new Size(38, 15);
             lblImageInfo.TabIndex = 2;
@@ -294,7 +320,7 @@
             picPreview.BackColor = Color.White;
             picPreview.Location = new Point(322, 8);
             picPreview.Name = "picPreview";
-            picPreview.Size = new Size(991, 660);
+            picPreview.Size = new Size(1060, 728);
             picPreview.SizeMode = PictureBoxSizeMode.Zoom;
             picPreview.TabIndex = 1;
             picPreview.TabStop = false;
@@ -309,7 +335,7 @@
             panelSidebar.Location = new Point(0, 0);
             panelSidebar.Name = "panelSidebar";
             panelSidebar.Padding = new Padding(0, 28, 0, 0);
-            panelSidebar.Size = new Size(250, 745);
+            panelSidebar.Size = new Size(250, 813);
             panelSidebar.TabIndex = 0;
             // 
             // label2
@@ -332,7 +358,7 @@
             lstUGC.FormattingEnabled = true;
             lstUGC.Location = new Point(0, 28);
             lstUGC.Name = "lstUGC";
-            lstUGC.Size = new Size(250, 717);
+            lstUGC.Size = new Size(250, 785);
             lstUGC.TabIndex = 0;
             lstUGC.SelectedIndexChanged += lstUGC_SelectedIndexChanged;
             // 
@@ -343,7 +369,7 @@
             pictureBox1.Image = Properties.Resources.tomo1;
             pictureBox1.Location = new Point(0, 0);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(1343, 745);
+            pictureBox1.Size = new Size(1412, 813);
             pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox1.TabIndex = 6;
             pictureBox1.TabStop = false;
@@ -355,7 +381,7 @@
             logo.BackColor = Color.Transparent;
             logo.BackgroundImage = Properties.Resources.tomoaio_logo;
             logo.BackgroundImageLayout = ImageLayout.Stretch;
-            logo.Location = new Point(1166, 3);
+            logo.Location = new Point(1235, 3);
             logo.Name = "logo";
             logo.Size = new Size(175, 160);
             logo.TabIndex = 11;
@@ -367,10 +393,11 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(255, 190, 0);
-            ClientSize = new Size(1343, 745);
+            ClientSize = new Size(1412, 813);
             Controls.Add(logo);
             Controls.Add(button2);
             Controls.Add(button1);
+            Controls.Add(btnDiscord);
             Controls.Add(panel1);
             Controls.Add(pictureBox1);
             Controls.Add(panelUGC);
@@ -385,6 +412,7 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
             panelUGC.ResumeLayout(false);
             panelUGC.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
             ((System.ComponentModel.ISupportInitialize)picPreview).EndInit();
             panelSidebar.ResumeLayout(false);
             panelSidebar.PerformLayout();
@@ -419,5 +447,9 @@
         private Button btnUgcImport;
         private Label label2;
         private Button btnUgcBack;
+        private Button discord;
+        private Button discsord2;
+        private PictureBox pictureBox3;
+        private Button btnDiscord;
     }
 }

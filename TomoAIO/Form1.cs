@@ -1462,5 +1462,15 @@ namespace TomoAIO
                 ResumeLayout(false);
             }
         }
+
+        private void button5_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnDiscord_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("https://discord.gg/JmEttdwE5J") { UseShellExecute = true });
+        }
     }
 }
