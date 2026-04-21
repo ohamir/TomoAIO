@@ -1,4 +1,4 @@
-# TomoAIO - Living the Dream Toolkit (v1.0)
+# TomoAIO - Living the Dream Tool (v1.0)
 
 Welcome to **TomoAIO**, the ultimate All-In-One save editing and modding toolkit for Tomodachi Life: Living the Dream Mii data and User Generated Content (UGC). 
 
