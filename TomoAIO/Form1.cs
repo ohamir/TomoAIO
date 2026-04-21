@@ -42,7 +42,6 @@ namespace TomoAIO
         private readonly Dictionary<Control, (Size size, int radius)> _roundedCache = new Dictionary<Control, (Size size, int radius)>();
         private string _selectedMiiPath = "Choose a Mii file here...";
 
-        // The 18 Hash Markers for Personality, Voice, Gender, and Birthday
         string[] persHashes = {
             "43CD364F", "CD8DBAF8", "25B48224", "607BA160", "68E1134E", // Personality P1-P5
             "4913AE1A", "141EE086", "07B9D175", "81CF470A", "4D78E262", "FBC3FFB0", // Voice V1-V6
@@ -82,7 +81,6 @@ namespace TomoAIO
 
         private void ConfigureMenuButtons()
         {
-            // In WinForms, transparent buttons must share the same parent as the background image.
             button1.Parent = pictureBox1;
             button2.Parent = pictureBox1;
             logo.Parent = pictureBox1;
@@ -275,7 +273,6 @@ namespace TomoAIO
             int goHeight = Math.Max(40, (int)Math.Round(42 * uiScale));
             int topButtonWidth = Math.Max(162, (int)Math.Round(170 * uiScale));
 
-            // Top row: back and load buttons aligned to same baseline.
             button3.Location = new Point(left, top);
             button3.Size = new Size(topButtonWidth, buttonHeight);
 
@@ -768,8 +765,6 @@ namespace TomoAIO
             byte[] linearData = new byte[width * height * bpp];
             System.Runtime.InteropServices.Marshal.Copy(bmpData.Scan0, linearData, 0, linearData.Length);
             clone.UnlockBits(bmpData);
-
-            // Standard Tegra Block Height
             int blockHeight = 16;
             if (height <= 128) blockHeight = 8;
             if (height <= 64) blockHeight = 4;
@@ -785,11 +780,10 @@ namespace TomoAIO
 
                     if (swizzledOffset + 3 < swizzledData.Length)
                     {
-                        // Swap Windows BGRA back to Switch RGBA
-                        swizzledData[swizzledOffset + 0] = linearData[linearOffset + 2]; // Red
-                        swizzledData[swizzledOffset + 1] = linearData[linearOffset + 1]; // Green
-                        swizzledData[swizzledOffset + 2] = linearData[linearOffset + 0]; // Blue
-                        swizzledData[swizzledOffset + 3] = linearData[linearOffset + 3]; // Alpha
+                        swizzledData[swizzledOffset + 0] = linearData[linearOffset + 2]; 
+                        swizzledData[swizzledOffset + 1] = linearData[linearOffset + 1]; 
+                        swizzledData[swizzledOffset + 2] = linearData[linearOffset + 0]; 
+                        swizzledData[swizzledOffset + 3] = linearData[linearOffset + 3];
                     }
                 }
             }
@@ -800,18 +794,11 @@ namespace TomoAIO
 
         private int GetSwizzleOffset(int x, int y, int width, int bpp, int blockHeight)
         {
-            // 1. Calculate how many GOBs (Group of Bytes - 64 bytes wide) fit in one row
             int widthInGobs = (width * bpp + 63) / 64;
-
-            // 2. Convert our X pixel coordinate to a Byte coordinate
             int xBytes = x * bpp;
-
-            // 3. Find the address of the specific GOB this pixel belongs to
             int gobAddr = (y / (8 * blockHeight)) * 512 * blockHeight * widthInGobs +
                           (xBytes / 64) * 512 * blockHeight +
                           (y % (8 * blockHeight) / 8) * 512;
-
-            // 4. Find the exact offset INSIDE the 64x8 GOB (This fixes the vertical slicing!)
             int innerGobAddr = ((xBytes % 64) / 32) * 256 +
                                ((y % 8) / 2) * 64 +
                                ((xBytes % 32) / 16) * 32 +
@@ -821,13 +808,12 @@ namespace TomoAIO
             return gobAddr + innerGobAddr;
         }
 
-        // --- MII ENGINE (ALL ORIGINAL FEATURES) ---
-
+        // MII TOOL
         private int GetActualOffset(byte[] fileData, string hashHex)
         {
             byte[] hash = Enumerable.Range(0, hashHex.Length / 2)
                                     .Select(x => Convert.ToByte(hashHex.Substring(x * 2, 2), 16))
-                                    .Reverse().ToArray(); // Little Endian
+                                    .Reverse().ToArray(); 
 
             for (int i = 0; i <= fileData.Length - 8; i++)
             {
@@ -846,8 +832,6 @@ namespace TomoAIO
 
             int bpp = 4;
             byte[] deswizzledData = new byte[width * height * bpp];
-
-            // Standard Nintendo Switch Tegra Block Heights for 4bpp (RGBA8)
             int blockHeight = 16;
             if (height <= 128) blockHeight = 8;
             if (height <= 64) blockHeight = 4;
@@ -863,11 +847,10 @@ namespace TomoAIO
 
                     if (swizzledOffset + 3 < rawData.Length)
                     {
-                        // Swap RGBA to BGRA
-                        deswizzledData[linearOffset + 0] = rawData[swizzledOffset + 2]; // Blue
-                        deswizzledData[linearOffset + 1] = rawData[swizzledOffset + 1]; // Green
-                        deswizzledData[linearOffset + 2] = rawData[swizzledOffset + 0]; // Red
-                        deswizzledData[linearOffset + 3] = rawData[swizzledOffset + 3]; // Alpha
+                        deswizzledData[linearOffset + 0] = rawData[swizzledOffset + 2]; 
+                        deswizzledData[linearOffset + 1] = rawData[swizzledOffset + 1]; 
+                        deswizzledData[linearOffset + 2] = rawData[swizzledOffset + 0]; 
+                        deswizzledData[linearOffset + 3] = rawData[swizzledOffset + 3]; 
                     }
                 }
             }
@@ -894,23 +877,20 @@ namespace TomoAIO
 
                 if (picPreview.Image != null) picPreview.Image.Dispose();
 
-                // 1. Isolate the Canvas files (Raw RGBA, just swizzled)
                 if (selectedFile.EndsWith(".canvas.zs"))
                 {
                     int size = (int)Math.Sqrt(decompressed.Length / 4);
                     picPreview.Image = DecodeRawTexture(decompressed, size, size);
                     lblImageInfo.Text = $"{selectedFile} ({size}x{size} Decoded)";
                 }
-                // 2. Identify the Compressed files
                 else if (selectedFile.EndsWith(".ugctex.zs"))
                 {
-                    // ASTC 4x4 uses ~1 byte per pixel. We check the file size to find the closest standard Switch resolution.
-                    int actualWidth = 256; // Default fallback
+                    int actualWidth = 256;
 
-                    if (decompressed.Length > 200000) actualWidth = 512;      // 512x512 = 262,144 bytes
-                    else if (decompressed.Length > 100000) actualWidth = 384; // 384x384 = 147,456 bytes
-                    else if (decompressed.Length > 40000) actualWidth = 256;  // 256x256 = 65,536 bytes
-                    else if (decompressed.Length > 10000) actualWidth = 128;  // 128x128 = 16,384 bytes
+                    if (decompressed.Length > 200000) actualWidth = 512;      
+                    else if (decompressed.Length > 100000) actualWidth = 384; 
+                    else if (decompressed.Length > 40000) actualWidth = 256;  
+                    else if (decompressed.Length > 10000) actualWidth = 128; 
 
                     int actualHeight = actualWidth;
 
@@ -935,26 +915,18 @@ namespace TomoAIO
         {
             int blockW = 4;
             int blockH = 4;
-
             int gridWidth = width / blockW;
             int gridHeight = height / blockH;
             int bytesPerBlock = 16;
-
             byte[] unswizzledData = new byte[gridWidth * gridHeight * bytesPerBlock];
-
-            // 1. The CORRECT Tegra X1 Block Height algorithm
             int swizzleBlockHeight = 1;
             while (swizzleBlockHeight * 8 < gridHeight && swizzleBlockHeight < 16)
             {
                 swizzleBlockHeight *= 2;
             }
-
-            // 2. Safety Offset: If the file is larger than the exact grid data, 
-            // it means there's a header. The actual texture data is at the end.
             int dataOffset = rawData.Length - unswizzledData.Length;
             if (dataOffset < 0) dataOffset = 0;
 
-            // 3. Unswizzle the Grid
             for (int y = 0; y < gridHeight; y++)
             {
                 for (int x = 0; x < gridWidth; x++)
@@ -968,8 +940,6 @@ namespace TomoAIO
                     }
                 }
             }
-
-            // 4. Build the official .astc file header
             byte[] astcFile = new byte[16 + unswizzledData.Length];
             astcFile[0] = 0x13; astcFile[1] = 0xAB; astcFile[2] = 0xA1; astcFile[3] = 0x5C;
             astcFile[4] = (byte)blockW; astcFile[5] = (byte)blockH; astcFile[6] = 1;
@@ -979,19 +949,15 @@ namespace TomoAIO
 
             Array.Copy(unswizzledData, 0, astcFile, 16, unswizzledData.Length);
 
-            // 5. Save temp files and run ARM's tool to convert to PNG!
+            // CONVERT PNG
             File.WriteAllBytes("temp.astc", astcFile);
-
             var process = new System.Diagnostics.Process();
             process.StartInfo.FileName = "astcenc.exe";
-            // Changed output to PNG to handle the transparent background properly
             process.StartInfo.Arguments = "-dl temp.astc temp.png";
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
             process.Start();
             process.WaitForExit();
-
-            // 6. Load the image and clean up
             Bitmap finalBmp = null;
             if (File.Exists("temp.png"))
             {
@@ -1068,25 +1034,17 @@ namespace TomoAIO
                 MessageBox.Show("Please select a valid .ltd or .mii file in the text box first!", "Hold up!");
                 return;
             }
-
             CreateSaveBackup();
-
             byte[] originalPkg = File.ReadAllBytes(filePath);
-
-            // FIX 2: Version Compatibility (Handle v1 and v2 files!)
             List<byte> pkgList = originalPkg.ToList();
             if (pkgList[0] < 3)
             {
-                pkgList.RemoveAt(4); // Remove the extra header byte
+                pkgList.RemoveAt(4); 
                 if (pkgList[0] == 2)
                 {
-                    pkgList.Insert(427, 0); // Padding fix for v2
-
-                    // Convert v2 marker "A3 A3 A3" to v3 marker "A3 A3 A3 A3"
+                    pkgList.Insert(427, 0); 
                     int cIdx = FindMarker(pkgList.ToArray(), new byte[] { 0xA3, 0xA3, 0xA3 });
                     if (cIdx != -1) pkgList.Insert(cIdx + 3, 0xA3);
-
-                    // Convert v2 marker for UGC (which was also A3 A3 A3) to "A4 A4 A4 A4"
                     int uIdx = FindLastMarker(pkgList.ToArray(), new byte[] { 0xA3, 0xA3, 0xA3 });
                     if (uIdx != -1)
                     {
@@ -1126,8 +1084,6 @@ namespace TomoAIO
                 int cS = FindMarker(pkg, new byte[] { 0xA3, 0xA3, 0xA3, 0xA3 }) + 4;
                 int tS = FindMarker(pkg, new byte[] { 0xA4, 0xA4, 0xA4, 0xA4 }) + 4;
                 int fO = GetActualOffset(miiBytes, "5E32ADF4") + 4;
-
-                // Track the original faceID in case we need to clear it!
                 int faceID = miiBytes[fO + (slot * 4)];
                 int oldFaceID = faceID;
 
@@ -1136,7 +1092,7 @@ namespace TomoAIO
 
                 if (cS > 3 && tS > cS && canvasSize > 0 && texSize > 0)
                 {
-                    if (faceID == 255) // This translates to FF in the first byte
+                    if (faceID == 255)
                     {
                         for (int i = 0; i < 70; i++)
                         {
@@ -1165,10 +1121,9 @@ namespace TomoAIO
                 {
                     miiBytes[dnaO + (slot * 156) + 43] = 0;
 
-                    // FIX 1: Use proper 32-bit -1 value (FF FF FF FF)
                     Array.Copy(new byte[] { 255, 255, 255, 255 }, 0, miiBytes, fO + (slot * 4), 4);
 
-                    // FIX 3: Clear old facepaint registry
+                    // Clear old facepaint registry
                     if (oldFaceID != 255 && oldFaceID < 70)
                     {
                         ClearPlayerRegistry(pBytes, oldFaceID);
@@ -1181,8 +1136,6 @@ namespace TomoAIO
             RefreshMiiList();
             MessageBox.Show("Mii Imported Successfully!");
         }
-
-        // --- HELPERS ---
 
         private void UpdatePlayerRegistry(byte[] pBytes, int faceID)
         {
@@ -1240,8 +1193,6 @@ namespace TomoAIO
             int fpS = GetActualOffset(pBytes, "23135BC5") + 4;
             int fpU = GetActualOffset(pBytes, "FFC750B6") + 4;
             int fpH = GetActualOffset(pBytes, "A56E42EC") + 4;
-
-            // Standard "empty" values used by the game 
             Array.Copy(new byte[] { 0x00, 0x00, 0x00, 0x00 }, 0, pBytes, fpP + (faceID * 4), 4);
             Array.Copy(new byte[] { 0x09, 0xDE, 0xEE, 0xB6 }, 0, pBytes, fpT + (faceID * 4), 4);
             Array.Copy(new byte[] { 0xA5, 0x8A, 0xFF, 0xAF }, 0, pBytes, fpS + (faceID * 4), 4);
@@ -1263,8 +1214,6 @@ namespace TomoAIO
             }
         }
 
-        // --- NAVIGATION & DESIGNER HANDSHAKES ---
-
         private void button1_Click(object sender, EventArgs e)
         {
             panel1.Visible = true;
@@ -1281,10 +1230,10 @@ namespace TomoAIO
                 fbd.Description = "Select your Living the Dream 'Ugc' folder";
                 if (fbd.ShowDialog() == DialogResult.OK)
                 {
-                    // 1. Try to load the list first
+ 
                     LoadUgcList(fbd.SelectedPath);
 
-                    // 2. Only show the panel if the folder actually had the right files!
+
                     if (lstUGC.Items.Count > 0)
                     {
                         panelUGC.Visible = true;
@@ -1292,8 +1241,7 @@ namespace TomoAIO
                         LayoutUgcEditorControls();
                         EnsureDiscordButtonVisible();
                     }
-                    // If the list is empty, the panel remains hidden and 
-                    // the user stays on the main menu.
+
                 }
             }
         }
@@ -1333,7 +1281,6 @@ namespace TomoAIO
             }
             else
             {
-                // Pass the file path from the text box directly into the importer!
                 ImportMii(slot, _selectedMiiPath);
             }
         }
@@ -1347,7 +1294,6 @@ namespace TomoAIO
             }
         }
 
-        // Empty stubs for designer compatibility
         private void panel1_Paint(object sender, PaintEventArgs e) { }
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -1393,76 +1339,72 @@ namespace TomoAIO
                 }
             }
         }
-
         private void lblImageInfo_Click(object sender, EventArgs e) { }
-
         private void btnUgcImport_Click(object sender, EventArgs e)
         {
             if (lstUGC.SelectedItem == null) return;
 
-            string selectedFile = lstUGC.SelectedItem.ToString()!;
-            if (!selectedFile.EndsWith(".canvas.zs"))
+            using (OpenFileDialog ofd = new OpenFileDialog() { Filter = "UGC Files (*.png;*.jpg;*.zs)|*.png;*.jpg;*.zs" })
             {
-                MessageBox.Show("Please select a .canvas.zs file to replace.");
-                return;
-            }
-
-            string fullPath = Path.Combine(currentUgcPath, selectedFile);
-
-            using (OpenFileDialog ofd = new OpenFileDialog())
-            {
-                ofd.Filter = "PNG Images (*.png)|*.png";
-                ofd.Title = "Select custom texture to import";
-
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
                     try
                     {
-                        // 1. Read the original file to get the exact required dimensions
-                        byte[] originalFileBytes = File.ReadAllBytes(fullPath);
-                        byte[] decompressedOriginal;
+                        string selectedFile = lstUGC.SelectedItem.ToString();
+                        string fullPath = Path.Combine(currentUgcPath, selectedFile);
+
+                        // 1. ZS FILE BYPASS
+                        if (ofd.FileName.EndsWith(".zs"))
+                        {
+                            File.Copy(ofd.FileName, fullPath, true);
+                            MessageBox.Show("Canvas/Texture file successfully replaced!", "Success");
+
+                            // Force the UI to refresh the image preview!
+                            lstUGC_SelectedIndexChanged(sender, e);
+                            return;
+                        }
+
+                        // (THE PROXY REDIRECT HAS BEEN REMOVED FROM HERE)
+
+                        // 2. PNG/JPG IMAGE IMPORT
+                        Bitmap newImage = new Bitmap(ofd.FileName);
+
+                        // Decode the original file quickly to get the exact size the game expects
+                        byte[] origBytes = File.ReadAllBytes(fullPath);
+                        byte[] origDecomp;
                         using (var decompressor = new ZstdSharp.Decompressor())
                         {
-                            decompressedOriginal = decompressor.Unwrap(originalFileBytes).ToArray();
+                            origDecomp = decompressor.Unwrap(origBytes).ToArray();
                         }
 
-                        int expectedSize = (int)Math.Sqrt(decompressedOriginal.Length / 4);
+                        int expectedSize = (int)Math.Sqrt(origDecomp.Length / 4);
 
-                        // 2. Load the user's new PNG image and automatically RESIZE it!
-                        Bitmap originalImport = new Bitmap(ofd.FileName);
-                        Bitmap resizedImage = new Bitmap(expectedSize, expectedSize, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-                        using (Graphics g = Graphics.FromImage(resizedImage))
+                        Bitmap finalImage = newImage;
+                        if (newImage.Width != expectedSize || newImage.Height != expectedSize)
                         {
-                            // Use high-quality resizing to keep the image looking crisp
-                            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
-
-                            // Draw the imported image onto our perfectly-sized canvas
-                            g.DrawImage(originalImport, new Rectangle(0, 0, expectedSize, expectedSize));
+                            // Auto-resize if it doesn't match
+                            finalImage = new Bitmap(newImage, new Size(expectedSize, expectedSize));
                         }
 
-                        // 3. Swizzle the newly resized image into a Switch-compatible byte array
-                        byte[] rawSwizzled = EncodeRawTexture(resizedImage);
-
-                        // Memory cleanup
-                        originalImport.Dispose();
-                        resizedImage.Dispose();
-
-                        // 4. Compress the swizzled bytes using Zstandard (Level 9 is safe/efficient)
+                        // Swizzle and compress
+                        byte[] rawSwizzled = EncodeRawTexture(finalImage);
                         byte[] compressedData;
                         using (var compressor = new ZstdSharp.Compressor(9))
                         {
                             compressedData = compressor.Wrap(rawSwizzled).ToArray();
                         }
 
-                        // 5. Overwrite the original .canvas.zs file!
+                        // Overwrite the EXACT file selected in the listbox
                         File.WriteAllBytes(fullPath, compressedData);
-                        MessageBox.Show("Custom texture successfully injected!", "Success");
 
-                        // 6. Refresh the preview to show the new custom image
-                        lstUGC_SelectedIndexChanged(null, EventArgs.Empty);
+                        // Clean up memory
+                        if (finalImage != newImage) finalImage.Dispose();
+                        newImage.Dispose();
+
+                        MessageBox.Show("Custom texture successfully resized and injected!", "Success");
+
+                        // Force the UI to refresh the image preview!
+                        lstUGC_SelectedIndexChanged(sender, e);
                     }
                     catch (Exception ex)
                     {
@@ -1471,23 +1413,17 @@ namespace TomoAIO
                 }
             }
         }
-
         private void btnUgcBack_Click(object sender, EventArgs e)
         {
-            // 1. Clear the image preview and memory
+
             if (picPreview.Image != null)
             {
                 picPreview.Image.Dispose();
                 picPreview.Image = null;
             }
             lblImageInfo.Text = "Waiting for selection...";
-
-            // 2. Simply hide the UGC Editor panel to reveal the main menu underneath!
             ShowMainMenu();
-
-            // (Notice we completely removed the references to panel1 here)
         }
-
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);

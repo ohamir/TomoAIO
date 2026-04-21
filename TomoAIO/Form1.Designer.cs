@@ -28,10 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             button1 = new Button();
             button2 = new Button();
             panel1 = new Panel();
-            btnDiscord = new Button();
             btnBrowseMii = new Button();
             txtMiiPath = new TextBox();
             label1 = new Label();
@@ -42,6 +42,7 @@
             listBox1 = new ListBox();
             logopanel1 = new PictureBox();
             pictureBox2 = new PictureBox();
+            btnDiscord = new Button();
             panelUGC = new Panel();
             pictureBox3 = new PictureBox();
             btnUgcBack = new Button();
@@ -121,17 +122,6 @@
             panel1.TabIndex = 3;
             panel1.Visible = false;
             panel1.Paint += panel1_Paint;
-            // 
-            // btnDiscord
-            // 
-            btnDiscord.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            btnDiscord.BackColor = Color.Transparent;
-            btnDiscord.Location = new Point(1335, 745);
-            btnDiscord.Name = "btnDiscord";
-            btnDiscord.Size = new Size(75, 65);
-            btnDiscord.TabIndex = 14;
-            btnDiscord.UseVisualStyleBackColor = true;
-            btnDiscord.Click += btnDiscord_Click;
             // 
             // btnBrowseMii
             // 
@@ -243,6 +233,17 @@
             pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox2.TabIndex = 7;
             pictureBox2.TabStop = false;
+            // 
+            // btnDiscord
+            // 
+            btnDiscord.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnDiscord.BackColor = Color.Transparent;
+            btnDiscord.Location = new Point(1335, 745);
+            btnDiscord.Name = "btnDiscord";
+            btnDiscord.Size = new Size(75, 65);
+            btnDiscord.TabIndex = 14;
+            btnDiscord.UseVisualStyleBackColor = true;
+            btnDiscord.Click += btnDiscord_Click;
             // 
             // panelUGC
             // 
@@ -403,9 +404,10 @@
             Controls.Add(panel1);
             Controls.Add(pictureBox1);
             Controls.Add(panelUGC);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(3, 2, 3, 2);
             Name = "Form1";
-            Text = "TomoAIO - Living the Dream Toolkit";
+            Text = "TomoAIO - TLLTD Tool 1.0";
             Load += Form1_Load;
             Shown += Form1_Shown;
             panel1.ResumeLayout(false);
