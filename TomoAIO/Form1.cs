@@ -97,8 +97,13 @@ namespace TomoAIO
             ConfigureTransparentButton(button1);
             ConfigureTransparentButton(button2);
             MakePictureBackgroundTransparent(logo, Color.FromArgb(255, 190, 0), 38);
+            MakePictureBackgroundTransparent(pictureBox3, Color.FromArgb(255, 190, 0), 38);
             MakePictureBackgroundTransparent(logopanel1, Color.FromArgb(255, 190, 0), 38);
+            MakePictureBackgroundTransparent(logo, Color.White, 65);
+            MakePictureBackgroundTransparent(pictureBox3, Color.White, 65);
             MakePictureBackgroundTransparent(logopanel1, Color.White, 65);
+            logo.BackgroundImageLayout = ImageLayout.Zoom;
+            pictureBox3.BackgroundImageLayout = ImageLayout.Zoom;
             logopanel1.BackgroundImageLayout = ImageLayout.Zoom;
             PinLogoTopRight();
             LayoutMainMenuButtons();
@@ -197,6 +202,14 @@ namespace TomoAIO
                 logopanel1.Size = new Size(logoWidth, logoHeight);
                 logopanel1.Location = new Point(
                     Math.Max(0, logopanel1.Parent.ClientSize.Width - logopanel1.Width - LogoMargin),
+                    LogoMargin);
+            }
+
+            if (pictureBox3.Parent != null)
+            {
+                pictureBox3.Size = new Size(logoWidth, logoHeight);
+                pictureBox3.Location = new Point(
+                    Math.Max(0, pictureBox3.Parent.ClientSize.Width - pictureBox3.Width - LogoMargin),
                     LogoMargin);
             }
         }
