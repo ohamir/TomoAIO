@@ -132,8 +132,8 @@
             // 
             // txtMiiPath
             // 
-            txtMiiPath.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txtMiiPath.AllowDrop = true;
+            txtMiiPath.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txtMiiPath.Location = new Point(298, 131);
             txtMiiPath.Name = "txtMiiPath";
             txtMiiPath.ReadOnly = true;
@@ -154,7 +154,6 @@
             // 
             // btnGo
             // 
-            btnGo.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             btnGo.Location = new Point(570, 177);
             btnGo.Margin = new Padding(3, 2, 3, 2);
             btnGo.Name = "btnGo";
@@ -166,7 +165,6 @@
             // 
             // cmbMiiAction
             // 
-            cmbMiiAction.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             cmbMiiAction.FormattingEnabled = true;
             cmbMiiAction.Items.AddRange(new object[] { "Import Mii (.ltd)", "Export Mii (.ltd)" });
             cmbMiiAction.Location = new Point(156, 82);
@@ -178,7 +176,6 @@
             // 
             // button4
             // 
-            button4.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             button4.Location = new Point(156, 56);
             button4.Margin = new Padding(3, 2, 3, 2);
             button4.Name = "button4";
@@ -223,9 +220,9 @@
             // 
             // pictureBox2
             // 
-            pictureBox2.Dock = DockStyle.Fill;
             pictureBox2.BackgroundImageLayout = ImageLayout.Zoom;
-            pictureBox2.Image = Properties.Resources._2026_04_20_17_04_43;
+            pictureBox2.Dock = DockStyle.Fill;
+            pictureBox2.Image = Properties.Resources.tomo1;
             pictureBox2.Location = new Point(0, 0);
             pictureBox2.Name = "pictureBox2";
             pictureBox2.Size = new Size(1343, 745);
@@ -322,7 +319,7 @@
             label2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
             label2.Location = new Point(12, 7);
             label2.Name = "label2";
-            label2.Size = new Size(72, 15);
+            label2.Size = new Size(68, 15);
             label2.TabIndex = 1;
             label2.Text = "UGC Editor";
             label2.Click += label2_Click;
@@ -333,17 +330,17 @@
             lstUGC.Dock = DockStyle.Fill;
             lstUGC.ForeColor = Color.Black;
             lstUGC.FormattingEnabled = true;
-            lstUGC.Location = new Point(0, 0);
+            lstUGC.Location = new Point(0, 28);
             lstUGC.Name = "lstUGC";
-            lstUGC.Size = new Size(250, 745);
+            lstUGC.Size = new Size(250, 717);
             lstUGC.TabIndex = 0;
             lstUGC.SelectedIndexChanged += lstUGC_SelectedIndexChanged;
             // 
             // pictureBox1
             // 
-            pictureBox1.Dock = DockStyle.Fill;
             pictureBox1.BackgroundImageLayout = ImageLayout.Zoom;
-            pictureBox1.Image = Properties.Resources._2026_04_20_17_04_43;
+            pictureBox1.Dock = DockStyle.Fill;
+            pictureBox1.Image = Properties.Resources.tomo1;
             pictureBox1.Location = new Point(0, 0);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(1343, 745);
