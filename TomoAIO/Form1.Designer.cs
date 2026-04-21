@@ -64,6 +64,7 @@
             // 
             // button1
             // 
+            button1.Anchor = AnchorStyles.None;
             button1.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             button1.BackColor = Color.Transparent;
             button1.BackgroundImage = Properties.Resources.mii_import1;
@@ -81,6 +82,7 @@
             // 
             // button2
             // 
+            button2.Anchor = AnchorStyles.None;
             button2.BackColor = Color.Transparent;
             button2.BackgroundImage = Properties.Resources.UGC_CREATOR;
             button2.BackgroundImageLayout = ImageLayout.Zoom;
@@ -119,6 +121,7 @@
             // 
             // btnBrowseMii
             // 
+            btnBrowseMii.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnBrowseMii.Location = new Point(906, 130);
             btnBrowseMii.Name = "btnBrowseMii";
             btnBrowseMii.Size = new Size(75, 23);
@@ -129,6 +132,7 @@
             // 
             // txtMiiPath
             // 
+            txtMiiPath.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             txtMiiPath.AllowDrop = true;
             txtMiiPath.Location = new Point(298, 131);
             txtMiiPath.Name = "txtMiiPath";
@@ -150,7 +154,7 @@
             // 
             // btnGo
             // 
-            btnGo.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnGo.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             btnGo.Location = new Point(570, 177);
             btnGo.Margin = new Padding(3, 2, 3, 2);
             btnGo.Name = "btnGo";
@@ -162,7 +166,7 @@
             // 
             // cmbMiiAction
             // 
-            cmbMiiAction.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            cmbMiiAction.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             cmbMiiAction.FormattingEnabled = true;
             cmbMiiAction.Items.AddRange(new object[] { "Import Mii (.ltd)", "Export Mii (.ltd)" });
             cmbMiiAction.Location = new Point(156, 82);
@@ -174,7 +178,7 @@
             // 
             // button4
             // 
-            button4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            button4.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             button4.Location = new Point(156, 56);
             button4.Margin = new Padding(3, 2, 3, 2);
             button4.Name = "button4";
@@ -207,7 +211,7 @@
             // 
             // logopanel1
             // 
-            logopanel1.Anchor = AnchorStyles.None;
+            logopanel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             logopanel1.BackColor = Color.Transparent;
             logopanel1.BackgroundImage = Properties.Resources.tomoaio_logo;
             logopanel1.BackgroundImageLayout = ImageLayout.Stretch;
@@ -219,12 +223,12 @@
             // 
             // pictureBox2
             // 
-            pictureBox2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            pictureBox2.Dock = DockStyle.Fill;
             pictureBox2.BackgroundImageLayout = ImageLayout.Zoom;
             pictureBox2.Image = Properties.Resources._2026_04_20_17_04_43;
-            pictureBox2.Location = new Point(-12, -5);
+            pictureBox2.Location = new Point(0, 0);
             pictureBox2.Name = "pictureBox2";
-            pictureBox2.Size = new Size(1374, 764);
+            pictureBox2.Size = new Size(1343, 745);
             pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox2.TabIndex = 7;
             pictureBox2.TabStop = false;
@@ -242,6 +246,7 @@
             panelUGC.Name = "panelUGC";
             panelUGC.Size = new Size(1343, 745);
             panelUGC.TabIndex = 13;
+            panelUGC.Visible = false;
             // 
             // btnUgcBack
             // 
@@ -255,6 +260,7 @@
             // 
             // btnUgcExport
             // 
+            btnUgcExport.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnUgcExport.Location = new Point(1012, 674);
             btnUgcExport.Name = "btnUgcExport";
             btnUgcExport.Size = new Size(301, 65);
@@ -265,6 +271,7 @@
             // 
             // btnUgcImport
             // 
+            btnUgcImport.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             btnUgcImport.Location = new Point(322, 674);
             btnUgcImport.Name = "btnUgcImport";
             btnUgcImport.Size = new Size(301, 65);
@@ -275,6 +282,7 @@
             // 
             // lblImageInfo
             // 
+            lblImageInfo.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             lblImageInfo.AutoSize = true;
             lblImageInfo.Location = new Point(647, 699);
             lblImageInfo.Name = "lblImageInfo";
@@ -285,6 +293,7 @@
             // 
             // picPreview
             // 
+            picPreview.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             picPreview.BackColor = Color.White;
             picPreview.Location = new Point(322, 8);
             picPreview.Name = "picPreview";
@@ -302,15 +311,18 @@
             panelSidebar.Dock = DockStyle.Left;
             panelSidebar.Location = new Point(0, 0);
             panelSidebar.Name = "panelSidebar";
+            panelSidebar.Padding = new Padding(0, 28, 0, 0);
             panelSidebar.Size = new Size(250, 745);
             panelSidebar.TabIndex = 0;
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(182, 3);
+            label2.BackColor = Color.DarkKhaki;
+            label2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            label2.Location = new Point(12, 7);
             label2.Name = "label2";
-            label2.Size = new Size(65, 15);
+            label2.Size = new Size(72, 15);
             label2.TabIndex = 1;
             label2.Text = "UGC Editor";
             label2.Click += label2_Click;
@@ -329,12 +341,12 @@
             // 
             // pictureBox1
             // 
-            pictureBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            pictureBox1.Dock = DockStyle.Fill;
             pictureBox1.BackgroundImageLayout = ImageLayout.Zoom;
             pictureBox1.Image = Properties.Resources._2026_04_20_17_04_43;
             pictureBox1.Location = new Point(0, 0);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(1381, 765);
+            pictureBox1.Size = new Size(1343, 745);
             pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox1.TabIndex = 6;
             pictureBox1.TabStop = false;
@@ -342,7 +354,7 @@
             // 
             // logo
             // 
-            logo.Anchor = AnchorStyles.None;
+            logo.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             logo.BackColor = Color.Transparent;
             logo.BackgroundImage = Properties.Resources.tomoaio_logo;
             logo.BackgroundImageLayout = ImageLayout.Stretch;
@@ -400,7 +412,6 @@
         private Label label1;
         private Button btnBrowseMii;
         private PictureBox logo;
-        private PictureBox pictureBox4;
         private PictureBox logopanel1;
         private Panel panelUGC;
         private PictureBox picPreview;

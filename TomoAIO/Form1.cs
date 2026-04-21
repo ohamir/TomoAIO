@@ -14,6 +14,7 @@ namespace TomoAIO
     {
         string currentMiiSavPath = "";
         string currentUgcPath = "";
+        private const int LogoMargin = 12;
 
         // The 18 Hash Markers for Personality, Voice, Gender, and Birthday
         string[] persHashes = {
@@ -36,10 +37,30 @@ namespace TomoAIO
             button2.Parent = pictureBox1;
             logo.Parent = pictureBox1;
             logo.BackColor = Color.Transparent;
+            pictureBox1.SendToBack();
+            logo.BringToFront();
 
             ConfigureTransparentButton(button1);
             ConfigureTransparentButton(button2);
             MakePictureBackgroundTransparent(logo, Color.FromArgb(255, 190, 0), 38);
+            PinLogoTopRight();
+        }
+
+        private void PinLogoTopRight()
+        {
+            if (logo.Parent != null)
+            {
+                logo.Location = new Point(
+                    Math.Max(0, logo.Parent.ClientSize.Width - logo.Width - LogoMargin),
+                    LogoMargin);
+            }
+
+            if (logopanel1.Parent != null)
+            {
+                logopanel1.Location = new Point(
+                    Math.Max(0, logopanel1.Parent.ClientSize.Width - logopanel1.Width - LogoMargin),
+                    LogoMargin);
+            }
         }
 
         private void ConfigureTransparentButton(Button button)
@@ -716,8 +737,16 @@ namespace TomoAIO
 
         // Empty stubs for designer compatibility
         private void panel1_Paint(object sender, PaintEventArgs e) { }
-        private void Form1_Load(object sender, EventArgs e) { }
-        private void Form1_Shown(object sender, EventArgs e) { }
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            lblImageInfo.Text = "Waiting for selection...";
+            label2.BringToFront();
+            PinLogoTopRight();
+        }
+        private void Form1_Shown(object sender, EventArgs e)
+        {
+            PinLogoTopRight();
+        }
         private void pictureBox3_Click(object sender, EventArgs e) { }
         private void pictureBox1_Click(object sender, EventArgs e) { }
         private void txtMiiPath_TextChanged(object sender, EventArgs e) { }
@@ -829,6 +858,12 @@ namespace TomoAIO
             panelUGC.Visible = false;
 
             // (Notice we completely removed the references to panel1 here)
+        }
+
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            PinLogoTopRight();
         }
     }
 }
