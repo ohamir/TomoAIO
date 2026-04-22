@@ -742,7 +742,7 @@ namespace TomoAIO
                 }
             }
         }
-        private byte[] EncodeRawTexture(Bitmap bmp)
+        private byte[] EncodeRawTexture(Bitmap bmp, bool convertSrgbToLinear = false)
         {
             int width = bmp.Width;
             int height = bmp.Height;
@@ -772,16 +772,37 @@ namespace TomoAIO
 
                     if (swizzledOffset + 3 < swizzledData.Length)
                     {
-                        swizzledData[swizzledOffset + 0] = linearData[linearOffset + 2];
-                        swizzledData[swizzledOffset + 1] = linearData[linearOffset + 1];
-                        swizzledData[swizzledOffset + 2] = linearData[linearOffset + 0];
-                        swizzledData[swizzledOffset + 3] = linearData[linearOffset + 3];
+                        byte b = linearData[linearOffset + 0];
+                        byte gChan = linearData[linearOffset + 1];
+                        byte r = linearData[linearOffset + 2];
+                        byte a = linearData[linearOffset + 3];
+
+                        if (convertSrgbToLinear)
+                        {
+                            r = SrgbToLinearByte(r);
+                            gChan = SrgbToLinearByte(gChan);
+                            b = SrgbToLinearByte(b);
+                        }
+
+                        swizzledData[swizzledOffset + 0] = r;
+                        swizzledData[swizzledOffset + 1] = gChan;
+                        swizzledData[swizzledOffset + 2] = b;
+                        swizzledData[swizzledOffset + 3] = a;
                     }
                 }
             }
 
             clone.Dispose();
             return swizzledData;
+        }
+        private byte SrgbToLinearByte(byte srgb)
+        {
+            float s = srgb / 255f;
+            float linear = (s <= 0.04045f) ? (s / 12.92f) : (float)Math.Pow((s + 0.055f) / 1.055f, 2.4f);
+            int value = (int)Math.Round(linear * 255f);
+            if (value < 0) value = 0;
+            if (value > 255) value = 255;
+            return (byte)value;
         }
         private int GetSwizzleOffset(int x, int y, int width, int bpp, int blockHeight)
         {
@@ -1415,7 +1436,8 @@ namespace TomoAIO
                                 GraphicsUnit.Pixel);
                         }
                         // 4. Swizzle and Compress
-                        byte[] rawSwizzled = EncodeRawTexture(processedImage);
+                        // Convert color textures from sRGB to linear before writing.
+                        byte[] rawSwizzled = EncodeRawTexture(processedImage, convertSrgbToLinear: true);
                         byte[] compressedData;
                         using (var compressor = new ZstdSharp.Compressor(9))
                         {
