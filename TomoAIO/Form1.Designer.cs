@@ -398,13 +398,13 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(255, 190, 0);
             ClientSize = new Size(1412, 813);
-            Controls.Add(panelUGC);
             Controls.Add(logo);
             Controls.Add(button2);
             Controls.Add(button1);
             Controls.Add(btnDiscord);
             Controls.Add(panel1);
             Controls.Add(pictureBox1);
+            Controls.Add(panelUGC);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(3, 2, 3, 2);
             Name = "Form1";

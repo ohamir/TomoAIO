@@ -1031,7 +1031,6 @@ namespace TomoAIO
 
             Array.Copy(unswizzledData, 0, astcFile, 16, unswizzledData.Length);
 
-            // CONVERT PNG
             File.WriteAllBytes("temp.astc", astcFile);
             var process = new System.Diagnostics.Process();
             process.StartInfo.FileName = "astcenc.exe";
@@ -1205,7 +1204,7 @@ namespace TomoAIO
 
                     Array.Copy(new byte[] { 255, 255, 255, 255 }, 0, miiBytes, fO + (slot * 4), 4);
 
-                    // Clear old facepaint registry
+                    // Clear old facepaint 
                     if (oldFaceID != 255 && oldFaceID < 70)
                     {
                         ClearPlayerRegistry(pBytes, oldFaceID);
@@ -1317,6 +1316,28 @@ namespace TomoAIO
             PinLogoTopRight();
             LayoutMiiEditorControls();
             EnsureDiscordButtonVisible();
+
+            using (FolderBrowserDialog fbd = new FolderBrowserDialog())
+            {
+                fbd.Description = "Select your game save folder (where Mii.sav is located)";
+
+                if (fbd.ShowDialog() == DialogResult.OK)
+                {
+                    string selectedFolder = fbd.SelectedPath;
+                    string miiSavPath = Path.Combine(selectedFolder, "Mii.sav");
+
+                    if (File.Exists(miiSavPath))
+                    {
+                        currentMiiSavPath = miiSavPath;
+                        RefreshMiiList();
+                        MessageBox.Show("Save file found!", "TomoAIO");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Could not find Mii.sav in that folder!\n\nPlease make sure you selected the correct save folder.", "Wrong Folder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }
+            }
         }
         private void button3_Click(object sender, EventArgs e) { ShowMainMenu(); }
         private void button2_Click(object sender, EventArgs e)
