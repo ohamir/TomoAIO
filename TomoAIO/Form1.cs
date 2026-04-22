@@ -892,7 +892,28 @@ namespace TomoAIO
                 if (selectedFile.EndsWith(".canvas.zs"))
                 {
                     int size = (int)Math.Sqrt(decompressed.Length / 4);
-                    picPreview.Image = DecodeRawTexture(decompressed, size, size);
+
+                    // 1. Decode the dark, mathematically-correct image
+                    Bitmap rawDecoded = DecodeRawTexture(decompressed, size, size);
+
+                    // 2. Create the brightened Preview Filter
+                    Bitmap previewImage = new Bitmap(rawDecoded.Width, rawDecoded.Height);
+                    using (Graphics g = Graphics.FromImage(previewImage))
+                    {
+                        using (System.Drawing.Imaging.ImageAttributes attr = new System.Drawing.Imaging.ImageAttributes())
+                        {
+                            attr.SetGamma(0.4545f); // Reverse the Linear curve for Windows
+                            g.DrawImage(rawDecoded,
+                                new Rectangle(0, 0, previewImage.Width, previewImage.Height),
+                                0, 0, rawDecoded.Width, rawDecoded.Height,
+                                GraphicsUnit.Pixel, attr);
+                        }
+                    }
+
+                    // 3. Assign the bright image to the PictureBox and clean up the dark one
+                    picPreview.Image = previewImage;
+                    rawDecoded.Dispose();
+
                     lblImageInfo.Text = $"{selectedFile} ({size}x{size} Decoded)";
                 }
                 else if (selectedFile.EndsWith(".ugctex.zs"))
@@ -1507,7 +1528,7 @@ namespace TomoAIO
                 {
                     lstUGC.Items.Add(file);
                 }
-                return; 
+                return;
             }
             string searchTerm = txtSearch.Text.ToLower();
             lstUGC.Items.Clear();
@@ -1537,6 +1558,11 @@ namespace TomoAIO
                 txtSearch.Text = "Search...";
                 txtSearch.ForeColor = Color.Gray;
             }
+        }
+
+        private void picPreview_Click(object sender, EventArgs e)
+        {
+
         }
     }
 } 
