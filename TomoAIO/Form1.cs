@@ -8,6 +8,8 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using ZstdSharp;
+using System.Net.Http;
+using System.Diagnostics;
 
 namespace TomoAIO
 {
@@ -58,6 +60,53 @@ namespace TomoAIO
             ConfigureActionButtons();
             ConfigureInputStyles();
             EnsureDiscordButtonVisible();
+        }
+
+        private async void CheckForUpdates()
+        {
+            try
+            {
+                string currentVersion = "1.1"; 
+                string repoOwner = "ohamir"; 
+                string repoName = "TomoAIO";   
+
+                string apiUrl = $"https://api.github.com/repos/{repoOwner}/{repoName}/releases/latest";
+
+                using (HttpClient client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Add("User-Agent", "TomoAIO-Updater");
+                    string response = await client.GetStringAsync(apiUrl);
+                    int tagIndex = response.IndexOf("\"tag_name\"");
+                    if (tagIndex != -1)
+                    {
+                        int startQuote = response.IndexOf('"', tagIndex + 11) + 1;
+                        int endQuote = response.IndexOf('"', startQuote);
+                        string latestVersion = response.Substring(startQuote, endQuote - startQuote);
+                        latestVersion = latestVersion.Replace("v", "").Replace("V", "");
+
+                        if (latestVersion != currentVersion)
+                        {
+                            DialogResult dialog = MessageBox.Show(
+                                $"A new version of TomoAIO is available! (v{latestVersion})\n\nWould you like to open the download page?",
+                                "Update Available",
+                                MessageBoxButtons.YesNo,
+                                MessageBoxIcon.Information);
+
+                            if (dialog == DialogResult.Yes)
+                            {
+                                Process.Start(new ProcessStartInfo
+                                {
+                                    FileName = $"https://github.com/{repoOwner}/{repoName}/releases/latest",
+                                    UseShellExecute = true
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+            }
         }
 
         private void EnableSmoothRendering()
@@ -1344,6 +1393,9 @@ namespace TomoAIO
         private void panel1_Paint(object sender, PaintEventArgs e) { }
         private void Form1_Load(object sender, EventArgs e)
         {
+            // Check for updates silently in the background the second the app opens!
+            CheckForUpdates();
+
             lblImageInfo.Text = "Waiting for selection...";
             PinLogoTopRight();
             LayoutMainMenuButtons();
