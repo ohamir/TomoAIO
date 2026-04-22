@@ -1429,14 +1429,11 @@ namespace TomoAIO
                         {
                             g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                            // Keep imported texture colors neutral (no forced saturation/contrast shift).
                             g.DrawImage(sourceImage,
                                 new Rectangle(0, 0, expectedSize, expectedSize),
                                 0, 0, sourceImage.Width, sourceImage.Height,
                                 GraphicsUnit.Pixel);
                         }
-                        // 4. Swizzle and Compress
-                        // Convert color textures from sRGB to linear before writing.
                         byte[] rawSwizzled = EncodeRawTexture(processedImage, convertSrgbToLinear: true);
                         byte[] compressedData;
                         using (var compressor = new ZstdSharp.Compressor(9))
