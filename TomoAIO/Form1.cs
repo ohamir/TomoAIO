@@ -1408,40 +1408,11 @@ namespace TomoAIO
                         {
                             g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                            float saturation = 1.35f; 
-                            float contrast = 1.20f;  
-                            float redAdjust = 0.96f;   
-                            float greenAdjust = 0.98f; 
-                            float blueAdjust = 1.08f; 
-                            float threshold = 0.5f * (1.0f - contrast);
-                            float rW = 0.3086f, gW = 0.6094f, bW = 0.0820f;
-                            float vA = (((1.0f - saturation) * rW) + saturation) * contrast * redAdjust;
-                            float vB = ((1.0f - saturation) * rW) * contrast * greenAdjust;
-                            float vC = ((1.0f - saturation) * rW) * contrast * blueAdjust;
-                            float vD = ((1.0f - saturation) * gW) * contrast * redAdjust;
-                            float vE = (((1.0f - saturation) * gW) + saturation) * contrast * greenAdjust;
-                            float vF = ((1.0f - saturation) * gW) * contrast * blueAdjust;
-                            float vG = ((1.0f - saturation) * bW) * contrast * redAdjust;
-                            float vH = ((1.0f - saturation) * bW) * contrast * greenAdjust;
-                            float vI = (((1.0f - saturation) * bW) + saturation) * contrast * blueAdjust;
-                            var colorMatrix = new System.Drawing.Imaging.ColorMatrix(new float[][] {
-    new float[] {vA, vB, vC, 0, 0},
-    new float[] {vD, vE, vF, 0, 0},
-    new float[] {vG, vH, vI, 0, 0},
-    new float[] {0,  0,  0,  1, 0},
-  
-    new float[] {threshold - 0.02f, threshold - 0.01f, threshold + 0.04f, 0, 1}
-});
-
-                            using (var attributes = new System.Drawing.Imaging.ImageAttributes())
-                            {
-                                attributes.SetColorMatrix(colorMatrix);
-                                // Draw resized and saturated image
-                                g.DrawImage(sourceImage,
-                                    new Rectangle(0, 0, expectedSize, expectedSize),
-                                    0, 0, sourceImage.Width, sourceImage.Height,
-                                    GraphicsUnit.Pixel, attributes);
-                            }
+                            // Keep imported texture colors neutral (no forced saturation/contrast shift).
+                            g.DrawImage(sourceImage,
+                                new Rectangle(0, 0, expectedSize, expectedSize),
+                                0, 0, sourceImage.Width, sourceImage.Height,
+                                GraphicsUnit.Pixel);
                         }
                         // 4. Swizzle and Compress
                         byte[] rawSwizzled = EncodeRawTexture(processedImage);
@@ -1454,7 +1425,7 @@ namespace TomoAIO
                         sourceImage.Dispose();
                         processedImage.Dispose();
 
-                        MessageBox.Show("Custom texture successfully resized, saturated, and injected!", "Success");
+                        MessageBox.Show("Custom texture successfully resized and injected!", "Success");
                         lstUGC_SelectedIndexChanged(sender, e);
                     }
                     catch (Exception ex)
