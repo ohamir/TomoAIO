@@ -51,7 +51,7 @@
             lblImageInfo = new Label();
             picPreview = new PictureBox();
             panelSidebar = new Panel();
-            label2 = new Label();
+            txtSearch = new TextBox();
             lstUGC = new ListBox();
             pictureBox1 = new PictureBox();
             logo = new PictureBox();
@@ -291,7 +291,7 @@
             btnUgcExport.Name = "btnUgcExport";
             btnUgcExport.Size = new Size(301, 65);
             btnUgcExport.TabIndex = 4;
-            btnUgcExport.Text = "Export";
+            btnUgcExport.Text = "Export (.png / .zs)";
             btnUgcExport.UseVisualStyleBackColor = true;
             btnUgcExport.Click += btnUgcExport_Click;
             // 
@@ -302,7 +302,7 @@
             btnUgcImport.Name = "btnUgcImport";
             btnUgcImport.Size = new Size(301, 65);
             btnUgcImport.TabIndex = 3;
-            btnUgcImport.Text = "Import";
+            btnUgcImport.Text = "Import (.png / .zs)";
             btnUgcImport.UseVisualStyleBackColor = true;
             btnUgcImport.Click += btnUgcImport_Click;
             // 
@@ -327,12 +327,13 @@
             picPreview.SizeMode = PictureBoxSizeMode.Zoom;
             picPreview.TabIndex = 1;
             picPreview.TabStop = false;
+            picPreview.Click += picPreview_Click;
             // 
             // panelSidebar
             // 
             panelSidebar.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             panelSidebar.BackColor = Color.DarkKhaki;
-            panelSidebar.Controls.Add(label2);
+            panelSidebar.Controls.Add(txtSearch);
             panelSidebar.Controls.Add(lstUGC);
             panelSidebar.Dock = DockStyle.Left;
             panelSidebar.Location = new Point(0, 0);
@@ -341,17 +342,17 @@
             panelSidebar.Size = new Size(250, 813);
             panelSidebar.TabIndex = 0;
             // 
-            // label2
+            // txtSearch
             // 
-            label2.AutoSize = true;
-            label2.BackColor = Color.DarkKhaki;
-            label2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label2.Location = new Point(12, 7);
-            label2.Name = "label2";
-            label2.Size = new Size(68, 15);
-            label2.TabIndex = 1;
-            label2.Text = "UGC Editor";
-            label2.Click += label2_Click;
+            txtSearch.Location = new Point(2, 4);
+            txtSearch.Margin = new Padding(3, 2, 3, 2);
+            txtSearch.Name = "txtSearch";
+            txtSearch.Size = new Size(247, 23);
+            txtSearch.TabIndex = 2;
+            txtSearch.Text = "Search...";
+            txtSearch.TextChanged += txtSearch_TextChanged;
+            txtSearch.Enter += txtSearch_Enter;
+            txtSearch.Leave += txtSearch_Leave;
             // 
             // lstUGC
             // 
@@ -407,7 +408,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(3, 2, 3, 2);
             Name = "Form1";
-            Text = "TomoAIO - TLLTD Tool 1.0";
+            Text = "TomoAIO - TLLTD Tool 1.2";
             Load += Form1_Load;
             Shown += Form1_Shown;
             panel1.ResumeLayout(false);
@@ -455,5 +456,6 @@
         private Button discsord2;
         private PictureBox pictureBox3;
         private Button btnDiscord;
+        private TextBox txtSearch;
     }
 }

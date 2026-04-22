@@ -8,11 +8,14 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using ZstdSharp;
+using System.Net.Http;
+using System.Diagnostics;
 
 namespace TomoAIO
 {
     public partial class Form1 : Form
     {
+        private List<string> allUgcFiles = new List<string>();
         string currentMiiSavPath = "";
         string currentUgcPath = "";
         private const int LogoMargin = 12;
@@ -57,6 +60,53 @@ namespace TomoAIO
             ConfigureActionButtons();
             ConfigureInputStyles();
             EnsureDiscordButtonVisible();
+        }
+
+        private async void CheckForUpdates()
+        {
+            try
+            {
+                string currentVersion = "1.2"; 
+                string repoOwner = "ohamir"; 
+                string repoName = "TomoAIO";   
+
+                string apiUrl = $"https://api.github.com/repos/{repoOwner}/{repoName}/releases/latest";
+
+                using (HttpClient client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Add("User-Agent", "TomoAIO-Updater");
+                    string response = await client.GetStringAsync(apiUrl);
+                    int tagIndex = response.IndexOf("\"tag_name\"");
+                    if (tagIndex != -1)
+                    {
+                        int startQuote = response.IndexOf('"', tagIndex + 11) + 1;
+                        int endQuote = response.IndexOf('"', startQuote);
+                        string latestVersion = response.Substring(startQuote, endQuote - startQuote);
+                        latestVersion = latestVersion.Replace("v", "").Replace("V", "");
+
+                        if (latestVersion != currentVersion)
+                        {
+                            DialogResult dialog = MessageBox.Show(
+                                $"A new version of TomoAIO is available! (v{latestVersion})\n\nWould you like to open the download page?",
+                                "Update Available",
+                                MessageBoxButtons.YesNo,
+                                MessageBoxIcon.Information);
+
+                            if (dialog == DialogResult.Yes)
+                            {
+                                Process.Start(new ProcessStartInfo
+                                {
+                                    FileName = $"https://github.com/{repoOwner}/{repoName}/releases/latest",
+                                    UseShellExecute = true
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+            }
         }
 
         private void EnableSmoothRendering()
@@ -719,49 +769,41 @@ namespace TomoAIO
                    Math.Abs(pixel.G - target.G) <= tolerance &&
                    Math.Abs(pixel.B - target.B) <= tolerance;
         }
-
-        // --- UGC EDITOR ENGINE (MadMax Logic) ---
-
         private void LoadUgcList(string exactUgcPath)
         {
             currentUgcPath = exactUgcPath;
             lstUGC.Items.Clear();
-
+            allUgcFiles.Clear();
             if (Directory.Exists(exactUgcPath))
             {
                 string[] files = Directory.GetFiles(exactUgcPath, "*.canvas.zs");
 
                 if (files.Length == 0)
                 {
-                    // The error message you wanted
                     MessageBox.Show("Please make sure you selected the right folder", "Folder Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
-
                 foreach (string file in files)
                 {
-                    lstUGC.Items.Add(Path.GetFileName(file));
+                    string fileName = Path.GetFileName(file);
+                    lstUGC.Items.Add(fileName);
+                    allUgcFiles.Add(fileName);
                 }
             }
         }
-        private byte[] EncodeRawTexture(Bitmap bmp)
+        private byte[] EncodeRawTexture(Bitmap bmp, bool convertSrgbToLinear = false)
         {
             int width = bmp.Width;
             int height = bmp.Height;
-            int bpp = 4; // 4 bytes per pixel (RGBA)
-
+            int bpp = 4;
             byte[] swizzledData = new byte[width * height * bpp];
-
-            // Force the image into a 32-bit ARGB format just in case the user imports a 24-bit PNG
             Bitmap clone = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             using (Graphics g = Graphics.FromImage(clone))
             {
                 g.DrawImage(bmp, new Rectangle(0, 0, width, height));
             }
-
             var rect = new Rectangle(0, 0, width, height);
             var bmpData = clone.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadOnly, clone.PixelFormat);
-
             byte[] linearData = new byte[width * height * bpp];
             System.Runtime.InteropServices.Marshal.Copy(bmpData.Scan0, linearData, 0, linearData.Length);
             clone.UnlockBits(bmpData);
@@ -770,7 +812,6 @@ namespace TomoAIO
             if (height <= 64) blockHeight = 4;
             if (height <= 32) blockHeight = 2;
             if (height <= 16) blockHeight = 1;
-
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
@@ -780,10 +821,22 @@ namespace TomoAIO
 
                     if (swizzledOffset + 3 < swizzledData.Length)
                     {
-                        swizzledData[swizzledOffset + 0] = linearData[linearOffset + 2]; 
-                        swizzledData[swizzledOffset + 1] = linearData[linearOffset + 1]; 
-                        swizzledData[swizzledOffset + 2] = linearData[linearOffset + 0]; 
-                        swizzledData[swizzledOffset + 3] = linearData[linearOffset + 3];
+                        byte b = linearData[linearOffset + 0];
+                        byte gChan = linearData[linearOffset + 1];
+                        byte r = linearData[linearOffset + 2];
+                        byte a = linearData[linearOffset + 3];
+
+                        if (convertSrgbToLinear)
+                        {
+                            r = SrgbToLinearByte(r);
+                            gChan = SrgbToLinearByte(gChan);
+                            b = SrgbToLinearByte(b);
+                        }
+
+                        swizzledData[swizzledOffset + 0] = r;
+                        swizzledData[swizzledOffset + 1] = gChan;
+                        swizzledData[swizzledOffset + 2] = b;
+                        swizzledData[swizzledOffset + 3] = a;
                     }
                 }
             }
@@ -791,7 +844,15 @@ namespace TomoAIO
             clone.Dispose();
             return swizzledData;
         }
-
+        private byte SrgbToLinearByte(byte srgb)
+        {
+            float s = srgb / 255f;
+            float linear = (s <= 0.04045f) ? (s / 12.92f) : (float)Math.Pow((s + 0.055f) / 1.055f, 2.4f);
+            int value = (int)Math.Round(linear * 255f);
+            if (value < 0) value = 0;
+            if (value > 255) value = 255;
+            return (byte)value;
+        }
         private int GetSwizzleOffset(int x, int y, int width, int bpp, int blockHeight)
         {
             int widthInGobs = (width * bpp + 63) / 64;
@@ -813,7 +874,7 @@ namespace TomoAIO
         {
             byte[] hash = Enumerable.Range(0, hashHex.Length / 2)
                                     .Select(x => Convert.ToByte(hashHex.Substring(x * 2, 2), 16))
-                                    .Reverse().ToArray(); 
+                                    .Reverse().ToArray();
 
             for (int i = 0; i <= fileData.Length - 8; i++)
             {
@@ -847,10 +908,10 @@ namespace TomoAIO
 
                     if (swizzledOffset + 3 < rawData.Length)
                     {
-                        deswizzledData[linearOffset + 0] = rawData[swizzledOffset + 2]; 
-                        deswizzledData[linearOffset + 1] = rawData[swizzledOffset + 1]; 
-                        deswizzledData[linearOffset + 2] = rawData[swizzledOffset + 0]; 
-                        deswizzledData[linearOffset + 3] = rawData[swizzledOffset + 3]; 
+                        deswizzledData[linearOffset + 0] = rawData[swizzledOffset + 2];
+                        deswizzledData[linearOffset + 1] = rawData[swizzledOffset + 1];
+                        deswizzledData[linearOffset + 2] = rawData[swizzledOffset + 0];
+                        deswizzledData[linearOffset + 3] = rawData[swizzledOffset + 3];
                     }
                 }
             }
@@ -880,17 +941,38 @@ namespace TomoAIO
                 if (selectedFile.EndsWith(".canvas.zs"))
                 {
                     int size = (int)Math.Sqrt(decompressed.Length / 4);
-                    picPreview.Image = DecodeRawTexture(decompressed, size, size);
+
+                    // 1. Decode the dark, mathematically-correct image
+                    Bitmap rawDecoded = DecodeRawTexture(decompressed, size, size);
+
+                    // 2. Create the brightened Preview Filter
+                    Bitmap previewImage = new Bitmap(rawDecoded.Width, rawDecoded.Height);
+                    using (Graphics g = Graphics.FromImage(previewImage))
+                    {
+                        using (System.Drawing.Imaging.ImageAttributes attr = new System.Drawing.Imaging.ImageAttributes())
+                        {
+                            attr.SetGamma(0.4545f); // Reverse the Linear curve for Windows
+                            g.DrawImage(rawDecoded,
+                                new Rectangle(0, 0, previewImage.Width, previewImage.Height),
+                                0, 0, rawDecoded.Width, rawDecoded.Height,
+                                GraphicsUnit.Pixel, attr);
+                        }
+                    }
+
+                    // 3. Assign the bright image to the PictureBox and clean up the dark one
+                    picPreview.Image = previewImage;
+                    rawDecoded.Dispose();
+
                     lblImageInfo.Text = $"{selectedFile} ({size}x{size} Decoded)";
                 }
                 else if (selectedFile.EndsWith(".ugctex.zs"))
                 {
                     int actualWidth = 256;
 
-                    if (decompressed.Length > 200000) actualWidth = 512;      
-                    else if (decompressed.Length > 100000) actualWidth = 384; 
-                    else if (decompressed.Length > 40000) actualWidth = 256;  
-                    else if (decompressed.Length > 10000) actualWidth = 128; 
+                    if (decompressed.Length > 200000) actualWidth = 512;
+                    else if (decompressed.Length > 100000) actualWidth = 384;
+                    else if (decompressed.Length > 40000) actualWidth = 256;
+                    else if (decompressed.Length > 10000) actualWidth = 128;
 
                     int actualHeight = actualWidth;
 
@@ -949,7 +1031,6 @@ namespace TomoAIO
 
             Array.Copy(unswizzledData, 0, astcFile, 16, unswizzledData.Length);
 
-            // CONVERT PNG
             File.WriteAllBytes("temp.astc", astcFile);
             var process = new System.Diagnostics.Process();
             process.StartInfo.FileName = "astcenc.exe";
@@ -1039,10 +1120,10 @@ namespace TomoAIO
             List<byte> pkgList = originalPkg.ToList();
             if (pkgList[0] < 3)
             {
-                pkgList.RemoveAt(4); 
+                pkgList.RemoveAt(4);
                 if (pkgList[0] == 2)
                 {
-                    pkgList.Insert(427, 0); 
+                    pkgList.Insert(427, 0);
                     int cIdx = FindMarker(pkgList.ToArray(), new byte[] { 0xA3, 0xA3, 0xA3 });
                     if (cIdx != -1) pkgList.Insert(cIdx + 3, 0xA3);
                     int uIdx = FindLastMarker(pkgList.ToArray(), new byte[] { 0xA3, 0xA3, 0xA3 });
@@ -1123,7 +1204,7 @@ namespace TomoAIO
 
                     Array.Copy(new byte[] { 255, 255, 255, 255 }, 0, miiBytes, fO + (slot * 4), 4);
 
-                    // Clear old facepaint registry
+                    // Clear old facepaint 
                     if (oldFaceID != 255 && oldFaceID < 70)
                     {
                         ClearPlayerRegistry(pBytes, oldFaceID);
@@ -1160,11 +1241,25 @@ namespace TomoAIO
             }
             string bD = Path.Combine(Application.StartupPath, "backup", DateTime.Now.ToString("dd_MM_yyyy_HHmmss"));
             Directory.CreateDirectory(bD);
-            foreach (string f in Directory.GetFiles(sD)) File.Copy(f, Path.Combine(bD, Path.GetFileName(f)));
-            if (Directory.Exists(Path.Combine(sD, "Ugc")))
+            string[] safeFiles = { "Map.sav", "Mii.sav", "Player.sav" };
+            foreach (string file in safeFiles)
             {
-                Directory.CreateDirectory(Path.Combine(bD, "Ugc"));
-                foreach (string f in Directory.GetFiles(Path.Combine(sD, "Ugc"))) File.Copy(f, Path.Combine(bD, "Ugc", Path.GetFileName(f)));
+                string sourceFile = Path.Combine(sD, file);
+                if (File.Exists(sourceFile))
+                {
+                    File.Copy(sourceFile, Path.Combine(bD, file), true);
+                }
+            }
+            string sourceUgc = Path.Combine(sD, "Ugc");
+            if (Directory.Exists(sourceUgc))
+            {
+                string destUgc = Path.Combine(bD, "Ugc");
+                Directory.CreateDirectory(destUgc);
+
+                foreach (string f in Directory.GetFiles(sourceUgc))
+                {
+                    File.Copy(f, Path.Combine(destUgc, Path.GetFileName(f)), true);
+                }
             }
         }
 
@@ -1221,6 +1316,28 @@ namespace TomoAIO
             PinLogoTopRight();
             LayoutMiiEditorControls();
             EnsureDiscordButtonVisible();
+
+            using (FolderBrowserDialog fbd = new FolderBrowserDialog())
+            {
+                fbd.Description = "Select your game save folder (where Mii.sav is located)";
+
+                if (fbd.ShowDialog() == DialogResult.OK)
+                {
+                    string selectedFolder = fbd.SelectedPath;
+                    string miiSavPath = Path.Combine(selectedFolder, "Mii.sav");
+
+                    if (File.Exists(miiSavPath))
+                    {
+                        currentMiiSavPath = miiSavPath;
+                        RefreshMiiList();
+                        MessageBox.Show("Save file found!", "TomoAIO");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Could not find Mii.sav in that folder!\n\nPlease make sure you selected the correct save folder.", "Wrong Folder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }
+            }
         }
         private void button3_Click(object sender, EventArgs e) { ShowMainMenu(); }
         private void button2_Click(object sender, EventArgs e)
@@ -1230,7 +1347,7 @@ namespace TomoAIO
                 fbd.Description = "Select your Living the Dream 'Ugc' folder";
                 if (fbd.ShowDialog() == DialogResult.OK)
                 {
- 
+
                     LoadUgcList(fbd.SelectedPath);
 
 
@@ -1297,8 +1414,10 @@ namespace TomoAIO
         private void panel1_Paint(object sender, PaintEventArgs e) { }
         private void Form1_Load(object sender, EventArgs e)
         {
+            // Check for updates silently in the background the second the app opens!
+            CheckForUpdates();
+
             lblImageInfo.Text = "Waiting for selection...";
-            label2.BringToFront();
             PinLogoTopRight();
             LayoutMainMenuButtons();
             LayoutMiiEditorControls();
@@ -1330,12 +1449,43 @@ namespace TomoAIO
         private void btnUgcExport_Click(object sender, EventArgs e)
         {
             if (lstUGC.SelectedItem == null) return;
-            using (SaveFileDialog sfd = new SaveFileDialog() { FileName = lstUGC.SelectedItem.ToString() })
+
+            string selectedFile = lstUGC.SelectedItem.ToString();
+            string sourcePath = Path.Combine(currentUgcPath, selectedFile);
+
+            using (SaveFileDialog sfd = new SaveFileDialog())
             {
+                sfd.Title = "Export UGC File";
+
+                // allows png export & .zs export
+                sfd.Filter = "PNG Image (*.png)|*.png|Zstandard Game File (*.zs)|*.zs";
+                string cleanName = selectedFile.Replace(".canvas.zs", "").Replace(".ugctex.zs", "").Replace(".zs", "");
+                sfd.FileName = cleanName + "_export";
+
                 if (sfd.ShowDialog() == DialogResult.OK)
                 {
-                    File.Copy(Path.Combine(currentUgcPath, lstUGC.SelectedItem.ToString()), sfd.FileName, true);
-                    MessageBox.Show("Exported Successfully!");
+                    try
+                    {
+                        if (sfd.FileName.EndsWith(".png"))
+                        {
+                            if (picPreview.Image == null)
+                            {
+                                MessageBox.Show("There is no image loaded to export as a PNG!", "Error");
+                                return;
+                            }
+                            picPreview.Image.Save(sfd.FileName, System.Drawing.Imaging.ImageFormat.Png);
+                        }
+                        else if (sfd.FileName.EndsWith(".zs"))
+                        {
+                            File.Copy(sourcePath, sfd.FileName, true);
+                        }
+
+                        MessageBox.Show("File successfully exported to your PC!", "Success");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Failed to export file: " + ex.Message, "Error");
+                    }
                 }
             }
         }
@@ -1343,7 +1493,6 @@ namespace TomoAIO
         private void btnUgcImport_Click(object sender, EventArgs e)
         {
             if (lstUGC.SelectedItem == null) return;
-
             using (OpenFileDialog ofd = new OpenFileDialog() { Filter = "UGC Files (*.png;*.jpg;*.zs)|*.png;*.jpg;*.zs" })
             {
                 if (ofd.ShowDialog() == DialogResult.OK)
@@ -1352,58 +1501,44 @@ namespace TomoAIO
                     {
                         string selectedFile = lstUGC.SelectedItem.ToString();
                         string fullPath = Path.Combine(currentUgcPath, selectedFile);
-
-                        // 1. ZS FILE BYPASS
                         if (ofd.FileName.EndsWith(".zs"))
                         {
                             File.Copy(ofd.FileName, fullPath, true);
                             MessageBox.Show("Canvas/Texture file successfully replaced!", "Success");
-
-                            // Force the UI to refresh the image preview!
                             lstUGC_SelectedIndexChanged(sender, e);
                             return;
                         }
-
-                        // (THE PROXY REDIRECT HAS BEEN REMOVED FROM HERE)
-
-                        // 2. PNG/JPG IMAGE IMPORT
-                        Bitmap newImage = new Bitmap(ofd.FileName);
-
-                        // Decode the original file quickly to get the exact size the game expects
                         byte[] origBytes = File.ReadAllBytes(fullPath);
                         byte[] origDecomp;
                         using (var decompressor = new ZstdSharp.Decompressor())
                         {
                             origDecomp = decompressor.Unwrap(origBytes).ToArray();
                         }
-
                         int expectedSize = (int)Math.Sqrt(origDecomp.Length / 4);
 
-                        Bitmap finalImage = newImage;
-                        if (newImage.Width != expectedSize || newImage.Height != expectedSize)
-                        {
-                            // Auto-resize if it doesn't match
-                            finalImage = new Bitmap(newImage, new Size(expectedSize, expectedSize));
-                        }
+                        Bitmap sourceImage = new Bitmap(ofd.FileName);
+                        Bitmap processedImage = new Bitmap(expectedSize, expectedSize, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-                        // Swizzle and compress
-                        byte[] rawSwizzled = EncodeRawTexture(finalImage);
+                        using (Graphics g = Graphics.FromImage(processedImage))
+                        {
+                            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                            g.DrawImage(sourceImage,
+                                new Rectangle(0, 0, expectedSize, expectedSize),
+                                0, 0, sourceImage.Width, sourceImage.Height,
+                                GraphicsUnit.Pixel);
+                        }
+                        byte[] rawSwizzled = EncodeRawTexture(processedImage, convertSrgbToLinear: true);
                         byte[] compressedData;
                         using (var compressor = new ZstdSharp.Compressor(9))
                         {
                             compressedData = compressor.Wrap(rawSwizzled).ToArray();
                         }
-
-                        // Overwrite the EXACT file selected in the listbox
                         File.WriteAllBytes(fullPath, compressedData);
-
-                        // Clean up memory
-                        if (finalImage != newImage) finalImage.Dispose();
-                        newImage.Dispose();
+                        sourceImage.Dispose();
+                        processedImage.Dispose();
 
                         MessageBox.Show("Custom texture successfully resized and injected!", "Success");
-
-                        // Force the UI to refresh the image preview!
                         lstUGC_SelectedIndexChanged(sender, e);
                     }
                     catch (Exception ex)
@@ -1456,5 +1591,51 @@ namespace TomoAIO
         {
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("https://discord.gg/JmEttdwE5J") { UseShellExecute = true });
         }
+
+        private void txtSearch_TextChanged(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtSearch.Text) || txtSearch.Text == "Search...")
+            {
+                lstUGC.Items.Clear();
+                foreach (string file in allUgcFiles)
+                {
+                    lstUGC.Items.Add(file);
+                }
+                return;
+            }
+            string searchTerm = txtSearch.Text.ToLower();
+            lstUGC.Items.Clear();
+
+            foreach (string file in allUgcFiles)
+            {
+                if (file.ToLower().Contains(searchTerm))
+                {
+                    lstUGC.Items.Add(file);
+                }
+            }
+        }
+
+        private void txtSearch_Enter(object sender, EventArgs e)
+        {
+            if (txtSearch.Text == "Search...")
+            {
+                txtSearch.Text = "";
+                txtSearch.ForeColor = Color.Black;
+            }
+        }
+
+        private void txtSearch_Leave(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtSearch.Text))
+            {
+                txtSearch.Text = "Search...";
+                txtSearch.ForeColor = Color.Gray;
+            }
+        }
+
+        private void picPreview_Click(object sender, EventArgs e)
+        {
+
+        }
     }
-}
+} 
