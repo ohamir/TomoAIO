@@ -1458,24 +1458,34 @@ namespace TomoAIO
                             return;
                         }
                         byte[] origDecomp = _ugcService.LoadAndDecompress(fullPath);
-                        int expectedSize = (int)Math.Sqrt(origDecomp.Length / 4);
-
                         Bitmap sourceImage = new Bitmap(ofd.FileName);
-                        Bitmap processedImage = new Bitmap(expectedSize, expectedSize, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-                        using (Graphics g = Graphics.FromImage(processedImage))
+                        byte[] encoded;
+                        if (selectedFile.EndsWith(".ugctex.zs", StringComparison.OrdinalIgnoreCase) &&
+                            selectedFile.Contains("thumb", StringComparison.OrdinalIgnoreCase))
                         {
-                            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                            g.DrawImage(sourceImage,
-                                new Rectangle(0, 0, expectedSize, expectedSize),
-                                0, 0, sourceImage.Width, sourceImage.Height,
-                                GraphicsUnit.Pixel);
+                            // Match LivingTheDreamToolkit thumbnail pipeline exactly:
+                            // resize -> sRGB to linear -> BC3 -> swizzle(blockHeight 8) -> zstd.
+                            encoded = _textureService.EncodeThumbnailBc3Swizzled(sourceImage, 256, convertSrgbToLinear: true, swizzleBlockHeight: 8);
                         }
-                        byte[] rawSwizzled = EncodeRawTexture(processedImage, convertSrgbToLinear: true);
-                        _ugcService.WriteCompressed(fullPath, rawSwizzled);
+                        else
+                        {
+                            int expectedSize = (int)Math.Sqrt(origDecomp.Length / 4);
+                            using Bitmap processedImage = new Bitmap(expectedSize, expectedSize, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                            using (Graphics g = Graphics.FromImage(processedImage))
+                            {
+                                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                                g.DrawImage(sourceImage,
+                                    new Rectangle(0, 0, expectedSize, expectedSize),
+                                    0, 0, sourceImage.Width, sourceImage.Height,
+                                    GraphicsUnit.Pixel);
+                            }
+
+                            encoded = EncodeRawTexture(processedImage, convertSrgbToLinear: true);
+                        }
+
+                        _ugcService.WriteCompressed(fullPath, encoded);
                         sourceImage.Dispose();
-                        processedImage.Dispose();
 
                         MessageBox.Show("Custom texture successfully resized and injected!", "Success");
                         lstUGC_SelectedIndexChanged(sender, e);
@@ -1498,6 +1508,7 @@ namespace TomoAIO
             lblImageInfo.Text = "Waiting for selection...";
             ShowMainMenu();
         }
+
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);

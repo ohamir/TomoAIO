@@ -5,6 +5,52 @@ namespace TomoAIO.Services
 {
     internal sealed class TextureService
     {
+        public byte[] EncodeThumbnailBc3Swizzled(Bitmap sourceImage, int thumbSize = 256, bool convertSrgbToLinear = true, int swizzleBlockHeight = 8)
+        {
+            using Bitmap resized = new(thumbSize, thumbSize, PixelFormat.Format32bppArgb);
+            using (Graphics g = Graphics.FromImage(resized))
+            {
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                g.DrawImage(sourceImage, new Rectangle(0, 0, thumbSize, thumbSize), 0, 0, sourceImage.Width, sourceImage.Height, GraphicsUnit.Pixel);
+            }
+
+            byte[] bgra = ExtractBgraBytes(resized);
+            byte[] rgba = BgraToRgba(bgra);
+            if (convertSrgbToLinear)
+            {
+                for (int i = 0; i < rgba.Length; i += 4)
+                {
+                    rgba[i + 0] = SrgbToLinearByte(rgba[i + 0]);
+                    rgba[i + 1] = SrgbToLinearByte(rgba[i + 1]);
+                    rgba[i + 2] = SrgbToLinearByte(rgba[i + 2]);
+                }
+            }
+
+            byte[] linearBc3 = Bc3EncodeLikeToolkit(rgba, thumbSize, thumbSize);
+            int gridW = thumbSize / 4;
+            int gridH = thumbSize / 4;
+            byte[] swizzled = new byte[linearBc3.Length];
+            const int bytesPerBlock = 16;
+
+            for (int y = 0; y < gridH; y++)
+            {
+                for (int x = 0; x < gridW; x++)
+                {
+                    int linearOffset = (y * gridW + x) * bytesPerBlock;
+                    int swizzledOffset = GetSwizzleOffset(x, y, gridW, bytesPerBlock, swizzleBlockHeight);
+                    if (swizzledOffset + (bytesPerBlock - 1) >= swizzled.Length)
+                    {
+                        continue;
+                    }
+
+                    Array.Copy(linearBc3, linearOffset, swizzled, swizzledOffset, bytesPerBlock);
+                }
+            }
+
+            return swizzled;
+        }
+
         public byte[] EncodeRawTexture(Bitmap bmp, bool convertSrgbToLinear = false)
         {
             int width = bmp.Width;
@@ -160,6 +206,222 @@ namespace TomoAIO.Services
             float linear = (s <= 0.04045f) ? (s / 12.92f) : (float)Math.Pow((s + 0.055f) / 1.055f, 2.4f);
             int value = (int)Math.Round(linear * 255f);
             return (byte)Math.Clamp(value, 0, 255);
+        }
+
+        private static byte[] ExtractBgraBytes(Bitmap bmp)
+        {
+            Rectangle rect = new(0, 0, bmp.Width, bmp.Height);
+            BitmapData bmpData = bmp.LockBits(rect, ImageLockMode.ReadOnly, bmp.PixelFormat);
+            try
+            {
+                byte[] bytes = new byte[bmp.Width * bmp.Height * 4];
+                System.Runtime.InteropServices.Marshal.Copy(bmpData.Scan0, bytes, 0, bytes.Length);
+                return bytes;
+            }
+            finally
+            {
+                bmp.UnlockBits(bmpData);
+            }
+        }
+
+        private static byte[] BgraToRgba(byte[] bgra)
+        {
+            byte[] rgba = new byte[bgra.Length];
+            for (int i = 0; i < bgra.Length; i += 4)
+            {
+                rgba[i + 0] = bgra[i + 2];
+                rgba[i + 1] = bgra[i + 1];
+                rgba[i + 2] = bgra[i + 0];
+                rgba[i + 3] = bgra[i + 3];
+            }
+
+            return rgba;
+        }
+
+        private static byte[] Bc3EncodeLikeToolkit(byte[] rgba, int texWidth, int texHeight)
+        {
+            int blocksX = texWidth / 4;
+            int blocksY = texHeight / 4;
+            byte[] output = new byte[blocksX * blocksY * 16];
+            byte[] block = new byte[64];
+
+            for (int by = 0; by < blocksY; by++)
+            {
+                for (int bx = 0; bx < blocksX; bx++)
+                {
+                    for (int row = 0; row < 4; row++)
+                    {
+                        for (int col = 0; col < 4; col++)
+                        {
+                            int px = bx * 4 + col;
+                            int py = by * 4 + row;
+                            int src = (py * texWidth + px) * 4;
+                            int dst = (row * 4 + col) * 4;
+                            block[dst] = rgba[src];
+                            block[dst + 1] = rgba[src + 1];
+                            block[dst + 2] = rgba[src + 2];
+                            block[dst + 3] = rgba[src + 3];
+                        }
+                    }
+
+                    Bc3EncodeBlockLikeToolkit(block, output, (by * blocksX + bx) * 16);
+                }
+            }
+
+            return output;
+        }
+
+        private static void Bc3EncodeBlockLikeToolkit(byte[] block, byte[] output, int outOffset)
+        {
+            int minA = 255;
+            int maxA = 0;
+            for (int i = 0; i < 16; i++)
+            {
+                int a = block[i * 4 + 3];
+                if (a < minA) minA = a;
+                if (a > maxA) maxA = a;
+            }
+
+            byte a0;
+            byte a1;
+            if (minA == maxA)
+            {
+                a0 = (byte)maxA;
+                a1 = (byte)maxA;
+            }
+            else
+            {
+                a0 = (byte)maxA;
+                a1 = (byte)minA;
+            }
+
+            output[outOffset] = a0;
+            output[outOffset + 1] = a1;
+
+            int[] alphaPal = new int[8];
+            alphaPal[0] = a0;
+            alphaPal[1] = a1;
+            if (a0 > a1)
+            {
+                alphaPal[2] = (6 * a0 + 1 * a1) / 7;
+                alphaPal[3] = (5 * a0 + 2 * a1) / 7;
+                alphaPal[4] = (4 * a0 + 3 * a1) / 7;
+                alphaPal[5] = (3 * a0 + 4 * a1) / 7;
+                alphaPal[6] = (2 * a0 + 5 * a1) / 7;
+                alphaPal[7] = (1 * a0 + 6 * a1) / 7;
+            }
+            else
+            {
+                alphaPal[2] = a0;
+                alphaPal[3] = a0;
+                alphaPal[4] = a0;
+                alphaPal[5] = a0;
+                alphaPal[6] = 0;
+                alphaPal[7] = 255;
+            }
+
+            ulong alphaIndexBits = 0;
+            for (int i = 0; i < 16; i++)
+            {
+                int bestIdx = 0;
+                int bestDist = int.MaxValue;
+                for (int k = 0; k < 8; k++)
+                {
+                    int d = Math.Abs(block[i * 4 + 3] - alphaPal[k]);
+                    if (d < bestDist)
+                    {
+                        bestDist = d;
+                        bestIdx = k;
+                    }
+                }
+
+                alphaIndexBits |= ((ulong)bestIdx & 0x7UL) << (i * 3);
+            }
+
+            for (int i = 0; i < 6; i++)
+            {
+                output[outOffset + 2 + i] = (byte)((alphaIndexBits >> (8 * i)) & 0xFF);
+            }
+
+            int minR = 255, minG = 255, minB = 255;
+            int maxR = 0, maxG = 0, maxB = 0;
+            for (int i = 0; i < 16; i++)
+            {
+                int off = i * 4;
+                int r = block[off], g = block[off + 1], b = block[off + 2];
+                if (r < minR) minR = r;
+                if (g < minG) minG = g;
+                if (b < minB) minB = b;
+                if (r > maxR) maxR = r;
+                if (g > maxG) maxG = g;
+                if (b > maxB) maxB = b;
+            }
+
+            ushort color0 = PackRgb565((byte)maxR, (byte)maxG, (byte)maxB);
+            ushort color1 = PackRgb565((byte)minR, (byte)minG, (byte)minB);
+            if (color0 < color1)
+            {
+                (color0, color1) = (color1, color0);
+            }
+            if (color0 == color1)
+            {
+                if (color0 < 0xFFFF) color0++;
+                else color1--;
+            }
+
+            var c0 = DecodeRgb565(color0);
+            var c1 = DecodeRgb565(color1);
+            int pr2 = (2 * c0.r + c1.r) / 3;
+            int pg2 = (2 * c0.g + c1.g) / 3;
+            int pb2 = (2 * c0.b + c1.b) / 3;
+            int pr3 = (c0.r + 2 * c1.r) / 3;
+            int pg3 = (c0.g + 2 * c1.g) / 3;
+            int pb3 = (c0.b + 2 * c1.b) / 3;
+
+            uint colorIndexBits = 0;
+            for (int i = 0; i < 16; i++)
+            {
+                int off = i * 4;
+                int r = block[off];
+                int g = block[off + 1];
+                int b = block[off + 2];
+
+                int bestIdx = 0;
+                int bestDist = ColorDistSq(r, g, b, c0.r, c0.g, c0.b);
+                int d1 = ColorDistSq(r, g, b, c1.r, c1.g, c1.b);
+                int d2 = ColorDistSq(r, g, b, pr2, pg2, pb2);
+                int d3 = ColorDistSq(r, g, b, pr3, pg3, pb3);
+                if (d1 < bestDist) { bestDist = d1; bestIdx = 1; }
+                if (d2 < bestDist) { bestDist = d2; bestIdx = 2; }
+                if (d3 < bestDist) { bestIdx = 3; }
+
+                colorIndexBits |= ((uint)bestIdx & 0x3u) << (i * 2);
+            }
+
+            output[outOffset + 8] = (byte)(color0 & 0xFF);
+            output[outOffset + 9] = (byte)((color0 >> 8) & 0xFF);
+            output[outOffset + 10] = (byte)(color1 & 0xFF);
+            output[outOffset + 11] = (byte)((color1 >> 8) & 0xFF);
+            output[outOffset + 12] = (byte)(colorIndexBits & 0xFF);
+            output[outOffset + 13] = (byte)((colorIndexBits >> 8) & 0xFF);
+            output[outOffset + 14] = (byte)((colorIndexBits >> 16) & 0xFF);
+            output[outOffset + 15] = (byte)((colorIndexBits >> 24) & 0xFF);
+        }
+
+        private static ushort PackRgb565(byte r, byte g, byte b)
+        {
+            int r5 = (r * 31 + 127) / 255;
+            int g6 = (g * 63 + 127) / 255;
+            int b5 = (b * 31 + 127) / 255;
+            return (ushort)((r5 << 11) | (g6 << 5) | b5);
+        }
+
+        private static int ColorDistSq(int r1, int g1, int b1, int r2, int g2, int b2)
+        {
+            int dr = r1 - r2;
+            int dg = g1 - g2;
+            int db = b1 - b2;
+            return dr * dr + dg * dg + db * db;
         }
 
         private static byte[] DecodeBc3LinearToBgra(byte[] bc3Blocks, int width, int height)
