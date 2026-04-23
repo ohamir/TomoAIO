@@ -16,6 +16,7 @@ namespace TomoAIO
     public partial class Form1 : Form
     {
         private List<string> allUgcFiles = new List<string>();
+        private readonly Dictionary<string, string> ugcDisplayToFile = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         string currentMiiSavPath = "";
         string currentUgcPath = "";
         private const int LogoMargin = 12;
@@ -774,9 +775,17 @@ namespace TomoAIO
             currentUgcPath = exactUgcPath;
             lstUGC.Items.Clear();
             allUgcFiles.Clear();
+            ugcDisplayToFile.Clear();
             if (Directory.Exists(exactUgcPath))
             {
-                string[] files = Directory.GetFiles(exactUgcPath, "*.canvas.zs");
+                string[] files = Directory
+                    .GetFiles(exactUgcPath, "*.zs")
+                    .Where(file =>
+                        file.EndsWith(".canvas.zs", StringComparison.OrdinalIgnoreCase) ||
+                        (file.EndsWith(".ugctex.zs", StringComparison.OrdinalIgnoreCase) &&
+                         Path.GetFileName(file).Contains("thumb", StringComparison.OrdinalIgnoreCase)))
+                    .OrderBy(Path.GetFileName)
+                    .ToArray();
 
                 if (files.Length == 0)
                 {
@@ -786,10 +795,58 @@ namespace TomoAIO
                 foreach (string file in files)
                 {
                     string fileName = Path.GetFileName(file);
-                    lstUGC.Items.Add(fileName);
                     allUgcFiles.Add(fileName);
+                    AddUgcListEntry(fileName);
                 }
             }
+        }
+
+        private void AddUgcListEntry(string fileName)
+        {
+            string displayName = GetUgcDisplayName(fileName);
+            string uniqueDisplay = displayName;
+            int suffix = 2;
+            while (ugcDisplayToFile.ContainsKey(uniqueDisplay))
+            {
+                uniqueDisplay = $"{displayName} ({suffix})";
+                suffix++;
+            }
+
+            ugcDisplayToFile[uniqueDisplay] = fileName;
+            lstUGC.Items.Add(uniqueDisplay);
+        }
+
+        private static string GetUgcDisplayName(string fileName)
+        {
+            string display = fileName.EndsWith(".zs", StringComparison.OrdinalIgnoreCase)
+                ? fileName[..^3]
+                : fileName;
+
+            if (display.EndsWith(".ugctex", StringComparison.OrdinalIgnoreCase))
+            {
+                display = display[..^(".ugctex".Length)];
+            }
+            else if (display.EndsWith(".canvas", StringComparison.OrdinalIgnoreCase))
+            {
+                display = display[..^(".canvas".Length)];
+            }
+
+            // Friendly label in UI only; real file names stay unchanged internally.
+            display = display.Replace("thumb", "thumbnail", StringComparison.OrdinalIgnoreCase);
+            return display;
+        }
+
+        private string? GetSelectedUgcFileName()
+        {
+            if (lstUGC.SelectedItem == null)
+            {
+                return null;
+            }
+
+            string selectedDisplay = lstUGC.SelectedItem.ToString() ?? string.Empty;
+            return ugcDisplayToFile.TryGetValue(selectedDisplay, out string? realFile)
+                ? realFile
+                : null;
         }
         private byte[] EncodeRawTexture(Bitmap bmp, bool convertSrgbToLinear = false)
         {
@@ -923,8 +980,8 @@ namespace TomoAIO
 
         private void lstUGC_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (lstUGC.SelectedItem == null) return;
-            string selectedFile = lstUGC.SelectedItem.ToString()!;
+            string? selectedFile = GetSelectedUgcFileName();
+            if (string.IsNullOrWhiteSpace(selectedFile)) return;
             string fullPath = Path.Combine(currentUgcPath, selectedFile);
 
             try
@@ -967,25 +1024,23 @@ namespace TomoAIO
                 }
                 else if (selectedFile.EndsWith(".ugctex.zs"))
                 {
-                    int actualWidth = 256;
+                    if (!selectedFile.Contains("thumb", StringComparison.OrdinalIgnoreCase))
+                    {
+                        lblImageInfo.Text = $"{selectedFile} (ignored: only thumbnail ugctex is supported)";
+                        return;
+                    }
 
-                    if (decompressed.Length > 200000) actualWidth = 512;
-                    else if (decompressed.Length > 100000) actualWidth = 384;
-                    else if (decompressed.Length > 40000) actualWidth = 256;
-                    else if (decompressed.Length > 10000) actualWidth = 128;
+                    int blockCount = decompressed.Length / 16;
+                    int gridSize = (int)Math.Sqrt(blockCount);
+                    bool validSquareGrid = gridSize > 0 && (gridSize * gridSize) == blockCount;
 
+                    int actualWidth = validSquareGrid ? gridSize * 4 : 256;
                     int actualHeight = actualWidth;
 
-                    picPreview.Image = DecodeCompressedAstc(decompressed, actualWidth, actualHeight);
-
-                    if (picPreview.Image == null)
-                    {
-                        lblImageInfo.Text = $"{selectedFile} (ASTC Decode Failed - Check astcenc.exe)";
-                    }
-                    else
-                    {
-                        lblImageInfo.Text = $"{selectedFile} ({actualWidth}x{actualHeight} ASTC Decoded)";
-                    }
+                    picPreview.Image = DecodeBc3SwizzledTexture(decompressed, actualWidth, actualHeight, 8);
+                    lblImageInfo.Text = picPreview.Image == null
+                        ? $"{selectedFile} (BC3 Decode Failed)"
+                        : $"{selectedFile} ({actualWidth}x{actualHeight} BC3 Decoded)";
                 }
             }
             catch (Exception ex)
@@ -993,65 +1048,149 @@ namespace TomoAIO
                 MessageBox.Show("Error: " + ex.Message);
             }
         }
-        private Bitmap DecodeCompressedAstc(byte[] rawData, int width, int height)
+        private Bitmap DecodeBc3SwizzledTexture(byte[] rawData, int width, int height, int blockHeight)
         {
-            int blockW = 4;
-            int blockH = 4;
-            int gridWidth = width / blockW;
-            int gridHeight = height / blockH;
-            int bytesPerBlock = 16;
-            byte[] unswizzledData = new byte[gridWidth * gridHeight * bytesPerBlock];
-            int swizzleBlockHeight = 1;
-            while (swizzleBlockHeight * 8 < gridHeight && swizzleBlockHeight < 16)
+            if (width <= 0 || height <= 0 || width % 4 != 0 || height % 4 != 0)
             {
-                swizzleBlockHeight *= 2;
+                return null;
             }
-            int dataOffset = rawData.Length - unswizzledData.Length;
-            if (dataOffset < 0) dataOffset = 0;
+
+            int gridWidth = width / 4;
+            int gridHeight = height / 4;
+            int bytesPerBlock = 16;
+            int expectedLength = gridWidth * gridHeight * bytesPerBlock;
+            int dataOffset = Math.Max(0, rawData.Length - expectedLength);
+            byte[] linearBc3 = new byte[expectedLength];
 
             for (int y = 0; y < gridHeight; y++)
             {
                 for (int x = 0; x < gridWidth; x++)
                 {
-                    int swizzledOffset = GetSwizzleOffset(x, y, gridWidth, bytesPerBlock, swizzleBlockHeight);
+                    int swizzledOffset = GetSwizzleOffset(x, y, gridWidth, bytesPerBlock, blockHeight);
                     int linearOffset = (y * gridWidth + x) * bytesPerBlock;
+                    int sourceOffset = swizzledOffset + dataOffset;
 
-                    if (swizzledOffset + dataOffset + 15 < rawData.Length)
+                    if (sourceOffset + (bytesPerBlock - 1) < rawData.Length && linearOffset + (bytesPerBlock - 1) < linearBc3.Length)
                     {
-                        Array.Copy(rawData, swizzledOffset + dataOffset, unswizzledData, linearOffset, bytesPerBlock);
+                        Array.Copy(rawData, sourceOffset, linearBc3, linearOffset, bytesPerBlock);
                     }
                 }
             }
-            byte[] astcFile = new byte[16 + unswizzledData.Length];
-            astcFile[0] = 0x13; astcFile[1] = 0xAB; astcFile[2] = 0xA1; astcFile[3] = 0x5C;
-            astcFile[4] = (byte)blockW; astcFile[5] = (byte)blockH; astcFile[6] = 1;
-            astcFile[7] = (byte)(width & 0xFF); astcFile[8] = (byte)((width >> 8) & 0xFF); astcFile[9] = 0;
-            astcFile[10] = (byte)(height & 0xFF); astcFile[11] = (byte)((height >> 8) & 0xFF); astcFile[12] = 0;
-            astcFile[13] = 1; astcFile[14] = 0; astcFile[15] = 0;
 
-            Array.Copy(unswizzledData, 0, astcFile, 16, unswizzledData.Length);
+            byte[] bgra = DecodeBc3LinearToBgra(linearBc3, width, height);
+            Bitmap bmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            Rectangle rect = new Rectangle(0, 0, width, height);
+            var bmpData = bmp.LockBits(rect, System.Drawing.Imaging.ImageLockMode.WriteOnly, bmp.PixelFormat);
+            System.Runtime.InteropServices.Marshal.Copy(bgra, 0, bmpData.Scan0, bgra.Length);
+            bmp.UnlockBits(bmpData);
+            return bmp;
+        }
 
-            File.WriteAllBytes("temp.astc", astcFile);
-            var process = new System.Diagnostics.Process();
-            process.StartInfo.FileName = "astcenc.exe";
-            process.StartInfo.Arguments = "-dl temp.astc temp.png";
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-            process.Start();
-            process.WaitForExit();
-            Bitmap finalBmp = null;
-            if (File.Exists("temp.png"))
+        private byte[] DecodeBc3LinearToBgra(byte[] bc3Blocks, int width, int height)
+        {
+            byte[] output = new byte[width * height * 4];
+            int blocksX = width / 4;
+            int blocksY = height / 4;
+
+            for (int by = 0; by < blocksY; by++)
             {
-                using (var tempImage = new Bitmap("temp.png"))
+                for (int bx = 0; bx < blocksX; bx++)
                 {
-                    finalBmp = new Bitmap(tempImage);
+                    int blockOffset = (by * blocksX + bx) * 16;
+                    if (blockOffset + 15 >= bc3Blocks.Length)
+                    {
+                        continue;
+                    }
+
+                    byte alpha0 = bc3Blocks[blockOffset + 0];
+                    byte alpha1 = bc3Blocks[blockOffset + 1];
+                    ulong alphaBits = 0;
+                    for (int i = 0; i < 6; i++)
+                    {
+                        alphaBits |= ((ulong)bc3Blocks[blockOffset + 2 + i]) << (8 * i);
+                    }
+
+                    byte[] alphaTable = BuildBc3AlphaTable(alpha0, alpha1);
+
+                    ushort color0 = BitConverter.ToUInt16(bc3Blocks, blockOffset + 8);
+                    ushort color1 = BitConverter.ToUInt16(bc3Blocks, blockOffset + 10);
+                    uint colorBits = BitConverter.ToUInt32(bc3Blocks, blockOffset + 12);
+
+                    var c0 = DecodeRgb565(color0);
+                    var c1 = DecodeRgb565(color1);
+                    byte[,] colors = new byte[4, 3];
+                    colors[0, 0] = c0.r; colors[0, 1] = c0.g; colors[0, 2] = c0.b;
+                    colors[1, 0] = c1.r; colors[1, 1] = c1.g; colors[1, 2] = c1.b;
+                    colors[2, 0] = (byte)((2 * c0.r + c1.r) / 3);
+                    colors[2, 1] = (byte)((2 * c0.g + c1.g) / 3);
+                    colors[2, 2] = (byte)((2 * c0.b + c1.b) / 3);
+                    colors[3, 0] = (byte)((c0.r + 2 * c1.r) / 3);
+                    colors[3, 1] = (byte)((c0.g + 2 * c1.g) / 3);
+                    colors[3, 2] = (byte)((c0.b + 2 * c1.b) / 3);
+
+                    for (int py = 0; py < 4; py++)
+                    {
+                        for (int px = 0; px < 4; px++)
+                        {
+                            int pixelIndex = py * 4 + px;
+                            int colorIndex = (int)((colorBits >> (2 * pixelIndex)) & 0x3);
+                            int alphaIndex = (int)((alphaBits >> (3 * pixelIndex)) & 0x7);
+
+                            int x = bx * 4 + px;
+                            int y = by * 4 + py;
+                            int dst = (y * width + x) * 4;
+
+                            // Bitmap Format32bppArgb expects BGRA byte order in memory.
+                            output[dst + 0] = colors[colorIndex, 2];
+                            output[dst + 1] = colors[colorIndex, 1];
+                            output[dst + 2] = colors[colorIndex, 0];
+                            output[dst + 3] = alphaTable[alphaIndex];
+                        }
+                    }
                 }
-                File.Delete("temp.png");
             }
 
-            if (File.Exists("temp.astc")) File.Delete("temp.astc");
+            return output;
+        }
 
-            return finalBmp;
+        private static byte[] BuildBc3AlphaTable(byte alpha0, byte alpha1)
+        {
+            byte[] table = new byte[8];
+            table[0] = alpha0;
+            table[1] = alpha1;
+
+            if (alpha0 > alpha1)
+            {
+                table[2] = (byte)((6 * alpha0 + 1 * alpha1) / 7);
+                table[3] = (byte)((5 * alpha0 + 2 * alpha1) / 7);
+                table[4] = (byte)((4 * alpha0 + 3 * alpha1) / 7);
+                table[5] = (byte)((3 * alpha0 + 4 * alpha1) / 7);
+                table[6] = (byte)((2 * alpha0 + 5 * alpha1) / 7);
+                table[7] = (byte)((1 * alpha0 + 6 * alpha1) / 7);
+            }
+            else
+            {
+                table[2] = (byte)((4 * alpha0 + 1 * alpha1) / 5);
+                table[3] = (byte)((3 * alpha0 + 2 * alpha1) / 5);
+                table[4] = (byte)((2 * alpha0 + 3 * alpha1) / 5);
+                table[5] = (byte)((1 * alpha0 + 4 * alpha1) / 5);
+                table[6] = 0;
+                table[7] = 255;
+            }
+
+            return table;
+        }
+
+        private static (byte r, byte g, byte b) DecodeRgb565(ushort value)
+        {
+            int r5 = (value >> 11) & 0x1F;
+            int g6 = (value >> 5) & 0x3F;
+            int b5 = value & 0x1F;
+
+            byte r = (byte)((r5 * 255 + 15) / 31);
+            byte g = (byte)((g6 * 255 + 31) / 63);
+            byte b = (byte)((b5 * 255 + 15) / 31);
+            return (r, g, b);
         }
         private void ExportMii(int slot, string name)
         {
@@ -1448,9 +1587,8 @@ namespace TomoAIO
         private void label2_Click(object sender, EventArgs e) { }
         private void btnUgcExport_Click(object sender, EventArgs e)
         {
-            if (lstUGC.SelectedItem == null) return;
-
-            string selectedFile = lstUGC.SelectedItem.ToString();
+            string? selectedFile = GetSelectedUgcFileName();
+            if (string.IsNullOrWhiteSpace(selectedFile)) return;
             string sourcePath = Path.Combine(currentUgcPath, selectedFile);
 
             using (SaveFileDialog sfd = new SaveFileDialog())
@@ -1492,14 +1630,14 @@ namespace TomoAIO
         private void lblImageInfo_Click(object sender, EventArgs e) { }
         private void btnUgcImport_Click(object sender, EventArgs e)
         {
-            if (lstUGC.SelectedItem == null) return;
+            string? selectedFile = GetSelectedUgcFileName();
+            if (string.IsNullOrWhiteSpace(selectedFile)) return;
             using (OpenFileDialog ofd = new OpenFileDialog() { Filter = "UGC Files (*.png;*.jpg;*.zs)|*.png;*.jpg;*.zs" })
             {
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
                     try
                     {
-                        string selectedFile = lstUGC.SelectedItem.ToString();
                         string fullPath = Path.Combine(currentUgcPath, selectedFile);
                         if (ofd.FileName.EndsWith(".zs"))
                         {
@@ -1597,20 +1735,23 @@ namespace TomoAIO
             if (string.IsNullOrWhiteSpace(txtSearch.Text) || txtSearch.Text == "Search...")
             {
                 lstUGC.Items.Clear();
+                ugcDisplayToFile.Clear();
                 foreach (string file in allUgcFiles)
                 {
-                    lstUGC.Items.Add(file);
+                    AddUgcListEntry(file);
                 }
                 return;
             }
             string searchTerm = txtSearch.Text.ToLower();
             lstUGC.Items.Clear();
+            ugcDisplayToFile.Clear();
 
             foreach (string file in allUgcFiles)
             {
-                if (file.ToLower().Contains(searchTerm))
+                string display = GetUgcDisplayName(file);
+                if (display.ToLower().Contains(searchTerm))
                 {
-                    lstUGC.Items.Add(file);
+                    AddUgcListEntry(file);
                 }
             }
         }
