@@ -1,4 +1,4 @@
-# TomoAIO - Living the Dream Tool (v1.0)
+# TomoAIO - Living the Dream Tool (v1.2)
 <img width="1412" height="813" alt="TomoAIO_UD7HUpK06q" src="https://github.com/user-attachments/assets/e483f3ba-0d27-45a7-aba8-9aefd9ce7222" />
 
 
