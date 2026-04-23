@@ -20,6 +20,7 @@ namespace TomoAIO
         string currentMiiSavPath = "";
         string currentUgcPath = "";
         private const int LogoMargin = 12;
+        private const int DiscordMargin = 12;
         private readonly Size _baseLogoSize = new Size(175, 160);
         private readonly Size _baseClientSize = new Size(1343, 745);
         private readonly Size _baseButtonSize = new Size(366, 285);
@@ -134,10 +135,9 @@ namespace TomoAIO
         {
             button1.Parent = pictureBox1;
             button2.Parent = pictureBox1;
-            logo.Parent = pictureBox1;
-            logopanel1.Parent = pictureBox2;
-            logo.BackColor = Color.Transparent;
-            logopanel1.BackColor = Color.Transparent;
+            ApplyLogoStyle(logo, pictureBox1);
+            ApplyLogoStyle(logopanel1, pictureBox2);
+            ApplyLogoStyle(pictureBox3, panelUGC);
             pictureBox1.SendToBack();
             logo.BringToFront();
             pictureBox2.SendToBack();
@@ -156,6 +156,13 @@ namespace TomoAIO
             logopanel1.BackgroundImageLayout = ImageLayout.Zoom;
             PinLogoTopRight();
             LayoutMainMenuButtons();
+        }
+
+        private void ApplyLogoStyle(PictureBox logoControl, Control parent)
+        {
+            logoControl.Parent = parent;
+            logoControl.BackColor = Color.Transparent;
+            logoControl.BackgroundImageLayout = ImageLayout.Zoom;
         }
 
         private void EnsureMenuImages()
@@ -179,6 +186,21 @@ namespace TomoAIO
             {
                 logo.BackgroundImage = Properties.Resources.tomoaio_logo;
             }
+
+            if (logopanel1.BackgroundImage == null)
+            {
+                logopanel1.BackgroundImage = Properties.Resources.tomoaio_logo;
+            }
+
+            if (pictureBox3.BackgroundImage == null)
+            {
+                pictureBox3.BackgroundImage = Properties.Resources.tomoaio_logo;
+            }
+
+            ApplyLogoStyle(logo, pictureBox1);
+            ApplyLogoStyle(logopanel1, pictureBox2);
+            ApplyLogoStyle(pictureBox3, panelUGC);
+            PinLogoTopRight();
         }
 
         private void ShowMainMenu()
@@ -225,9 +247,23 @@ namespace TomoAIO
             btnDiscord.FlatAppearance.BorderSize = 0;
             btnDiscord.FlatAppearance.MouseDownBackColor = Color.Transparent;
             btnDiscord.FlatAppearance.MouseOverBackColor = Color.Transparent;
+            btnDiscord.Anchor = AnchorStyles.None;
             btnDiscord.Visible = true;
             btnDiscord.Enabled = true;
+            PinDiscordBottomRight();
             btnDiscord.BringToFront();
+        }
+
+        private void PinDiscordBottomRight()
+        {
+            if (btnDiscord.Parent == null)
+            {
+                return;
+            }
+
+            btnDiscord.Location = new Point(
+                Math.Max(0, btnDiscord.Parent.ClientSize.Width - btnDiscord.Width - DiscordMargin),
+                Math.Max(0, btnDiscord.Parent.ClientSize.Height - btnDiscord.Height - DiscordMargin));
         }
 
         private void PinLogoTopRight()
@@ -281,7 +317,9 @@ namespace TomoAIO
             int gap = (int)Math.Round(BaseButtonGap * scale);
 
             int totalWidth = (buttonWidth * 2) + gap;
-            int startX = Math.Max(20, (clientWidth - totalWidth) / 2);
+            int reservedRight = GetRightTopReservedWidth();
+            int usableWidth = Math.Max(260, clientWidth - reservedRight);
+            int startX = Math.Max(20, (usableWidth - totalWidth) / 2);
             int y = Math.Max(110, (clientHeight - buttonHeight) / 2);
 
             button1.Size = new Size(buttonWidth, buttonHeight);
@@ -308,7 +346,8 @@ namespace TomoAIO
             int top = Math.Max(10, (int)Math.Round(12 * uiScale));
             int rowGap = Math.Max(8, (int)Math.Round(12 * uiScale));
 
-            int maxArea = Math.Max(220, panelWidth - (outerMargin * 2));
+            int reservedRight = panel1.Visible ? GetRightTopReservedWidth() : 0;
+            int maxArea = Math.Max(220, panelWidth - (outerMargin * 2) - reservedRight);
             int areaWidth = Math.Min((int)Math.Round(panelWidth * 0.72f), maxArea);
             areaWidth = Math.Max(260, areaWidth);
             areaWidth = Math.Min(areaWidth, maxArea);
@@ -391,42 +430,92 @@ namespace TomoAIO
                 return;
             }
 
-            panelSidebar.Width = UgcSidebarWidth;
+            int minSidebar = 170;
+            int maxSidebar = UgcSidebarWidth;
+            int responsiveSidebar = (int)Math.Round(panelWidth * 0.24f);
+            panelSidebar.Width = Math.Max(minSidebar, Math.Min(maxSidebar, responsiveSidebar));
 
-            int contentLeft = panelSidebar.Width + 20;
-            int contentRight = panelWidth - 20;
+            int outerMargin = 12;
+            int contentLeft = panelSidebar.Width + outerMargin;
+            int reservedRight = panelUGC.Visible ? GetRightTopReservedWidth() : 0;
+            int contentRight = panelWidth - outerMargin - reservedRight;
             int contentWidth = Math.Max(220, contentRight - contentLeft);
-            int top = 16;
-            int bottomAreaHeight = 70;
-            int gap = 12;
+            int top = 14;
+            int gap = 10;
 
-            int availableHeight = Math.Max(200, panelHeight - top - bottomAreaHeight - (gap * 2));
-            int squareSize = Math.Max(180, Math.Min(contentWidth, availableHeight));
-            int squareX = contentLeft + ((contentWidth - squareSize) / 2);
-            int squareY = top;
+            btnUgcBack.Size = new Size(Math.Max(130, Math.Min(180, contentWidth / 3)), 38);
+            btnUgcBack.Location = new Point(contentLeft, top);
+            btnUgcBack.BringToFront();
+
+            int contentTop = btnUgcBack.Bottom + gap;
+            int footerReserve = 58;
+            int availableHeight = Math.Max(150, panelHeight - contentTop - footerReserve);
+
+            bool stackButtons = contentWidth < 430 || panelHeight < 520;
+            int buttonHeight = 42;
+            int buttonAreaHeight = stackButtons ? (buttonHeight * 2) + gap : buttonHeight;
+            int infoHeight = 20;
+
+            int maxPreviewHeight = Math.Max(120, availableHeight - buttonAreaHeight - infoHeight - (gap * 2));
+            int squareSize = Math.Max(120, Math.Min(contentWidth, maxPreviewHeight));
+            int squareX = contentLeft + Math.Max(0, (contentWidth - squareSize) / 2);
+            int squareY = contentTop;
 
             picPreview.Location = new Point(squareX, squareY);
             picPreview.Size = new Size(squareSize, squareSize);
 
             int buttonY = picPreview.Bottom + gap;
-            int buttonWidth = Math.Max(120, Math.Min(280, (squareSize - gap) / 2));
-            int totalButtonsWidth = (buttonWidth * 2) + gap;
-            int buttonsLeft = squareX + ((squareSize - totalButtonsWidth) / 2);
+            if (stackButtons)
+            {
+                int fullButtonWidth = Math.Max(130, Math.Min(contentWidth, squareSize));
+                int centeredX = contentLeft + Math.Max(0, (contentWidth - fullButtonWidth) / 2);
 
-            btnUgcImport.Location = new Point(buttonsLeft, buttonY);
-            btnUgcImport.Size = new Size(buttonWidth, 44);
+                btnUgcImport.Location = new Point(centeredX, buttonY);
+                btnUgcImport.Size = new Size(fullButtonWidth, buttonHeight);
 
-            btnUgcExport.Location = new Point(btnUgcImport.Right + gap, buttonY);
-            btnUgcExport.Size = new Size(buttonWidth, 44);
+                btnUgcExport.Location = new Point(centeredX, btnUgcImport.Bottom + gap);
+                btnUgcExport.Size = new Size(fullButtonWidth, buttonHeight);
+            }
+            else
+            {
+                int buttonWidth = Math.Max(120, Math.Min(280, (squareSize - gap) / 2));
+                int totalButtonsWidth = (buttonWidth * 2) + gap;
+                int buttonsLeft = squareX + ((squareSize - totalButtonsWidth) / 2);
+
+                btnUgcImport.Location = new Point(buttonsLeft, buttonY);
+                btnUgcImport.Size = new Size(buttonWidth, buttonHeight);
+
+                btnUgcExport.Location = new Point(btnUgcImport.Right + gap, buttonY);
+                btnUgcExport.Size = new Size(buttonWidth, buttonHeight);
+            }
 
             lblImageInfo.AutoSize = false;
             lblImageInfo.TextAlign = ContentAlignment.MiddleCenter;
-            lblImageInfo.Location = new Point(squareX, btnUgcImport.Bottom + 6);
-            lblImageInfo.Size = new Size(squareSize, 20);
+            int infoTop = Math.Min(panelHeight - infoHeight - 4, btnUgcExport.Bottom + 6);
+            lblImageInfo.Location = new Point(contentLeft, infoTop);
+            lblImageInfo.Size = new Size(contentWidth, infoHeight);
+        }
 
-            btnUgcBack.Size = new Size(154, 38);
-            btnUgcBack.Location = new Point(contentLeft, top);
-            btnUgcBack.BringToFront();
+        private int GetRightTopReservedWidth()
+        {
+            int reserved = 0;
+
+            if (logo.Visible && logo.Parent == this)
+            {
+                reserved = Math.Max(reserved, logo.Width + (LogoMargin * 2));
+            }
+
+            if (logopanel1.Visible && logopanel1.Parent == panel1)
+            {
+                reserved = Math.Max(reserved, logopanel1.Width + (LogoMargin * 2));
+            }
+
+            if (pictureBox3.Visible && pictureBox3.Parent == panelUGC)
+            {
+                reserved = Math.Max(reserved, pictureBox3.Width + (LogoMargin * 2));
+            }
+
+            return reserved;
         }
 
         private void ConfigureTransparentButton(Button button)
