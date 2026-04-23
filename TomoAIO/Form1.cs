@@ -66,7 +66,7 @@ namespace TomoAIO
         {
             try
             {
-                string currentVersion = "1.1"; 
+                string currentVersion = "1.2"; 
                 string repoOwner = "ohamir"; 
                 string repoName = "TomoAIO";   
 
