@@ -61,3 +61,13 @@ If your game ever fails to load, simply open the `backup` folder, find the most 
 
 Need help, have questions, or want to share the custom Miis and UGC items you've made? 
 Join the community Discord https://discord.gg/jhdupweGw7
+
+## 📜 Credits
+
+This project utilizes the following open-source libraries:
+
+* **[ZstdSharp.Port](https://github.com/mkoloschak/ZstdSharp)** - Used for Zstandard compression and decompression.
+* **[AssetRipper.TextureDecoder](https://github.com/AssetRipper/TextureDecoder)** - Used for handling game texture formats.
+* **[astcenc](https://github.com/ARM-software/astc-encoder)** - Utilized for decoding ASTC compressed textures via command-line interface.
+* **[ShareMii](https://github.com/Star-F0rce/ShareMii)** - For the original Mii data structures and `.ltd` file format inspiration.
+* **[Living the Dream Toolkit](https://github.com/MadMax1960/LivingTheDreamToolkit)** - For the research and logic behind the game's save file offsets and registry triggers.
