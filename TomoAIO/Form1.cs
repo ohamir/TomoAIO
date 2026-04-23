@@ -1356,7 +1356,7 @@ namespace TomoAIO
         private void panel1_Paint(object sender, PaintEventArgs e) { }
         private void Form1_Load(object sender, EventArgs e)
         {
-            // Check for updates silently in the background the second the app opens!
+            // Check for updates in the background on startup.
             CheckForUpdates();
 
             lblImageInfo.Text = "Waiting for selection...";
@@ -1406,7 +1406,7 @@ namespace TomoAIO
             {
                 sfd.Title = "Export UGC File";
 
-                // allows png export & .zs export
+                // PNG image export and raw .zs export.
                 sfd.Filter = "PNG Image (*.png)|*.png|Zstandard Game File (*.zs)|*.zs";
                 string cleanName = selectedFile.Replace(".canvas.zs", "").Replace(".ugctex.zs", "").Replace(".zs", "");
                 sfd.FileName = cleanName + "_export";
