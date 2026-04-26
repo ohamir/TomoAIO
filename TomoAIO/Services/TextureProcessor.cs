@@ -77,7 +77,6 @@ public static class TextureProcessor
             GetBaseName(Path.GetFileName(inputPath)));
 
         using var img = DecodeFile(inputPath, noSrgb);
-        WriteExportPngs(img, basePath, log);
     }
 
     private static Image<Rgba32> DecodeCanvas(byte[] rawData, bool noSrgb)
@@ -273,7 +272,7 @@ public static class TextureProcessor
             int gridH = thumbH / 4;
             byte[] thumbSwizzled = SwizzleBlockLinear(bc3Blocks, gridW, gridH, 16, ThumbBlockHeight);
 
-            string thumbPath = destStem + "_Thumb_ugctex.zs";
+            string thumbPath = destStem + "_Thumb.ugctex.zs"; // <- changed this to .ugctex.zs since i don't know what thumb_ugctex.zs does as it's not in the game files
             File.WriteAllBytes(thumbPath, ZstdCompress(thumbSwizzled, ZstdLevel));
             log($"Wrote {thumbPath}");
         }

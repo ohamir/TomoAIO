@@ -941,7 +941,7 @@ namespace TomoAIO
                 {
                     using (var ms = new MemoryStream())
                     {
-                        imageSharpImg.Save(ms, new SixLabors.ImageSharp.Formats.Bmp.BmpEncoder());
+                        imageSharpImg.Save(ms, new SixLabors.ImageSharp.Formats.Png.PngEncoder());
 
                         if (picPreview.Image != null) picPreview.Image.Dispose();
 
@@ -1443,19 +1443,19 @@ namespace TomoAIO
                             lstUGC_SelectedIndexChanged(sender, e);
                             return;
                         }
-                        string destStem = fullPath.Replace(".canvas.zs", "")
-                                                  .Replace(".ugctex.zs", "")
-                                                  .Replace("_Thumb_ugctex.zs", "");
+                        string destStem = fullPath.Replace(".canvas.zs", "", StringComparison.OrdinalIgnoreCase)
+                                                  .Replace(".ugctex.zs", "", StringComparison.OrdinalIgnoreCase);
+
                         string originalUgcPath = destStem + ".ugctex.zs";
+                        bool isThumb = destStem.EndsWith("_Thumb", StringComparison.OrdinalIgnoreCase);
                         TextureProcessor.ImportPng(
-                            pngPath: ofd.FileName, 
-                            destStem: destStem,   
-                            writeCanvas: true,     
-                            writeThumb: true,      
-                            noSrgb: false,        
+                            pngPath: ofd.FileName,
+                            destStem: destStem,
+                            writeCanvas: !isThumb,  
+                            writeThumb: !isThumb,  
+                            noSrgb: false,
                             originalUgctexPath: File.Exists(originalUgcPath) ? originalUgcPath : null
                         );
-
                         MessageBox.Show("Custom texture successfully converted and injected!", "Success");
                         lstUGC_SelectedIndexChanged(sender, e);
                     }
