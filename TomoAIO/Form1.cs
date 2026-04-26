@@ -1059,9 +1059,33 @@ namespace TomoAIO
                 br.ReadBytes(4);
                 Array.Copy(br.ReadBytes(156), 0, miiBytes, dnaO + (slot * 156), 156);
                 foreach (string h in persHashes) Array.Copy(br.ReadBytes(4), 0, miiBytes, GetActualOffset(miiBytes, h) + 4 + (slot * 4), 4);
-                Array.Copy(br.ReadBytes(64), 0, miiBytes, GetActualOffset(miiBytes, "2499BFDA") + 4 + (slot * 64), 64);
-                Array.Copy(br.ReadBytes(128), 0, miiBytes, GetActualOffset(miiBytes, "3A5EDA05") + 4 + (slot * 128), 128);
+                int nameOffset = GetActualOffset(miiBytes, "2499BFDA") + 4 + (slot * 64);
+                byte[] rawName = br.ReadBytes(64);
+                Array.Clear(miiBytes, nameOffset, 64); 
+                int validNameLen = 64;
+                for (int i = 0; i < 63; i += 2)
+                {
+                    if (rawName[i] == 0 && rawName[i + 1] == 0) 
+                    {
+                        validNameLen = i + 2;
+                        break;
+                    }
+                }
+                Array.Copy(rawName, 0, miiBytes, nameOffset, validNameLen); 
+                int creatorOffset = GetActualOffset(miiBytes, "3A5EDA05") + 4 + (slot * 128);
+                byte[] rawCreator = br.ReadBytes(128);
+                Array.Clear(miiBytes, creatorOffset, 128); 
 
+                int validCreatorLen = 128;
+                for (int i = 0; i < 127; i += 2)
+                {
+                    if (rawCreator[i] == 0 && rawCreator[i + 1] == 0)
+                    {
+                        validCreatorLen = i + 2;
+                        break;
+                    }
+                }
+                Array.Copy(rawCreator, 0, miiBytes, creatorOffset, validCreatorLen);
                 byte[] mySx = br.ReadBytes(3); br.ReadByte();
                 int sxO = GetActualOffset(miiBytes, "DFC82223") + 4;
                 List<int> bits = DecodeSexuality(miiBytes.Skip(sxO).Take(27).ToArray());
