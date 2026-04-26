@@ -937,61 +937,22 @@ namespace TomoAIO
 
             try
             {
-                byte[] decompressed = _ugcService.LoadAndDecompress(fullPath);
-
-                if (picPreview.Image != null) picPreview.Image.Dispose();
-
-                if (selectedFile.EndsWith(".canvas.zs"))
+                using (var imageSharpImg = TextureProcessor.DecodeFile(fullPath))
                 {
-                    int size = (int)Math.Sqrt(decompressed.Length / 4);
-
-                    // 1. Decode the dark, mathematically-correct image
-                    Bitmap rawDecoded = DecodeRawTexture(decompressed, size, size);
-
-                    // 2. Create the brightened Preview Filter
-                    Bitmap previewImage = new Bitmap(rawDecoded.Width, rawDecoded.Height);
-                    using (Graphics g = Graphics.FromImage(previewImage))
+                    using (var ms = new MemoryStream())
                     {
-                        using (System.Drawing.Imaging.ImageAttributes attr = new System.Drawing.Imaging.ImageAttributes())
-                        {
-                            attr.SetGamma(0.4545f); // Reverse the Linear curve for Windows
-                            g.DrawImage(rawDecoded,
-                                new Rectangle(0, 0, previewImage.Width, previewImage.Height),
-                                0, 0, rawDecoded.Width, rawDecoded.Height,
-                                GraphicsUnit.Pixel, attr);
-                        }
+                        imageSharpImg.Save(ms, new SixLabors.ImageSharp.Formats.Bmp.BmpEncoder());
+
+                        if (picPreview.Image != null) picPreview.Image.Dispose();
+
+                        picPreview.Image = new Bitmap(ms);
                     }
-
-                    // 3. Assign the bright image to the PictureBox and clean up the dark one
-                    picPreview.Image = previewImage;
-                    rawDecoded.Dispose();
-
-                    lblImageInfo.Text = $"{selectedFile} ({size}x{size} Decoded)";
-                }
-                else if (selectedFile.EndsWith(".ugctex.zs"))
-                {
-                    if (!selectedFile.Contains("thumb", StringComparison.OrdinalIgnoreCase))
-                    {
-                        lblImageInfo.Text = $"{selectedFile} (ignored: only thumbnail ugctex is supported)";
-                        return;
-                    }
-
-                    int blockCount = decompressed.Length / 16;
-                    int gridSize = (int)Math.Sqrt(blockCount);
-                    bool validSquareGrid = gridSize > 0 && (gridSize * gridSize) == blockCount;
-
-                    int actualWidth = validSquareGrid ? gridSize * 4 : 256;
-                    int actualHeight = actualWidth;
-
-                    picPreview.Image = DecodeBc3SwizzledTexture(decompressed, actualWidth, actualHeight, 8);
-                    lblImageInfo.Text = picPreview.Image == null
-                        ? $"{selectedFile} (BC3 Decode Failed)"
-                        : $"{selectedFile} ({actualWidth}x{actualHeight} BC3 Decoded)";
+                    lblImageInfo.Text = $"{selectedFile} ({imageSharpImg.Width}x{imageSharpImg.Height} Decoded)";
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message);
+                MessageBox.Show("Error loading preview: " + ex.Message, "TomoAIO");
             }
         }
         private Bitmap? DecodeBc3SwizzledTexture(byte[] rawData, int width, int height, int blockHeight)
@@ -1443,6 +1404,7 @@ namespace TomoAIO
         {
             string? selectedFile = GetSelectedUgcFileName();
             if (string.IsNullOrWhiteSpace(selectedFile)) return;
+
             using (OpenFileDialog ofd = new OpenFileDialog() { Filter = "UGC Files (*.png;*.jpg;*.zs)|*.png;*.jpg;*.zs" })
             {
                 if (ofd.ShowDialog() == DialogResult.OK)
@@ -1450,49 +1412,32 @@ namespace TomoAIO
                     try
                     {
                         string fullPath = Path.Combine(_state.CurrentUgcPath, selectedFile);
-                        if (ofd.FileName.EndsWith(".zs"))
+                        if (ofd.FileName.EndsWith(".zs", StringComparison.OrdinalIgnoreCase))
                         {
                             _ugcService.ReplaceFromZs(ofd.FileName, fullPath);
                             MessageBox.Show("Canvas/Texture file successfully replaced!", "Success");
                             lstUGC_SelectedIndexChanged(sender, e);
                             return;
                         }
-                        byte[] origDecomp = _ugcService.LoadAndDecompress(fullPath);
-                        Bitmap sourceImage = new Bitmap(ofd.FileName);
-                        byte[] encoded;
-                        if (selectedFile.EndsWith(".ugctex.zs", StringComparison.OrdinalIgnoreCase) &&
-                            selectedFile.Contains("thumb", StringComparison.OrdinalIgnoreCase))
-                        {
-                            // Match LivingTheDreamToolkit thumbnail pipeline exactly:
-                            // resize -> sRGB to linear -> BC3 -> swizzle(blockHeight 8) -> zstd.
-                            encoded = _textureService.EncodeThumbnailBc3Swizzled(sourceImage, 256, convertSrgbToLinear: true, swizzleBlockHeight: 8);
-                        }
-                        else
-                        {
-                            int expectedSize = (int)Math.Sqrt(origDecomp.Length / 4);
-                            using Bitmap processedImage = new Bitmap(expectedSize, expectedSize, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                            using (Graphics g = Graphics.FromImage(processedImage))
-                            {
-                                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                                g.DrawImage(sourceImage,
-                                    new Rectangle(0, 0, expectedSize, expectedSize),
-                                    0, 0, sourceImage.Width, sourceImage.Height,
-                                    GraphicsUnit.Pixel);
-                            }
+                        string destStem = fullPath.Replace(".canvas.zs", "")
+                                                  .Replace(".ugctex.zs", "")
+                                                  .Replace("_Thumb_ugctex.zs", "");
+                        string originalUgcPath = destStem + ".ugctex.zs";
+                        TextureProcessor.ImportPng(
+                            pngPath: ofd.FileName, 
+                            destStem: destStem,   
+                            writeCanvas: true,     
+                            writeThumb: true,      
+                            noSrgb: false,        
+                            originalUgctexPath: File.Exists(originalUgcPath) ? originalUgcPath : null
+                        );
 
-                            encoded = EncodeRawTexture(processedImage, convertSrgbToLinear: true);
-                        }
-
-                        _ugcService.WriteCompressed(fullPath, encoded);
-                        sourceImage.Dispose();
-
-                        MessageBox.Show("Custom texture successfully resized and injected!", "Success");
+                        MessageBox.Show("Custom texture successfully converted and injected!", "Success");
                         lstUGC_SelectedIndexChanged(sender, e);
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Import Error: " + ex.Message);
+                        MessageBox.Show("Import Error: " + ex.Message, "Error");
                     }
                 }
             }
