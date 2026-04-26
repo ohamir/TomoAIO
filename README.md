@@ -70,4 +70,4 @@ This project utilizes the following open-source libraries:
 * **[AssetRipper.TextureDecoder](https://github.com/AssetRipper/TextureDecoder)** - Used for handling game texture formats.
 * **[astcenc](https://github.com/ARM-software/astc-encoder)** - Utilized for decoding ASTC compressed textures via command-line interface.
 * **[ShareMii](https://github.com/Star-F0rce/ShareMii)** - For the original Mii data structures and `.ltd` file format inspiration.
-* **[Living the Dream Toolkit](https://github.com/MadMax1960/LivingTheDreamToolkit)** - For the research and logic behind the game's save file offsets and registry triggers.
+* **[Living the Dream Toolkit](https://github.com/MadMax1960/LivingTheDreamToolkit)** - Used the Texture Processing of LTD Toolkit for the UGC Editor
