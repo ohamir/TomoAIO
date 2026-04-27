@@ -69,6 +69,7 @@ namespace TomoAIO
         {
             _ugcService = new UgcService(_fileSystem, _zstdCodec);
             InitializeComponent();
+            StyleSpecificAssets();
             _mainMenuView = new MainMenuView(pictureBox1, logo, button1, button2);
             _miiEditorView = new MiiEditorView(panel1);
             _ugcCreatorView = new UgcCreatorView(panelUGC);
@@ -1600,7 +1601,7 @@ namespace TomoAIO
                     Array.Copy(moneyData, 0, pBytes, valueIndex, 4);
                     File.WriteAllBytes(_state.CurrentPlayerSavPath, pBytes);
 
-                    MessageBox.Show($"Success! Your island funds have been set to ${numMoney.Value:N2}", "Bank Updated");
+                    MessageBox.Show($"Success! Your island funds have been set to ${numMoney.Value:N2}", "Island Funds Updated  ");
                     RefreshIslandManagementUI();
                 }
             }
@@ -1714,14 +1715,12 @@ namespace TomoAIO
 
                     int nullIndex = islandName.IndexOf('\0');
                     if (nullIndex != -1) islandName = islandName.Substring(0, nullIndex);
-
-                   // lblCurrentIslandName.Text = $"Island: {islandName}"; <- not needed at this time or it would show the island name twice
+                    // lblCurrentIslandName.Text = $"Island: {islandName}"; <- not needed at this time or it would show the island name twice
                     if (lblIslandTitle != null) lblIslandTitle.Text = $"{islandName} Management";
                 }
             }
             catch (Exception ex)
             {
-               // lblCurrentIslandName.Text = "Error: " + ex.Message; <- not needed at this time or it would show the island name twice    
             }
         }
         private void LoadCurrentMoney()
@@ -1752,6 +1751,55 @@ namespace TomoAIO
         private void btnUnlockFood_Click(object sender, EventArgs e)
         {
             UnlockSpecificCategory(new string[] { "933DA780" }, false, "Foods");
+        }
+
+        private void pictureBox4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void IslandFund_Click(object sender, EventArgs e)
+        {
+
+        }
+        private void StyleSpecificAssets()
+        {
+            Button[] unlockButtons = { btnUnlockClothes, btnUnlockFood, btnUnlockQBuilds, btnUnlockInteriors };
+            Color exactBlue = ColorTranslator.FromHtml("#2F3D52");
+            foreach (Button btn in unlockButtons)
+            {
+                btn.Dock = DockStyle.None; 
+                btn.Anchor = AnchorStyles.None;   
+                btn.Size = new Size(370, 61);  
+                btn.FlatStyle = FlatStyle.Flat;
+                btn.FlatAppearance.BorderSize = 0;
+                btn.BackColor = exactBlue;
+                btn.ForeColor = Color.White;
+                btn.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+                btn.Cursor = Cursors.Hand;
+                btn.Resize -= CustomButton_Resize; 
+                btn.Resize += CustomButton_Resize;
+                CustomButton_Resize(btn, EventArgs.Empty);
+            }
+        }
+        private void CustomButton_Resize(object sender, EventArgs e)
+        {
+            if (sender is Button btn)
+            {
+                int radius = 12; 
+                System.Drawing.Drawing2D.GraphicsPath path = new System.Drawing.Drawing2D.GraphicsPath();
+                path.AddArc(0, 0, radius, radius, 180, 90);
+                path.AddArc(btn.Width - radius, 0, radius, radius, 270, 90);
+                path.AddArc(btn.Width - radius, btn.Height - radius, radius, radius, 0, 90);
+                path.AddArc(0, btn.Height - radius, radius, radius, 90, 90);
+                path.CloseFigure();
+                btn.Region = new Region(path);
+            }
+        }
+
+        private void lblCurrentMoney_Click(object sender, EventArgs e)
+        {
+
         }
     }
 } 
