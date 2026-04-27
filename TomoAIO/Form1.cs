@@ -83,9 +83,9 @@ namespace TomoAIO
         {
             try
             {
-                string currentVersion = "1.2"; 
-                string repoOwner = "ohamir"; 
-                string repoName = "TomoAIO";   
+                string currentVersion = "1.2";
+                string repoOwner = "ohamir";
+                string repoName = "TomoAIO";
                 string? latestVersion = await _updateService.GetLatestVersionAsync(repoOwner, repoName);
                 if (!string.IsNullOrWhiteSpace(latestVersion) && latestVersion != currentVersion)
                 {
@@ -134,6 +134,7 @@ namespace TomoAIO
         {
             button1.Parent = pictureBox1;
             button2.Parent = pictureBox1;
+            btnIslandMgmt.Parent = pictureBox1;
             ApplyLogoStyle(logo, pictureBox1);
             ApplyLogoStyle(logopanel1, pictureBox2);
             ApplyLogoStyle(pictureBox3, panelUGC);
@@ -144,6 +145,7 @@ namespace TomoAIO
 
             ConfigureTransparentButton(button1);
             ConfigureTransparentButton(button2);
+            ConfigureTransparentButton(btnIslandMgmt);
             MakePictureBackgroundTransparent(logo, Color.FromArgb(255, 190, 0), 38);
             MakePictureBackgroundTransparent(pictureBox3, Color.FromArgb(255, 190, 0), 38);
             MakePictureBackgroundTransparent(logopanel1, Color.FromArgb(255, 190, 0), 38);
@@ -166,6 +168,10 @@ namespace TomoAIO
 
         private void EnsureMenuImages()
         {
+            if (btnIslandMgmt.BackgroundImage == null)
+            {
+                btnIslandMgmt.BackgroundImage = Properties.Resources.islandmanager;
+            }
             if (pictureBox1.Image == null)
             {
                 pictureBox1.Image = Properties.Resources._2026_04_20_17_04_43;
@@ -206,11 +212,13 @@ namespace TomoAIO
         {
             panel1.Visible = false;
             panelUGC.Visible = false;
+            button1.Visible = true;
+            button2.Visible = true;
+            btnIslandMgmt.Visible = true;
+            pictureBox1.Visible = true;
             CloseActionDropdown();
-
             EnsureMenuImages();
             _mainMenuView?.Show();
-
             PinLogoTopRight();
             LayoutMainMenuButtons();
             EnsureDiscordButtonVisible();
@@ -290,29 +298,26 @@ namespace TomoAIO
         {
             int clientWidth = ClientSize.Width;
             int clientHeight = ClientSize.Height;
-            if (clientWidth <= 0 || clientHeight <= 0)
-            {
-                return;
-            }
+            if (clientWidth <= 0 || clientHeight <= 0) return;
 
             float scaleX = clientWidth / (float)_baseClientSize.Width;
             float scaleY = clientHeight / (float)_baseClientSize.Height;
-            float scale = Math.Max(0.6f, Math.Min(scaleX, scaleY));
+            float scale = Math.Max(0.5f, Math.Min(scaleX, scaleY));
 
             int buttonWidth = (int)Math.Round(_baseButtonSize.Width * scale);
             int buttonHeight = (int)Math.Round(_baseButtonSize.Height * scale);
             int gap = (int)Math.Round(BaseButtonGap * scale);
-
-            int totalWidth = (buttonWidth * 2) + gap;
+            int totalWidth = (buttonWidth * 3) + (gap * 2);
             int reservedRight = GetRightTopReservedWidth();
             int usableWidth = Math.Max(260, clientWidth - reservedRight);
             int startX = Math.Max(20, (usableWidth - totalWidth) / 2);
             int y = Math.Max(110, (clientHeight - buttonHeight) / 2);
 
-            button1.Size = new Size(buttonWidth, buttonHeight);
-            button2.Size = new Size(buttonWidth, buttonHeight);
+            button1.Size = button2.Size = btnIslandMgmt.Size = new Size(buttonWidth, buttonHeight);
+
             button1.Location = new Point(startX, y);
             button2.Location = new Point(startX + buttonWidth + gap, y);
+            btnIslandMgmt.Location = new Point(startX + (buttonWidth + gap) * 2, y);
         }
 
         private void LayoutMiiEditorControls()
@@ -899,15 +904,6 @@ namespace TomoAIO
                 ? realFile
                 : null;
         }
-        private byte[] EncodeRawTexture(Bitmap bmp, bool convertSrgbToLinear = false)
-        {
-            return _textureService.EncodeRawTexture(bmp, convertSrgbToLinear);
-        }
-        private int GetSwizzleOffset(int x, int y, int width, int bpp, int blockHeight)
-        {
-            return _textureService.GetSwizzleOffset(x, y, width, bpp, blockHeight);
-        }
-
         // MII TOOL
         private int GetActualOffset(byte[] fileData, string hashHex)
         {
@@ -924,11 +920,6 @@ namespace TomoAIO
             }
             return -1;
         }
-        private Bitmap DecodeRawTexture(byte[] rawData, int width, int height)
-        {
-            return _textureService.DecodeRawTexture(rawData, width, height);
-        }
-
         private void lstUGC_SelectedIndexChanged(object sender, EventArgs e)
         {
             string? selectedFile = GetSelectedUgcFileName();
@@ -954,10 +945,6 @@ namespace TomoAIO
             {
                 MessageBox.Show("Error loading preview: " + ex.Message, "TomoAIO");
             }
-        }
-        private Bitmap? DecodeBc3SwizzledTexture(byte[] rawData, int width, int height, int blockHeight)
-        {
-            return _textureService.DecodeBc3SwizzledTexture(rawData, width, height, blockHeight);
         }
         private void ExportMii(int slot, string name)
         {
@@ -1061,20 +1048,20 @@ namespace TomoAIO
                 foreach (string h in persHashes) Array.Copy(br.ReadBytes(4), 0, miiBytes, GetActualOffset(miiBytes, h) + 4 + (slot * 4), 4);
                 int nameOffset = GetActualOffset(miiBytes, "2499BFDA") + 4 + (slot * 64);
                 byte[] rawName = br.ReadBytes(64);
-                Array.Clear(miiBytes, nameOffset, 64); 
+                Array.Clear(miiBytes, nameOffset, 64);
                 int validNameLen = 64;
                 for (int i = 0; i < 63; i += 2)
                 {
-                    if (rawName[i] == 0 && rawName[i + 1] == 0) 
+                    if (rawName[i] == 0 && rawName[i + 1] == 0)
                     {
                         validNameLen = i + 2;
                         break;
                     }
                 }
-                Array.Copy(rawName, 0, miiBytes, nameOffset, validNameLen); 
+                Array.Copy(rawName, 0, miiBytes, nameOffset, validNameLen);
                 int creatorOffset = GetActualOffset(miiBytes, "3A5EDA05") + 4 + (slot * 128);
                 byte[] rawCreator = br.ReadBytes(128);
-                Array.Clear(miiBytes, creatorOffset, 128); 
+                Array.Clear(miiBytes, creatorOffset, 128);
 
                 int validCreatorLen = 128;
                 for (int i = 0; i < 127; i += 2)
@@ -1341,7 +1328,6 @@ namespace TomoAIO
         private void panel1_Paint(object sender, PaintEventArgs e) { }
         private void Form1_Load(object sender, EventArgs e)
         {
-            // Check for updates in the background on startup.
             CheckForUpdates();
 
             lblImageInfo.Text = "Waiting for selection...";
@@ -1390,8 +1376,6 @@ namespace TomoAIO
             using (SaveFileDialog sfd = new SaveFileDialog())
             {
                 sfd.Title = "Export UGC File";
-
-                // PNG image export and raw .zs export.
                 sfd.Filter = "PNG Image (*.png)|*.png|Zstandard Game File (*.zs)|*.zs";
                 string cleanName = selectedFile.Replace(".canvas.zs", "").Replace(".ugctex.zs", "").Replace(".zs", "");
                 sfd.FileName = cleanName + "_export";
@@ -1451,8 +1435,8 @@ namespace TomoAIO
                         TextureProcessor.ImportPng(
                             pngPath: ofd.FileName,
                             destStem: destStem,
-                            writeCanvas: !isThumb,  
-                            writeThumb: !isThumb,  
+                            writeCanvas: !isThumb,
+                            writeThumb: !isThumb,
                             noSrgb: false,
                             originalUgctexPath: File.Exists(originalUgcPath) ? originalUgcPath : null
                         );
@@ -1557,6 +1541,217 @@ namespace TomoAIO
         private void picPreview_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void btnIslandMgmt_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog ofd = new OpenFileDialog())
+            {
+                ofd.Title = "Select your Player.sav file";
+                ofd.Filter = "Tomodachi Player Save (Player.sav)|Player.sav";
+
+                if (ofd.ShowDialog() == DialogResult.OK)
+                {
+                    _state.CurrentPlayerSavPath = ofd.FileName;
+                    button1.Visible = false;
+                    button2.Visible = false;
+                    btnIslandMgmt.Visible = false;
+                    pictureBox1.Visible = false;
+                    panelIsland.Visible = true;
+                    panelIsland.Dock = DockStyle.Fill;
+                    panelIsland.BringToFront();
+                    RefreshIslandManagementUI();
+                    PinLogoTopRight();
+                    EnsureDiscordButtonVisible();
+                }
+            }
+        }
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+        private void numMoney_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnSaveMoney_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(_state.CurrentPlayerSavPath) || !File.Exists(_state.CurrentPlayerSavPath)) return;
+
+            try
+            {
+                byte[] pBytes = File.ReadAllBytes(_state.CurrentPlayerSavPath);
+                byte[] hash = Enumerable.Range(0, 4).Select(x => Convert.ToByte("365FAB1F".Substring(x * 2, 2), 16)).Reverse().ToArray();
+                int valueIndex = -1;
+
+                for (int i = 0; i <= pBytes.Length - 8; i++)
+                {
+                    if (pBytes.Skip(i).Take(4).SequenceEqual(hash))
+                    {
+                        valueIndex = i + 4;
+                        break;
+                    }
+                }
+                if (valueIndex != -1)
+                {
+                    int totalCents = (int)(numMoney.Value * 100);
+                    byte[] moneyData = BitConverter.GetBytes(totalCents);
+                    Array.Copy(moneyData, 0, pBytes, valueIndex, 4);
+                    File.WriteAllBytes(_state.CurrentPlayerSavPath, pBytes);
+
+                    MessageBox.Show($"Success! Your island funds have been set to ${numMoney.Value:N2}", "Bank Updated");
+                    RefreshIslandManagementUI();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to update money: " + ex.Message);
+            }
+        }
+
+        private void UnlockSpecificCategory(string[]? arrayHashes, bool unlockRooms, string categoryName)
+        {
+            if (string.IsNullOrEmpty(_state.CurrentPlayerSavPath)) return;
+            string? saveDir = Path.GetDirectoryName(_state.CurrentPlayerSavPath);
+            if (string.IsNullOrEmpty(saveDir)) return;
+
+            string playerPath = Path.Combine(saveDir, "Player.sav");
+            if (!File.Exists(playerPath))
+            {
+                MessageBox.Show("Could not find Player.sav to unlock items!", "Error");
+                return;
+            }
+
+            try
+            {
+                byte[] pBytes = File.ReadAllBytes(playerPath);
+                byte[] obtainedState = new byte[] { 0x7C, 0xEF, 0x5F, 0xBC };
+                bool fileWasModified = false;
+                if (arrayHashes != null)
+                {
+                    foreach (string hash in arrayHashes)
+                    {
+                        int arrayOffset = GetActualOffset(pBytes, hash);
+                        if (arrayOffset > 0 && arrayOffset < pBytes.Length - 4)
+                        {
+                            int itemCount = BitConverter.ToInt32(pBytes, arrayOffset);
+                            int dataStart = arrayOffset + 4;
+
+                            if (itemCount > 0 && dataStart + (itemCount * 4) <= pBytes.Length)
+                            {
+                                for (int j = 0; j < itemCount; j++)
+                                {
+                                    Array.Copy(obtainedState, 0, pBytes, dataStart + (j * 4), 4);
+                                }
+                                fileWasModified = true;
+                            }
+                        }
+                    }
+                }
+                if (unlockRooms)
+                {
+                    string hashFilePath = Path.Combine(Application.StartupPath, "services", "room_hashes.csv");
+                    if (File.Exists(hashFilePath))
+                    {
+                        string[] roomHashes = File.ReadAllLines(hashFilePath);
+                        foreach (string line in roomHashes)
+                        {
+                            string hashHex = line.Trim();
+                            if (hashHex.Equals("Hash", StringComparison.OrdinalIgnoreCase) || hashHex.Length != 8)
+                                continue;
+
+                            byte[] hashBytes = Enumerable.Range(0, 4).Select(x => Convert.ToByte(hashHex.Substring(x * 2, 2), 16)).Reverse().ToArray();
+
+                            for (int i = 0; i <= pBytes.Length - 8; i++)
+                            {
+                                if (pBytes.Skip(i).Take(4).SequenceEqual(hashBytes))
+                                {
+                                    Array.Copy(obtainedState, 0, pBytes, i + 4, 4);
+                                    fileWasModified = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Warning: 'services\\room_hashes.csv' was not found!", "Missing File");
+                    }
+                }
+                if (fileWasModified)
+                {
+                    File.WriteAllBytes(playerPath, pBytes);
+
+                    MessageBox.Show($"{categoryName} successfully unlocked!", "TomoAIO");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Unlock Error: " + ex.Message);
+            }
+        }
+
+        private void RefreshIslandManagementUI()
+        {
+            if (string.IsNullOrEmpty(_state.CurrentPlayerSavPath) || !File.Exists(_state.CurrentPlayerSavPath)) return;
+
+            try
+            {
+                byte[] pBytes = File.ReadAllBytes(_state.CurrentPlayerSavPath);
+                int totalCents = GetActualOffset(pBytes, "365FAB1F");
+                if (totalCents >= 0)
+                {
+                    decimal dollars = (decimal)totalCents / 100;
+                    lblCurrentMoney.Text = $"Balance: {dollars:C2}";
+                    numMoney.Value = Math.Min(numMoney.Maximum, dollars);
+                }
+                int nameOffset = GetActualOffset(pBytes, "D46DF986");
+                if (nameOffset > 0)
+                {
+                    byte[] nameBytes = pBytes.Skip(nameOffset).Take(64).ToArray();
+                    string islandName = System.Text.Encoding.Unicode.GetString(nameBytes);
+
+                    int nullIndex = islandName.IndexOf('\0');
+                    if (nullIndex != -1) islandName = islandName.Substring(0, nullIndex);
+
+                   // lblCurrentIslandName.Text = $"Island: {islandName}"; <- not needed at this time or it would show the island name twice
+                    if (lblIslandTitle != null) lblIslandTitle.Text = $"{islandName} Management";
+                }
+            }
+            catch (Exception ex)
+            {
+               // lblCurrentIslandName.Text = "Error: " + ex.Message; <- not needed at this time or it would show the island name twice    
+            }
+        }
+        private void LoadCurrentMoney()
+        {
+            RefreshIslandManagementUI();
+        }
+        private void btnMenuBack_Click1(object sender, EventArgs e)
+        {
+            panelIsland.Visible = false;
+            ShowMainMenu();
+        }
+
+        private void btnUnlockInteriors_Click(object sender, EventArgs e)
+        {
+            UnlockSpecificCategory(null, true, "Interiors");
+        }
+
+        private void btnUnlockQBuilds_Click(object sender, EventArgs e)
+        {
+            UnlockSpecificCategory(new string[] { "3AF3C005" }, false, "Quik Builds");
+        }
+
+        private void btnUnlockClothes_Click(object sender, EventArgs e)
+        {
+            UnlockSpecificCategory(new string[] { "D273AD77", "7708017B" }, false, "Clothes");
+        }
+
+        private void btnUnlockFood_Click(object sender, EventArgs e)
+        {
+            UnlockSpecificCategory(new string[] { "933DA780" }, false, "Foods");
         }
     }
 } 

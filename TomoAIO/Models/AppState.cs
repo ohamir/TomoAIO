@@ -11,6 +11,7 @@ namespace TomoAIO.Models
         public string SelectedMiiPath { get; set; } = "Choose a Mii file here...";
 
         public string? SelectedMiiAction { get; set; }
+        public string CurrentPlayerSavPath { get; set; } = string.Empty;
 
         public List<UgcFileItem> UgcFiles { get; } = new();
     }

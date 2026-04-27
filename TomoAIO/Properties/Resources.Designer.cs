@@ -83,9 +83,9 @@ namespace TomoAIO.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap mii_import {
+        internal static System.Drawing.Bitmap islandmanager {
             get {
-                object obj = ResourceManager.GetObject("mii import", resourceCulture);
+                object obj = ResourceManager.GetObject("islandmanager", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

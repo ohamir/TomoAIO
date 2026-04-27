@@ -124,11 +124,8 @@
   <data name="2026-04-20 17-04-43" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\2026-04-20 17-04-43.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="mii import" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\mii import.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="tomoaio logo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\tomoaio logo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="discord" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\discord.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="mii import1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\mii import.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -136,10 +133,13 @@
   <data name="tomo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\tomo.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="tomoaio logo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\tomoaio logo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="UGC CREATOR" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\UGC CREATOR.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="discord" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\discord.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="islandmanager" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\islandmanager.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

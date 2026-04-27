@@ -42,6 +42,7 @@
             listBox1 = new ListBox();
             logopanel1 = new PictureBox();
             pictureBox2 = new PictureBox();
+            btnIslandMgmt = new Button();
             btnDiscord = new Button();
             panelUGC = new Panel();
             pictureBox3 = new PictureBox();
@@ -53,6 +54,17 @@
             panelSidebar = new Panel();
             txtSearch = new TextBox();
             lstUGC = new ListBox();
+            panelIsland = new Panel();
+            btnUnlockClothes = new Button();
+            btnUnlockFood = new Button();
+            btnUnlockQBuilds = new Button();
+            btnUnlockInteriors = new Button();
+            lblCurrentMoney = new Label();
+            btnMenuBack = new Button();
+            btnSaveMoney = new Button();
+            numMoney = new NumericUpDown();
+            IslandFund = new Label();
+            lblIslandTitle = new Label();
             pictureBox1 = new PictureBox();
             logo = new PictureBox();
             panel1.SuspendLayout();
@@ -62,6 +74,8 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
             ((System.ComponentModel.ISupportInitialize)picPreview).BeginInit();
             panelSidebar.SuspendLayout();
+            panelIsland.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)numMoney).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)logo).BeginInit();
             SuspendLayout();
@@ -76,7 +90,7 @@
             button1.Cursor = Cursors.Hand;
             button1.FlatAppearance.BorderSize = 0;
             button1.FlatStyle = FlatStyle.Flat;
-            button1.Location = new Point(312, 254);
+            button1.Location = new Point(77, 254);
             button1.Margin = new Padding(3, 2, 3, 2);
             button1.Name = "button1";
             button1.Size = new Size(366, 285);
@@ -93,7 +107,7 @@
             button2.Cursor = Cursors.Hand;
             button2.FlatAppearance.BorderSize = 0;
             button2.FlatStyle = FlatStyle.Flat;
-            button2.Location = new Point(723, 254);
+            button2.Location = new Point(520, 254);
             button2.Margin = new Padding(3, 2, 3, 2);
             button2.Name = "button2";
             button2.Size = new Size(366, 285);
@@ -234,6 +248,23 @@
             pictureBox2.TabIndex = 7;
             pictureBox2.TabStop = false;
             // 
+            // btnIslandMgmt
+            // 
+            btnIslandMgmt.Anchor = AnchorStyles.None;
+            btnIslandMgmt.BackColor = Color.Transparent;
+            btnIslandMgmt.BackgroundImage = Properties.Resources.islandmanager;
+            btnIslandMgmt.BackgroundImageLayout = ImageLayout.Zoom;
+            btnIslandMgmt.Cursor = Cursors.Hand;
+            btnIslandMgmt.FlatAppearance.BorderSize = 0;
+            btnIslandMgmt.FlatStyle = FlatStyle.Flat;
+            btnIslandMgmt.Location = new Point(950, 254);
+            btnIslandMgmt.Margin = new Padding(3, 2, 3, 2);
+            btnIslandMgmt.Name = "btnIslandMgmt";
+            btnIslandMgmt.Size = new Size(366, 285);
+            btnIslandMgmt.TabIndex = 15;
+            btnIslandMgmt.UseVisualStyleBackColor = false;
+            btnIslandMgmt.Click += btnIslandMgmt_Click;
+            // 
             // btnDiscord
             // 
             btnDiscord.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
@@ -366,6 +397,121 @@
             lstUGC.TabIndex = 0;
             lstUGC.SelectedIndexChanged += lstUGC_SelectedIndexChanged;
             // 
+            // panelIsland
+            // 
+            panelIsland.Controls.Add(btnUnlockClothes);
+            panelIsland.Controls.Add(btnUnlockFood);
+            panelIsland.Controls.Add(btnUnlockQBuilds);
+            panelIsland.Controls.Add(btnUnlockInteriors);
+            panelIsland.Controls.Add(lblCurrentMoney);
+            panelIsland.Controls.Add(btnMenuBack);
+            panelIsland.Controls.Add(btnSaveMoney);
+            panelIsland.Controls.Add(numMoney);
+            panelIsland.Controls.Add(IslandFund);
+            panelIsland.Controls.Add(lblIslandTitle);
+            panelIsland.Location = new Point(0, 0);
+            panelIsland.Name = "panelIsland";
+            panelIsland.Size = new Size(1421, 813);
+            panelIsland.TabIndex = 13;
+            panelIsland.Visible = false;
+            // 
+            // btnUnlockClothes
+            // 
+            btnUnlockClothes.Location = new Point(350, 243);
+            btnUnlockClothes.Name = "btnUnlockClothes";
+            btnUnlockClothes.Size = new Size(151, 37);
+            btnUnlockClothes.TabIndex = 12;
+            btnUnlockClothes.Text = "Unlock all Clothing";
+            btnUnlockClothes.UseVisualStyleBackColor = true;
+            btnUnlockClothes.Click += btnUnlockClothes_Click;
+            // 
+            // btnUnlockFood
+            // 
+            btnUnlockFood.Location = new Point(136, 240);
+            btnUnlockFood.Name = "btnUnlockFood";
+            btnUnlockFood.Size = new Size(190, 40);
+            btnUnlockFood.TabIndex = 11;
+            btnUnlockFood.Text = "Unlock all Food";
+            btnUnlockFood.UseVisualStyleBackColor = true;
+            btnUnlockFood.Click += btnUnlockFood_Click;
+            // 
+            // btnUnlockQBuilds
+            // 
+            btnUnlockQBuilds.Location = new Point(530, 242);
+            btnUnlockQBuilds.Name = "btnUnlockQBuilds";
+            btnUnlockQBuilds.Size = new Size(160, 41);
+            btnUnlockQBuilds.TabIndex = 10;
+            btnUnlockQBuilds.Text = "Unlock all Quik Builds";
+            btnUnlockQBuilds.UseVisualStyleBackColor = true;
+            btnUnlockQBuilds.Click += btnUnlockQBuilds_Click;
+            // 
+            // btnUnlockInteriors
+            // 
+            btnUnlockInteriors.Location = new Point(696, 244);
+            btnUnlockInteriors.Name = "btnUnlockInteriors";
+            btnUnlockInteriors.Size = new Size(165, 36);
+            btnUnlockInteriors.TabIndex = 9;
+            btnUnlockInteriors.Text = "Unlock all Interiors";
+            btnUnlockInteriors.UseVisualStyleBackColor = true;
+            btnUnlockInteriors.Click += btnUnlockInteriors_Click;
+            // 
+            // lblCurrentMoney
+            // 
+            lblCurrentMoney.AutoSize = true;
+            lblCurrentMoney.Location = new Point(941, 112);
+            lblCurrentMoney.Name = "lblCurrentMoney";
+            lblCurrentMoney.Size = new Size(87, 15);
+            lblCurrentMoney.TabIndex = 6;
+            lblCurrentMoney.Text = "Current money";
+            // 
+            // btnMenuBack
+            // 
+            btnMenuBack.Location = new Point(109, 44);
+            btnMenuBack.Name = "btnMenuBack";
+            btnMenuBack.Size = new Size(176, 34);
+            btnMenuBack.TabIndex = 5;
+            btnMenuBack.Text = "Back to menu";
+            btnMenuBack.UseVisualStyleBackColor = true;
+            btnMenuBack.Click += btnMenuBack_Click1;
+            // 
+            // btnSaveMoney
+            // 
+            btnSaveMoney.Location = new Point(932, 244);
+            btnSaveMoney.Name = "btnSaveMoney";
+            btnSaveMoney.Size = new Size(118, 36);
+            btnSaveMoney.TabIndex = 3;
+            btnSaveMoney.Text = "Save Money";
+            btnSaveMoney.UseVisualStyleBackColor = true;
+            btnSaveMoney.Click += btnSaveMoney_Click;
+            // 
+            // numMoney
+            // 
+            numMoney.Location = new Point(932, 202);
+            numMoney.Maximum = new decimal(new int[] { 999999, 0, 0, 0 });
+            numMoney.Name = "numMoney";
+            numMoney.Size = new Size(120, 23);
+            numMoney.TabIndex = 2;
+            numMoney.ValueChanged += numMoney_ValueChanged;
+            // 
+            // IslandFund
+            // 
+            IslandFund.AutoSize = true;
+            IslandFund.Location = new Point(950, 166);
+            IslandFund.Name = "IslandFund";
+            IslandFund.Size = new Size(78, 15);
+            IslandFund.TabIndex = 1;
+            IslandFund.Text = "Island money";
+            // 
+            // lblIslandTitle
+            // 
+            lblIslandTitle.AutoSize = true;
+            lblIslandTitle.Location = new Point(661, 44);
+            lblIslandTitle.Name = "lblIslandTitle";
+            lblIslandTitle.Size = new Size(38, 15);
+            lblIslandTitle.TabIndex = 0;
+            lblIslandTitle.Text = "label3";
+            lblIslandTitle.Click += label3_Click;
+            // 
             // pictureBox1
             // 
             pictureBox1.BackgroundImageLayout = ImageLayout.Zoom;
@@ -399,8 +545,10 @@
             BackColor = Color.FromArgb(255, 190, 0);
             ClientSize = new Size(1412, 813);
             Controls.Add(logo);
+            Controls.Add(panelIsland);
             Controls.Add(button2);
             Controls.Add(button1);
+            Controls.Add(btnIslandMgmt);
             Controls.Add(btnDiscord);
             Controls.Add(panel1);
             Controls.Add(pictureBox1);
@@ -422,6 +570,9 @@
             ((System.ComponentModel.ISupportInitialize)picPreview).EndInit();
             panelSidebar.ResumeLayout(false);
             panelSidebar.PerformLayout();
+            panelIsland.ResumeLayout(false);
+            panelIsland.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)numMoney).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ((System.ComponentModel.ISupportInitialize)logo).EndInit();
             ResumeLayout(false);
@@ -451,12 +602,23 @@
         private Label lblImageInfo;
         private Button btnUgcExport;
         private Button btnUgcImport;
-        private Label label2;
+        private Label IslandFund;
         private Button btnUgcBack;
         private Button discord;
         private Button discsord2;
         private PictureBox pictureBox3;
         private Button btnDiscord;
         private TextBox txtSearch;
+        private Button btnIslandMgmt;
+        private Panel panelIsland;
+        private Label lblIslandTitle;
+        private NumericUpDown numMoney;
+        private Button btnMenuBack;
+        private Button btnSaveMoney;
+        private Label lblCurrentMoney;
+        private Button btnUnlockClothes;
+        private Button btnUnlockFood;
+        private Button btnUnlockQBuilds;
+        private Button btnUnlockInteriors;
     }
 }
