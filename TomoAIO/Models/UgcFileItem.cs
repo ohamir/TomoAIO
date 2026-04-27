@@ -1,6 +1,6 @@
 namespace TomoAIO.Models
 {
-    internal sealed class UgcFileItem
+    public sealed class UgcFileItem
     {
         public required string FileName { get; init; }
 

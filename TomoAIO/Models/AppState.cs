@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace TomoAIO.Models
 {
-    internal sealed class AppState
+    public class AppState
     {
         public string CurrentMiiSavPath { get; set; } = string.Empty;
 
