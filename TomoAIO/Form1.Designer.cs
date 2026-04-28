@@ -159,7 +159,7 @@
             panelIsland.Controls.Add(numMoney);
             panelIsland.Controls.Add(IslandFund);
             panelIsland.Controls.Add(lblIslandTitle);
-            panelIsland.Location = new Point(886, 4);
+            panelIsland.Location = new Point(341, 240);
             panelIsland.Margin = new Padding(3, 4, 3, 4);
             panelIsland.Name = "panelIsland";
             panelIsland.Size = new Size(1624, 1069);

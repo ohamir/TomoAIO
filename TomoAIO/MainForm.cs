@@ -53,9 +53,8 @@ namespace TomoAIO
         #region Mii Import Button
         private void ImportMiiBtn_Click(object sender, EventArgs e)
         {
-
-            //var form = new MiiImportForm(_state);
-            //form.ShowDialog(this);
+            var form = new MiiImportForm(_state);
+            form.ShowDialog(this);
         }
 
         #endregion
