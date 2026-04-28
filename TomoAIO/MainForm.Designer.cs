@@ -47,7 +47,7 @@
             ImportMiiBtn.FlatAppearance.BorderSize = 0;
             ImportMiiBtn.FlatAppearance.MouseOverBackColor = Color.FromArgb(255, 255, 192);
             ImportMiiBtn.FlatStyle = FlatStyle.Flat;
-            ImportMiiBtn.Location = new Point(12, 152);
+            ImportMiiBtn.Location = new Point(12, 199);
             ImportMiiBtn.Name = "ImportMiiBtn";
             ImportMiiBtn.Size = new Size(210, 172);
             ImportMiiBtn.TabIndex = 1;
@@ -56,7 +56,7 @@
             // 
             // UgcEditorBtn
             // 
-            UgcEditorBtn.Anchor = AnchorStyles.None;
+            UgcEditorBtn.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             UgcEditorBtn.BackColor = Color.Transparent;
             UgcEditorBtn.BackgroundImage = Properties.Resources.UGC_CREATOR;
             UgcEditorBtn.BackgroundImageLayout = ImageLayout.Zoom;
@@ -64,7 +64,7 @@
             UgcEditorBtn.FlatAppearance.BorderSize = 0;
             UgcEditorBtn.FlatAppearance.MouseOverBackColor = Color.FromArgb(255, 255, 192);
             UgcEditorBtn.FlatStyle = FlatStyle.Flat;
-            UgcEditorBtn.Location = new Point(210, 152);
+            UgcEditorBtn.Location = new Point(228, 198);
             UgcEditorBtn.Name = "UgcEditorBtn";
             UgcEditorBtn.Size = new Size(210, 172);
             UgcEditorBtn.TabIndex = 2;
@@ -76,17 +76,18 @@
             logo.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             logo.BackColor = Color.Transparent;
             logo.BackgroundImage = Properties.Resources.tomoaio_logo;
-            logo.BackgroundImageLayout = ImageLayout.Stretch;
-            logo.Location = new Point(224, -2);
+            logo.BackgroundImageLayout = ImageLayout.Zoom;
+            logo.Location = new Point(246, -2);
             logo.Margin = new Padding(3, 4, 3, 4);
             logo.Name = "logo";
-            logo.Size = new Size(184, 147);
+            logo.Size = new Size(185, 185);
             logo.TabIndex = 12;
             logo.TabStop = false;
             // 
             // IslandManagerBtn
             // 
             IslandManagerBtn.Anchor = AnchorStyles.None;
+            IslandManagerBtn.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             IslandManagerBtn.BackColor = Color.Transparent;
             IslandManagerBtn.BackgroundImage = Properties.Resources.islandmanager;
             IslandManagerBtn.BackgroundImageLayout = ImageLayout.Zoom;
@@ -94,7 +95,7 @@
             IslandManagerBtn.FlatAppearance.BorderSize = 0;
             IslandManagerBtn.FlatAppearance.MouseOverBackColor = Color.FromArgb(255, 255, 192);
             IslandManagerBtn.FlatStyle = FlatStyle.Flat;
-            IslandManagerBtn.Location = new Point(426, 152);
+            IslandManagerBtn.Location = new Point(455, 199);
             IslandManagerBtn.Name = "IslandManagerBtn";
             IslandManagerBtn.Size = new Size(210, 172);
             IslandManagerBtn.TabIndex = 16;
@@ -110,7 +111,7 @@
             DiscordJoinBtn.FlatAppearance.MouseDownBackColor = Color.Transparent;
             DiscordJoinBtn.FlatAppearance.MouseOverBackColor = Color.FromArgb(255, 255, 192);
             DiscordJoinBtn.FlatStyle = FlatStyle.Flat;
-            DiscordJoinBtn.Location = new Point(590, 327);
+            DiscordJoinBtn.Location = new Point(600, 363);
             DiscordJoinBtn.Name = "DiscordJoinBtn";
             DiscordJoinBtn.Size = new Size(65, 43);
             DiscordJoinBtn.TabIndex = 18;
@@ -121,17 +122,16 @@
             // 
             AutoScaleDimensions = new SizeF(8F, 19F);
             AutoScaleMode = AutoScaleMode.Font;
-            AutoSize = true;
             BackgroundImage = Properties.Resources.tomo1;
-            ClientSize = new Size(655, 369);
+            ClientSize = new Size(677, 420);
             Controls.Add(DiscordJoinBtn);
             Controls.Add(IslandManagerBtn);
             Controls.Add(logo);
             Controls.Add(UgcEditorBtn);
             Controls.Add(ImportMiiBtn);
-            FormBorderStyle = FormBorderStyle.Fixed3D;
-            MaximizeBox = false;
+            MinimumSize = new Size(695, 465);
             Name = "MainForm";
+            SizeGripStyle = SizeGripStyle.Show;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "TomoAIO - All in one multi-tool";
             ((System.ComponentModel.ISupportInitialize)logo).EndInit();

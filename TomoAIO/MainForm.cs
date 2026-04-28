@@ -18,12 +18,66 @@ namespace TomoAIO
         private readonly AppState _state = new();
         private readonly UpdateService _updateService = new();
 
+        // Store original form size and control bounds for scaling
+        private SizeF _originalFormSize;
+        private readonly System.Collections.Generic.Dictionary<Control, RectangleF> _originalBounds = new();
+
         public MainForm()
         {
             InitializeComponent();
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
             UpdateStyles();
             CheckForUpdates();
+
+            // Capture original sizes after layout is done
+            this.Load += (s, e) => CaptureOriginalBounds();
+            this.Resize += MainForm_Resize;
+        }
+
+        private void CaptureOriginalBounds()
+        {
+            _originalFormSize = new SizeF(this.ClientSize.Width, this.ClientSize.Height);
+            CaptureControlBounds(this.Controls);
+        }
+
+        private void CaptureControlBounds(Control.ControlCollection controls)
+        {
+            foreach (Control c in controls)
+            {
+                _originalBounds[c] = new RectangleF(c.Left, c.Top, c.Width, c.Height);
+                if (c.Controls.Count > 0)
+                    CaptureControlBounds(c.Controls);
+            }
+        }
+
+        private void MainForm_Resize(object? sender, EventArgs e)
+        {
+            if (_originalFormSize.IsEmpty) return;
+
+            float scaleX = this.ClientSize.Width / _originalFormSize.Width;
+            float scaleY = this.ClientSize.Height / _originalFormSize.Height;
+
+            ScaleControls(this.Controls, scaleX, scaleY);
+        }
+
+        private void ScaleControls(Control.ControlCollection controls, float scaleX, float scaleY)
+        {
+            foreach (Control c in controls)
+            {
+                if (!_originalBounds.TryGetValue(c, out RectangleF orig)) continue;
+
+                c.Left = (int)(orig.X * scaleX);
+                c.Top = (int)(orig.Y * scaleY);
+                c.Width = (int)(orig.Width * scaleX);
+                c.Height = (int)(orig.Height * scaleY);
+
+                // Scale font too
+                float newFontSize = Math.Max(6f, c.Font.Size * Math.Min(scaleX, scaleY));
+                c.Font = new Font(c.Font.FontFamily, newFontSize, c.Font.Style);
+
+                if (c.Controls.Count > 0)
+                    ScaleControls(c.Controls, scaleX, scaleY);
+            }
         }
 
         private async void CheckForUpdates()

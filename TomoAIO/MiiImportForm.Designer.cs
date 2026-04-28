@@ -52,13 +52,13 @@
             // 
             PathToSaveTxtBox.Location = new Point(12, 107);
             PathToSaveTxtBox.Name = "PathToSaveTxtBox";
-            PathToSaveTxtBox.Size = new Size(261, 26);
+            PathToSaveTxtBox.Size = new Size(355, 26);
             PathToSaveTxtBox.TabIndex = 1;
             PathToSaveTxtBox.Text = "Choose a Mii file here...";
             // 
             // BrowseBtn
             // 
-            BrowseBtn.Location = new Point(279, 106);
+            BrowseBtn.Location = new Point(373, 106);
             BrowseBtn.Name = "BrowseBtn";
             BrowseBtn.Size = new Size(89, 27);
             BrowseBtn.TabIndex = 2;
