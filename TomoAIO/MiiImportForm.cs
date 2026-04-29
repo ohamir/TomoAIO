@@ -38,9 +38,72 @@ namespace TomoAIO
             InitializeComponent();
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
             EnableDoubleBuffer(DisplayMiiLstBox);
+            ApplyStyleToButtons();
         }
 
         // ─── Setup ────────────────────────────────────────────────────────────
+
+        public void ApplyStyleToButtons()
+        {
+            ApplyButtonStyle(LoadSaveBtn);
+            ApplyButtonStyle(BrowseBtn);
+            ApplyButtonStyle(ApplyChangesBtn);
+        }
+
+        public void ApplyButtonStyle(Button btn, bool isPrimary = false)
+        {
+            // Define our Color Palettes
+            // Secondary (Load/Browse) - Dark Navy/Charcoal
+            Color secMain = Color.FromArgb(44, 62, 80);
+            Color secHover = Color.FromArgb(52, 73, 94);
+            Color secClick = Color.FromArgb(31, 46, 61);
+
+            // Primary (Apply) - Game-Pop Teal
+            Color priMain = Color.FromArgb(19, 141, 117);
+            Color priHover = Color.FromArgb(22, 160, 133);
+            Color priClick = Color.FromArgb(14, 102, 85);
+
+            // Choose the palette based on the parameter
+            Color mainColor = isPrimary ? priMain : secMain;
+            Color hoverColor = isPrimary ? priHover : secHover;
+            Color clickColor = isPrimary ? priClick : secClick;
+
+            // 1. Basic Visual Setup
+            btn.FlatStyle = FlatStyle.Flat;
+            btn.FlatAppearance.BorderSize = 0;
+            btn.BackColor = mainColor;
+            btn.ForeColor = Color.White;
+            btn.Font = new Font("Segoe UI Semibold", 12f);
+
+            // Create space for the "3D" movement effect
+            btn.Padding = new Padding(0, 0, 0, 4);
+
+            // 2. Hover Effect
+            btn.MouseEnter += (s, e) => btn.BackColor = hoverColor;
+            btn.MouseLeave += (s, e) => btn.BackColor = mainColor;
+
+            // 3. The "Push" Animation
+            btn.MouseDown += (s, e) => {
+                btn.BackColor = clickColor;
+                // This shifts the text down by 2 pixels to simulate a physical press
+                btn.Padding = new Padding(0, 2, 0, 0);
+            };
+
+            btn.MouseUp += (s, e) => {
+                btn.BackColor = hoverColor;
+                btn.Padding = new Padding(0, 0, 0, 4);
+            };
+
+            // Optional: Add round corners (Requires using System.Drawing.Drawing2D)
+            GraphicsPath path = new GraphicsPath();
+            int r = 15; 
+            path.AddArc(0, 0, r, r, 180, 90);
+            path.AddArc(btn.Width - r, 0, r, r, 270, 90);
+            path.AddArc(btn.Width - r, btn.Height - r, r, r, 0, 90);
+            path.AddArc(0, btn.Height - r, r, r, 90, 90);
+            btn.Region = new Region(path);
+        }
+
 
         private static void EnableDoubleBuffer(Control control)
         {

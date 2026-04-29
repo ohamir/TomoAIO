@@ -90,9 +90,10 @@
             button1.Cursor = Cursors.Hand;
             button1.FlatAppearance.BorderSize = 0;
             button1.FlatStyle = FlatStyle.Flat;
-            button1.Location = new Point(88, 322);
+            button1.Location = new Point(143, 542);
+            button1.Margin = new Padding(5, 5, 5, 5);
             button1.Name = "button1";
-            button1.Size = new Size(418, 361);
+            button1.Size = new Size(679, 608);
             button1.TabIndex = 0;
             button1.UseVisualStyleBackColor = false;
             button1.Click += button1_Click;
@@ -106,9 +107,10 @@
             button2.Cursor = Cursors.Hand;
             button2.FlatAppearance.BorderSize = 0;
             button2.FlatStyle = FlatStyle.Flat;
-            button2.Location = new Point(594, 322);
+            button2.Location = new Point(965, 542);
+            button2.Margin = new Padding(5, 5, 5, 5);
             button2.Name = "button2";
-            button2.Size = new Size(418, 361);
+            button2.Size = new Size(679, 608);
             button2.TabIndex = 1;
             button2.UseVisualStyleBackColor = false;
             button2.Click += button2_Click;
@@ -127,9 +129,10 @@
             panel1.Controls.Add(pictureBox2);
             panel1.Dock = DockStyle.Fill;
             panel1.Location = new Point(0, 0);
-            panel1.MinimumSize = new Size(800, 476);
+            panel1.Margin = new Padding(5, 5, 5, 5);
+            panel1.MinimumSize = new Size(1300, 802);
             panel1.Name = "panel1";
-            panel1.Size = new Size(1614, 1030);
+            panel1.Size = new Size(2623, 1735);
             panel1.TabIndex = 3;
             panel1.Visible = false;
             panel1.Paint += panel1_Paint;
@@ -137,10 +140,10 @@
             // btnBrowseMii
             // 
             btnBrowseMii.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnBrowseMii.Location = new Point(1114, 165);
-            btnBrowseMii.Margin = new Padding(3, 4, 3, 4);
+            btnBrowseMii.Location = new Point(1810, 278);
+            btnBrowseMii.Margin = new Padding(5, 7, 5, 7);
             btnBrowseMii.Name = "btnBrowseMii";
-            btnBrowseMii.Size = new Size(86, 29);
+            btnBrowseMii.Size = new Size(140, 49);
             btnBrowseMii.TabIndex = 10;
             btnBrowseMii.Text = "Browse..";
             btnBrowseMii.UseVisualStyleBackColor = true;
@@ -159,19 +162,19 @@
             panelIsland.Controls.Add(numMoney);
             panelIsland.Controls.Add(IslandFund);
             panelIsland.Controls.Add(lblIslandTitle);
-            panelIsland.Location = new Point(341, 240);
-            panelIsland.Margin = new Padding(3, 4, 3, 4);
+            panelIsland.Location = new Point(224, 139);
+            panelIsland.Margin = new Padding(5, 7, 5, 7);
             panelIsland.Name = "panelIsland";
-            panelIsland.Size = new Size(1624, 1069);
+            panelIsland.Size = new Size(2639, 1800);
             panelIsland.TabIndex = 13;
             panelIsland.Visible = false;
             // 
             // btnUnlockClothes
             // 
-            btnUnlockClothes.Location = new Point(400, 308);
-            btnUnlockClothes.Margin = new Padding(3, 4, 3, 4);
+            btnUnlockClothes.Location = new Point(650, 519);
+            btnUnlockClothes.Margin = new Padding(5, 7, 5, 7);
             btnUnlockClothes.Name = "btnUnlockClothes";
-            btnUnlockClothes.Size = new Size(173, 47);
+            btnUnlockClothes.Size = new Size(281, 79);
             btnUnlockClothes.TabIndex = 12;
             btnUnlockClothes.Text = "Unlock all Clothing";
             btnUnlockClothes.UseVisualStyleBackColor = true;
@@ -179,10 +182,10 @@
             // 
             // btnUnlockFood
             // 
-            btnUnlockFood.Location = new Point(155, 304);
-            btnUnlockFood.Margin = new Padding(3, 4, 3, 4);
+            btnUnlockFood.Location = new Point(252, 512);
+            btnUnlockFood.Margin = new Padding(5, 7, 5, 7);
             btnUnlockFood.Name = "btnUnlockFood";
-            btnUnlockFood.Size = new Size(217, 51);
+            btnUnlockFood.Size = new Size(353, 86);
             btnUnlockFood.TabIndex = 11;
             btnUnlockFood.Text = "Unlock all Food";
             btnUnlockFood.UseVisualStyleBackColor = true;
@@ -190,10 +193,10 @@
             // 
             // btnUnlockQBuilds
             // 
-            btnUnlockQBuilds.Location = new Point(606, 307);
-            btnUnlockQBuilds.Margin = new Padding(3, 4, 3, 4);
+            btnUnlockQBuilds.Location = new Point(985, 517);
+            btnUnlockQBuilds.Margin = new Padding(5, 7, 5, 7);
             btnUnlockQBuilds.Name = "btnUnlockQBuilds";
-            btnUnlockQBuilds.Size = new Size(183, 52);
+            btnUnlockQBuilds.Size = new Size(297, 88);
             btnUnlockQBuilds.TabIndex = 10;
             btnUnlockQBuilds.Text = "Unlock all Quik Builds";
             btnUnlockQBuilds.UseVisualStyleBackColor = true;
@@ -201,10 +204,10 @@
             // 
             // btnUnlockInteriors
             // 
-            btnUnlockInteriors.Location = new Point(795, 309);
-            btnUnlockInteriors.Margin = new Padding(3, 4, 3, 4);
+            btnUnlockInteriors.Location = new Point(1292, 520);
+            btnUnlockInteriors.Margin = new Padding(5, 7, 5, 7);
             btnUnlockInteriors.Name = "btnUnlockInteriors";
-            btnUnlockInteriors.Size = new Size(189, 46);
+            btnUnlockInteriors.Size = new Size(307, 77);
             btnUnlockInteriors.TabIndex = 9;
             btnUnlockInteriors.Text = "Unlock all Interiors";
             btnUnlockInteriors.UseVisualStyleBackColor = true;
@@ -213,18 +216,19 @@
             // lblCurrentMoney
             // 
             lblCurrentMoney.AutoSize = true;
-            lblCurrentMoney.Location = new Point(1075, 142);
+            lblCurrentMoney.Location = new Point(1747, 239);
+            lblCurrentMoney.Margin = new Padding(5, 0, 5, 0);
             lblCurrentMoney.Name = "lblCurrentMoney";
-            lblCurrentMoney.Size = new Size(102, 19);
+            lblCurrentMoney.Size = new Size(175, 32);
             lblCurrentMoney.TabIndex = 6;
             lblCurrentMoney.Text = "Current money";
             // 
             // btnMenuBack
             // 
-            btnMenuBack.Location = new Point(125, 56);
-            btnMenuBack.Margin = new Padding(3, 4, 3, 4);
+            btnMenuBack.Location = new Point(203, 94);
+            btnMenuBack.Margin = new Padding(5, 7, 5, 7);
             btnMenuBack.Name = "btnMenuBack";
-            btnMenuBack.Size = new Size(201, 43);
+            btnMenuBack.Size = new Size(327, 72);
             btnMenuBack.TabIndex = 5;
             btnMenuBack.Text = "Back to menu";
             btnMenuBack.UseVisualStyleBackColor = true;
@@ -232,9 +236,10 @@
             // 
             // button4
             // 
-            button4.Location = new Point(34, 21);
+            button4.Location = new Point(55, 35);
+            button4.Margin = new Padding(5, 5, 5, 5);
             button4.Name = "button4";
-            button4.Size = new Size(147, 28);
+            button4.Size = new Size(239, 47);
             button4.TabIndex = 2;
             button4.Text = "Load Save Folder";
             button4.UseVisualStyleBackColor = true;
@@ -242,10 +247,10 @@
             // 
             // btnSaveMoney
             // 
-            btnSaveMoney.Location = new Point(1065, 309);
-            btnSaveMoney.Margin = new Padding(3, 4, 3, 4);
+            btnSaveMoney.Location = new Point(1731, 520);
+            btnSaveMoney.Margin = new Padding(5, 7, 5, 7);
             btnSaveMoney.Name = "btnSaveMoney";
-            btnSaveMoney.Size = new Size(135, 46);
+            btnSaveMoney.Size = new Size(219, 77);
             btnSaveMoney.TabIndex = 3;
             btnSaveMoney.Text = "Save Money";
             btnSaveMoney.UseVisualStyleBackColor = true;
@@ -253,29 +258,31 @@
             // 
             // numMoney
             // 
-            numMoney.Location = new Point(1065, 256);
-            numMoney.Margin = new Padding(3, 4, 3, 4);
+            numMoney.Location = new Point(1731, 431);
+            numMoney.Margin = new Padding(5, 7, 5, 7);
             numMoney.Maximum = new decimal(new int[] { 999999, 0, 0, 0 });
             numMoney.Name = "numMoney";
-            numMoney.Size = new Size(137, 26);
+            numMoney.Size = new Size(223, 39);
             numMoney.TabIndex = 2;
             numMoney.ValueChanged += numMoney_ValueChanged;
             // 
             // IslandFund
             // 
             IslandFund.AutoSize = true;
-            IslandFund.Location = new Point(1086, 210);
+            IslandFund.Location = new Point(1765, 354);
+            IslandFund.Margin = new Padding(5, 0, 5, 0);
             IslandFund.Name = "IslandFund";
-            IslandFund.Size = new Size(91, 19);
+            IslandFund.Size = new Size(157, 32);
             IslandFund.TabIndex = 1;
             IslandFund.Text = "Island money";
             // 
             // lblIslandTitle
             // 
             lblIslandTitle.AutoSize = true;
-            lblIslandTitle.Location = new Point(755, 56);
+            lblIslandTitle.Location = new Point(1227, 94);
+            lblIslandTitle.Margin = new Padding(5, 0, 5, 0);
             lblIslandTitle.Name = "lblIslandTitle";
-            lblIslandTitle.Size = new Size(45, 19);
+            lblIslandTitle.Size = new Size(78, 32);
             lblIslandTitle.TabIndex = 0;
             lblIslandTitle.Text = "label3";
             lblIslandTitle.Click += label3_Click;
@@ -284,11 +291,11 @@
             // 
             txtMiiPath.AllowDrop = true;
             txtMiiPath.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            txtMiiPath.Location = new Point(341, 166);
-            txtMiiPath.Margin = new Padding(3, 4, 3, 4);
+            txtMiiPath.Location = new Point(554, 280);
+            txtMiiPath.Margin = new Padding(5, 7, 5, 7);
             txtMiiPath.Name = "txtMiiPath";
             txtMiiPath.ReadOnly = true;
-            txtMiiPath.Size = new Size(766, 26);
+            txtMiiPath.Size = new Size(1242, 39);
             txtMiiPath.TabIndex = 9;
             txtMiiPath.Text = "Choose a Mii file here...";
             txtMiiPath.TextChanged += txtMiiPath_TextChanged;
@@ -297,17 +304,19 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(341, 142);
+            label1.Location = new Point(554, 239);
+            label1.Margin = new Padding(5, 0, 5, 0);
             label1.Name = "label1";
-            label1.Size = new Size(127, 19);
+            label1.Size = new Size(221, 32);
             label1.TabIndex = 8;
             label1.Text = "Open / Save as Mii:";
             // 
             // btnGo
             // 
-            btnGo.Location = new Point(651, 224);
+            btnGo.Location = new Point(1058, 377);
+            btnGo.Margin = new Padding(5, 5, 5, 5);
             btnGo.Name = "btnGo";
-            btnGo.Size = new Size(118, 42);
+            btnGo.Size = new Size(192, 71);
             btnGo.TabIndex = 5;
             btnGo.Text = "Go";
             btnGo.UseVisualStyleBackColor = true;
@@ -317,17 +326,19 @@
             // 
             cmbMiiAction.FormattingEnabled = true;
             cmbMiiAction.Items.AddRange(new object[] { "Import Mii (.ltd)", "Export Mii (.ltd)" });
-            cmbMiiAction.Location = new Point(178, 104);
+            cmbMiiAction.Location = new Point(289, 175);
+            cmbMiiAction.Margin = new Padding(5, 5, 5, 5);
             cmbMiiAction.Name = "cmbMiiAction";
-            cmbMiiAction.Size = new Size(147, 27);
+            cmbMiiAction.Size = new Size(236, 40);
             cmbMiiAction.TabIndex = 4;
             cmbMiiAction.Text = "Select Action..";
             // 
             // button3
             // 
-            button3.Location = new Point(10, 10);
+            button3.Location = new Point(16, 17);
+            button3.Margin = new Padding(5, 5, 5, 5);
             button3.Name = "button3";
-            button3.Size = new Size(135, 28);
+            button3.Size = new Size(219, 47);
             button3.TabIndex = 1;
             button3.Text = "<- Back to menu";
             button3.UseVisualStyleBackColor = true;
@@ -337,9 +348,10 @@
             // 
             listBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             listBox1.FormattingEnabled = true;
-            listBox1.Location = new Point(174, 271);
+            listBox1.Location = new Point(283, 456);
+            listBox1.Margin = new Padding(5, 5, 5, 5);
             listBox1.Name = "listBox1";
-            listBox1.Size = new Size(1267, 650);
+            listBox1.Size = new Size(2056, 1092);
             listBox1.TabIndex = 0;
             // 
             // logopanel1
@@ -348,10 +360,10 @@
             logopanel1.BackColor = Color.Transparent;
             logopanel1.BackgroundImage = Properties.Resources.tomoaio_logo;
             logopanel1.BackgroundImageLayout = ImageLayout.Stretch;
-            logopanel1.Location = new Point(1411, 4);
-            logopanel1.Margin = new Padding(3, 4, 3, 4);
+            logopanel1.Location = new Point(2293, 7);
+            logopanel1.Margin = new Padding(5, 7, 5, 7);
             logopanel1.Name = "logopanel1";
-            logopanel1.Size = new Size(200, 203);
+            logopanel1.Size = new Size(325, 342);
             logopanel1.TabIndex = 12;
             logopanel1.TabStop = false;
             // 
@@ -361,9 +373,9 @@
             pictureBox2.Dock = DockStyle.Fill;
             pictureBox2.Image = Properties.Resources.tomo1;
             pictureBox2.Location = new Point(0, 0);
-            pictureBox2.Margin = new Padding(3, 4, 3, 4);
+            pictureBox2.Margin = new Padding(5, 7, 5, 7);
             pictureBox2.Name = "pictureBox2";
-            pictureBox2.Size = new Size(1614, 1030);
+            pictureBox2.Size = new Size(2623, 1735);
             pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox2.TabIndex = 7;
             pictureBox2.TabStop = false;
@@ -377,9 +389,10 @@
             btnIslandMgmt.Cursor = Cursors.Hand;
             btnIslandMgmt.FlatAppearance.BorderSize = 0;
             btnIslandMgmt.FlatStyle = FlatStyle.Flat;
-            btnIslandMgmt.Location = new Point(1086, 322);
+            btnIslandMgmt.Location = new Point(1765, 542);
+            btnIslandMgmt.Margin = new Padding(5, 5, 5, 5);
             btnIslandMgmt.Name = "btnIslandMgmt";
-            btnIslandMgmt.Size = new Size(418, 361);
+            btnIslandMgmt.Size = new Size(679, 608);
             btnIslandMgmt.TabIndex = 15;
             btnIslandMgmt.UseVisualStyleBackColor = false;
             btnIslandMgmt.Click += btnIslandMgmt_Click;
@@ -388,10 +401,10 @@
             // 
             btnDiscord.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnDiscord.BackColor = Color.Transparent;
-            btnDiscord.Location = new Point(1526, 944);
-            btnDiscord.Margin = new Padding(3, 4, 3, 4);
+            btnDiscord.Location = new Point(2480, 1590);
+            btnDiscord.Margin = new Padding(5, 7, 5, 7);
             btnDiscord.Name = "btnDiscord";
-            btnDiscord.Size = new Size(86, 82);
+            btnDiscord.Size = new Size(140, 138);
             btnDiscord.TabIndex = 14;
             btnDiscord.UseVisualStyleBackColor = true;
             btnDiscord.Click += btnDiscord_Click;
@@ -408,9 +421,9 @@
             panelUGC.Controls.Add(panelSidebar);
             panelUGC.Dock = DockStyle.Fill;
             panelUGC.Location = new Point(0, 0);
-            panelUGC.Margin = new Padding(3, 4, 3, 4);
+            panelUGC.Margin = new Padding(5, 7, 5, 7);
             panelUGC.Name = "panelUGC";
-            panelUGC.Size = new Size(1614, 1030);
+            panelUGC.Size = new Size(2623, 1735);
             panelUGC.TabIndex = 13;
             panelUGC.Visible = false;
             // 
@@ -420,19 +433,19 @@
             pictureBox3.BackColor = Color.Transparent;
             pictureBox3.BackgroundImage = Properties.Resources.tomoaio_logo;
             pictureBox3.BackgroundImageLayout = ImageLayout.Stretch;
-            pictureBox3.Location = new Point(1410, 4);
-            pictureBox3.Margin = new Padding(3, 4, 3, 4);
+            pictureBox3.Location = new Point(2291, 7);
+            pictureBox3.Margin = new Padding(5, 7, 5, 7);
             pictureBox3.Name = "pictureBox3";
-            pictureBox3.Size = new Size(200, 203);
+            pictureBox3.Size = new Size(325, 342);
             pictureBox3.TabIndex = 12;
             pictureBox3.TabStop = false;
             // 
             // btnUgcBack
             // 
-            btnUgcBack.Location = new Point(293, 35);
-            btnUgcBack.Margin = new Padding(3, 4, 3, 4);
+            btnUgcBack.Location = new Point(476, 59);
+            btnUgcBack.Margin = new Padding(5, 7, 5, 7);
             btnUgcBack.Name = "btnUgcBack";
-            btnUgcBack.Size = new Size(69, 86);
+            btnUgcBack.Size = new Size(112, 145);
             btnUgcBack.TabIndex = 5;
             btnUgcBack.Text = "Back to menu";
             btnUgcBack.UseVisualStyleBackColor = true;
@@ -441,10 +454,10 @@
             // btnUgcExport
             // 
             btnUgcExport.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            btnUgcExport.Location = new Point(1235, 940);
-            btnUgcExport.Margin = new Padding(3, 4, 3, 4);
+            btnUgcExport.Location = new Point(2007, 1583);
+            btnUgcExport.Margin = new Padding(5, 7, 5, 7);
             btnUgcExport.Name = "btnUgcExport";
-            btnUgcExport.Size = new Size(344, 82);
+            btnUgcExport.Size = new Size(559, 138);
             btnUgcExport.TabIndex = 4;
             btnUgcExport.Text = "Export (.png / .zs)";
             btnUgcExport.UseVisualStyleBackColor = true;
@@ -453,10 +466,10 @@
             // btnUgcImport
             // 
             btnUgcImport.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            btnUgcImport.Location = new Point(368, 940);
-            btnUgcImport.Margin = new Padding(3, 4, 3, 4);
+            btnUgcImport.Location = new Point(598, 1583);
+            btnUgcImport.Margin = new Padding(5, 7, 5, 7);
             btnUgcImport.Name = "btnUgcImport";
-            btnUgcImport.Size = new Size(344, 82);
+            btnUgcImport.Size = new Size(559, 138);
             btnUgcImport.TabIndex = 3;
             btnUgcImport.Text = "Import (.png / .zs)";
             btnUgcImport.UseVisualStyleBackColor = true;
@@ -466,9 +479,10 @@
             // 
             lblImageInfo.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             lblImageInfo.AutoSize = true;
-            lblImageInfo.Location = new Point(739, 972);
+            lblImageInfo.Location = new Point(1201, 1637);
+            lblImageInfo.Margin = new Padding(5, 0, 5, 0);
             lblImageInfo.Name = "lblImageInfo";
-            lblImageInfo.Size = new Size(45, 19);
+            lblImageInfo.Size = new Size(78, 32);
             lblImageInfo.TabIndex = 2;
             lblImageInfo.Text = "label2";
             lblImageInfo.Click += lblImageInfo_Click;
@@ -477,10 +491,10 @@
             // 
             picPreview.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             picPreview.BackColor = Color.White;
-            picPreview.Location = new Point(368, 10);
-            picPreview.Margin = new Padding(3, 4, 3, 4);
+            picPreview.Location = new Point(598, 17);
+            picPreview.Margin = new Padding(5, 7, 5, 7);
             picPreview.Name = "picPreview";
-            picPreview.Size = new Size(1211, 922);
+            picPreview.Size = new Size(1968, 1553);
             picPreview.SizeMode = PictureBoxSizeMode.Zoom;
             picPreview.TabIndex = 1;
             picPreview.TabStop = false;
@@ -494,17 +508,18 @@
             panelSidebar.Controls.Add(lstUGC);
             panelSidebar.Dock = DockStyle.Left;
             panelSidebar.Location = new Point(0, 0);
-            panelSidebar.Margin = new Padding(3, 4, 3, 4);
+            panelSidebar.Margin = new Padding(5, 7, 5, 7);
             panelSidebar.Name = "panelSidebar";
-            panelSidebar.Padding = new Padding(0, 35, 0, 0);
-            panelSidebar.Size = new Size(286, 1030);
+            panelSidebar.Padding = new Padding(0, 59, 0, 0);
+            panelSidebar.Size = new Size(465, 1735);
             panelSidebar.TabIndex = 0;
             // 
             // txtSearch
             // 
-            txtSearch.Location = new Point(2, 5);
+            txtSearch.Location = new Point(3, 8);
+            txtSearch.Margin = new Padding(5, 5, 5, 5);
             txtSearch.Name = "txtSearch";
-            txtSearch.Size = new Size(282, 26);
+            txtSearch.Size = new Size(456, 39);
             txtSearch.TabIndex = 2;
             txtSearch.Text = "Search...";
             txtSearch.TextChanged += txtSearch_TextChanged;
@@ -517,10 +532,10 @@
             lstUGC.Dock = DockStyle.Fill;
             lstUGC.ForeColor = Color.Black;
             lstUGC.FormattingEnabled = true;
-            lstUGC.Location = new Point(0, 35);
-            lstUGC.Margin = new Padding(3, 4, 3, 4);
+            lstUGC.Location = new Point(0, 59);
+            lstUGC.Margin = new Padding(5, 7, 5, 7);
             lstUGC.Name = "lstUGC";
-            lstUGC.Size = new Size(286, 995);
+            lstUGC.Size = new Size(465, 1676);
             lstUGC.TabIndex = 0;
             lstUGC.SelectedIndexChanged += lstUGC_SelectedIndexChanged;
             // 
@@ -530,9 +545,9 @@
             pictureBox1.Dock = DockStyle.Fill;
             pictureBox1.Image = Properties.Resources.tomo1;
             pictureBox1.Location = new Point(0, 0);
-            pictureBox1.Margin = new Padding(3, 4, 3, 4);
+            pictureBox1.Margin = new Padding(5, 7, 5, 7);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(1614, 1030);
+            pictureBox1.Size = new Size(2623, 1735);
             pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox1.TabIndex = 6;
             pictureBox1.TabStop = false;
@@ -544,20 +559,20 @@
             logo.BackColor = Color.Transparent;
             logo.BackgroundImage = Properties.Resources.tomoaio_logo;
             logo.BackgroundImageLayout = ImageLayout.Stretch;
-            logo.Location = new Point(1411, 4);
-            logo.Margin = new Padding(3, 4, 3, 4);
+            logo.Location = new Point(2293, 7);
+            logo.Margin = new Padding(5, 7, 5, 7);
             logo.Name = "logo";
-            logo.Size = new Size(200, 203);
+            logo.Size = new Size(325, 342);
             logo.TabIndex = 11;
             logo.TabStop = false;
             logo.Click += pictureBox3_Click;
             // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(8F, 19F);
+            AutoScaleDimensions = new SizeF(13F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(255, 190, 0);
-            ClientSize = new Size(1614, 1030);
+            ClientSize = new Size(2623, 1735);
             Controls.Add(logo);
             Controls.Add(button2);
             Controls.Add(button1);
@@ -567,6 +582,7 @@
             Controls.Add(pictureBox1);
             Controls.Add(panelUGC);
             Icon = (Icon)resources.GetObject("$this.Icon");
+            Margin = new Padding(5, 5, 5, 5);
             Name = "Form1";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "TomoAIO - TLLTD Tool 2.0";
