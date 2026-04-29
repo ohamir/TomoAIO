@@ -67,6 +67,7 @@
             IslandFund = new Label();
             lblIslandTitle = new Label();
             pictureBox4 = new PictureBox();
+            logoislandmgt = new PictureBox();
             pictureBox1 = new PictureBox();
             logo = new PictureBox();
             btnChangeFolders = new Button();
@@ -81,6 +82,7 @@
             tablelayoutpanelisland.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numMoney).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)logoislandmgt).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)logo).BeginInit();
             SuspendLayout();
@@ -411,6 +413,7 @@
             panelIslandMGT.Controls.Add(numMoney);
             panelIslandMGT.Controls.Add(IslandFund);
             panelIslandMGT.Controls.Add(lblIslandTitle);
+            panelIslandMGT.Controls.Add(logoislandmgt);
             panelIslandMGT.Controls.Add(pictureBox4);
             panelIslandMGT.Location = new Point(0, 0);
             panelIslandMGT.Name = "panelIslandMGT";
@@ -574,6 +577,19 @@
             pictureBox4.TabStop = false;
             pictureBox4.Click += pictureBox4_Click;
             // 
+            // logoislandmgt
+            // 
+            logoislandmgt.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            logoislandmgt.BackColor = Color.Transparent;
+            logoislandmgt.BackgroundImage = Properties.Resources.tomoaio_logo;
+            logoislandmgt.BackgroundImageLayout = ImageLayout.Zoom;
+            logoislandmgt.Location = new Point(1225, 12);
+            logoislandmgt.Name = "logoislandmgt";
+            logoislandmgt.Size = new Size(175, 160);
+            logoislandmgt.TabIndex = 16;
+            logoislandmgt.TabStop = false;
+            logoislandmgt.Click += logoislandmgt_Click;
+            // 
             // pictureBox1
             // 
             pictureBox1.BackgroundImageLayout = ImageLayout.Zoom;
@@ -624,8 +640,8 @@
             Controls.Add(button1);
             Controls.Add(btnIslandMgmt);
             Controls.Add(btnDiscord);
-            Controls.Add(panelMii);
             Controls.Add(pictureBox1);
+            Controls.Add(panelMii);
             Controls.Add(panelUGC);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(3, 2, 3, 2);
@@ -649,6 +665,7 @@
             tablelayoutpanelisland.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)numMoney).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
+            ((System.ComponentModel.ISupportInitialize)logoislandmgt).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ((System.ComponentModel.ISupportInitialize)logo).EndInit();
             ResumeLayout(false);
@@ -699,5 +716,6 @@
         private PictureBox pictureBox4;
         private TableLayoutPanel tablelayoutpanelisland;
         private Button btnChangeFolders;
+        private PictureBox logoislandmgt;
     }
 }

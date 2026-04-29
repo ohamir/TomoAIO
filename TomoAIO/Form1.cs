@@ -141,6 +141,7 @@ namespace TomoAIO
             ApplyLogoStyle(logo, pictureBox1);
             ApplyLogoStyle(logopanel1, pictureBox2);
             ApplyLogoStyle(pictureBox3, panelUGC);
+            ApplyLogoStyle(logoislandmgt, panelIslandMGT);
             pictureBox1.SendToBack();
             logo.BringToFront();
             pictureBox2.SendToBack();
@@ -152,12 +153,15 @@ namespace TomoAIO
             MakePictureBackgroundTransparent(logo, Color.FromArgb(255, 190, 0), 38);
             MakePictureBackgroundTransparent(pictureBox3, Color.FromArgb(255, 190, 0), 38);
             MakePictureBackgroundTransparent(logopanel1, Color.FromArgb(255, 190, 0), 38);
+            MakePictureBackgroundTransparent(logoislandmgt, Color.FromArgb(255, 190, 0), 38);
             MakePictureBackgroundTransparent(logo, Color.White, 65);
+            MakePictureBackgroundTransparent(logoislandmgt, Color.White, 65);
             MakePictureBackgroundTransparent(pictureBox3, Color.White, 65);
             MakePictureBackgroundTransparent(logopanel1, Color.White, 65);
             logo.BackgroundImageLayout = ImageLayout.Zoom;
             pictureBox3.BackgroundImageLayout = ImageLayout.Zoom;
             logopanel1.BackgroundImageLayout = ImageLayout.Zoom;
+            logoislandmgt.BackgroundImageLayout = ImageLayout.Zoom;
             PinLogoTopRight();
             LayoutMainMenuButtons();
         }
@@ -200,6 +204,11 @@ namespace TomoAIO
                 logopanel1.BackgroundImage = Properties.Resources.tomoaio_logo;
             }
 
+            if (logoislandmgt.BackgroundImage == null)
+            {
+                logoislandmgt.BackgroundImage = Properties.Resources.tomoaio_logo;
+            }
+
             if (pictureBox3.BackgroundImage == null)
             {
                 pictureBox3.BackgroundImage = Properties.Resources.tomoaio_logo;
@@ -208,6 +217,7 @@ namespace TomoAIO
             ApplyLogoStyle(logo, pictureBox1);
             ApplyLogoStyle(logopanel1, pictureBox2);
             ApplyLogoStyle(pictureBox3, panelUGC);
+            ApplyLogoStyle(logoislandmgt, panelIslandMGT);
             PinLogoTopRight();
         }
 
@@ -297,6 +307,13 @@ namespace TomoAIO
                 pictureBox3.Size = size;
                 pictureBox3.Location = location;
             }
+            if (logoislandmgt.Parent != null)
+            {
+                (Size size, Point location) = _layoutService.ComputeTopRightLogo(logoislandmgt.Parent.ClientSize, scaleX, scaleY);
+                logoislandmgt.Size = size;
+                logoislandmgt.Location = location;
+            }
+      
         }
 
         private void LayoutMainMenuButtons()
@@ -1906,6 +1923,11 @@ namespace TomoAIO
                 Properties.Settings.Default.Save();
                 CheckFirstBootSetup();
             }
+        }
+
+        private void logoislandmgt_Click(object sender, EventArgs e)
+        {
+
         }
     }
 } 
