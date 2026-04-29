@@ -71,3 +71,4 @@ This project utilizes the following open-source libraries:
 * **[astcenc](https://github.com/ARM-software/astc-encoder)** - Utilized for decoding ASTC compressed textures via command-line interface.
 * **[ShareMii](https://github.com/Star-F0rce/ShareMii)** - For the original Mii data structures and `.ltd` file format inspiration.
 * **[Living the Dream Toolkit](https://github.com/MadMax1960/LivingTheDreamToolkit)** - Used the Texture Processing of LTD Toolkit for the UGC Editor
+* **[rafacasari's Save Editor](https://github.com/Rafacasari/ltd-save-editor)** - Huge thanks for their open-source work on reverse-engineering the save files. The interior and facility hashes used in the TomoAIO Island Management were referenced from their tool!
