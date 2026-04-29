@@ -70,8 +70,9 @@ namespace TomoAIO
             _ugcService = new UgcService(_fileSystem, _zstdCodec);
             InitializeComponent();
             StyleSpecificAssets();
+            CheckFirstBootSetup();
             _mainMenuView = new MainMenuView(pictureBox1, logo, button1, button2);
-            _miiEditorView = new MiiEditorView(panel1);
+            _miiEditorView = new MiiEditorView(panelMii);
             _ugcCreatorView = new UgcCreatorView(panelUGC);
             EnableSmoothRendering();
             ConfigureMenuButtons();
@@ -116,7 +117,7 @@ namespace TomoAIO
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
             UpdateStyles();
 
-            EnableDoubleBuffer(panel1);
+            EnableDoubleBuffer(panelMii);
             EnableDoubleBuffer(panelUGC);
             EnableDoubleBuffer(panelSidebar);
             EnableDoubleBuffer(listBox1);
@@ -136,6 +137,7 @@ namespace TomoAIO
             button1.Parent = pictureBox1;
             button2.Parent = pictureBox1;
             btnIslandMgmt.Parent = pictureBox1;
+            btnChangeFolders.Parent = pictureBox1;
             ApplyLogoStyle(logo, pictureBox1);
             ApplyLogoStyle(logopanel1, pictureBox2);
             ApplyLogoStyle(pictureBox3, panelUGC);
@@ -211,12 +213,14 @@ namespace TomoAIO
 
         private void ShowMainMenu()
         {
-            panel1.Visible = false;
+            panelMii.Visible = false;
             panelUGC.Visible = false;
             button1.Visible = true;
             button2.Visible = true;
+            btnChangeFolders.Visible = true;
             btnIslandMgmt.Visible = true;
             pictureBox1.Visible = true;
+            btnChangeFolders.BringToFront();
             CloseActionDropdown();
             EnsureMenuImages();
             _mainMenuView?.Show();
@@ -328,8 +332,8 @@ namespace TomoAIO
                 return;
             }
 
-            int panelWidth = Math.Max(1, panel1.ClientSize.Width);
-            int panelHeight = Math.Max(1, panel1.ClientSize.Height);
+            int panelWidth = Math.Max(1, panelMii.ClientSize.Width);
+            int panelHeight = Math.Max(1, panelMii.ClientSize.Height);
 
             float scaleX = panelWidth / 1343f;
             float scaleY = panelHeight / 745f;
@@ -339,7 +343,7 @@ namespace TomoAIO
             int top = Math.Max(10, (int)Math.Round(12 * uiScale));
             int rowGap = Math.Max(8, (int)Math.Round(12 * uiScale));
 
-            int reservedRight = panel1.Visible ? GetRightTopReservedWidth() : 0;
+            int reservedRight = panelMii.Visible ? GetRightTopReservedWidth() : 0;
             int maxArea = Math.Max(220, panelWidth - (outerMargin * 2) - reservedRight);
             int areaWidth = Math.Min((int)Math.Round(panelWidth * 0.72f), maxArea);
             areaWidth = Math.Max(260, areaWidth);
@@ -399,7 +403,7 @@ namespace TomoAIO
             btnGo.Location = new Point(left + ((areaWidth - goWidth) / 2), btnBrowseMii.Bottom + 14);
 
             listBox1.Location = new Point(left, btnGo.Bottom + 12);
-            int listHeight = Math.Max(120, panel1.ClientSize.Height - listBox1.Top - 20);
+            int listHeight = Math.Max(120, panelMii.ClientSize.Height - listBox1.Top - 20);
             listBox1.Size = new Size(areaWidth, listHeight);
         }
 
@@ -498,7 +502,7 @@ namespace TomoAIO
                 reserved = Math.Max(reserved, logo.Width + (LogoMargin * 2));
             }
 
-            if (logopanel1.Visible && logopanel1.Parent == panel1)
+            if (logopanel1.Visible && logopanel1.Parent == panelMii)
             {
                 reserved = Math.Max(reserved, logopanel1.Width + (LogoMargin * 2));
             }
@@ -528,6 +532,8 @@ namespace TomoAIO
             btnUgcBack.Text = "Back to Menu";
 
             StyleActionButton(button4, ButtonPrimaryColor, ButtonPrimaryHoverColor, ButtonPrimaryPressedColor);
+            StyleActionButton(btnChangeFolders, ButtonSecondaryColor, ButtonSecondaryHoverColor, ButtonSecondaryPressedColor);
+            StyleActionButton(btnMenuBack, ButtonSecondaryColor, ButtonSecondaryHoverColor, ButtonSecondaryPressedColor);
             StyleActionButton(btnBrowseMii, ButtonPrimaryColor, ButtonPrimaryHoverColor, ButtonPrimaryPressedColor);
             StyleActionButton(btnGo, ButtonPrimaryColor, ButtonPrimaryHoverColor, ButtonPrimaryPressedColor);
             StyleActionButton(btnUgcImport, ButtonPrimaryColor, ButtonPrimaryHoverColor, ButtonPrimaryPressedColor);
@@ -586,7 +592,7 @@ namespace TomoAIO
                 {
                     BackColor = InputBorderColor
                 };
-                panel1.Controls.Add(_comboHost);
+                panelMii.Controls.Add(_comboHost);
                 _comboHost.BringToFront();
             }
 
@@ -597,7 +603,7 @@ namespace TomoAIO
                     BackColor = InputBorderColor,
                     Padding = new Padding(1)
                 };
-                panel1.Controls.Add(_pathHost);
+                panelMii.Controls.Add(_pathHost);
                 _pathHost.BringToFront();
             }
 
@@ -695,11 +701,11 @@ namespace TomoAIO
                     }
                     CloseActionDropdown();
                 };
-                panel1.Controls.Add(_actionDropdownList);
+                panelMii.Controls.Add(_actionDropdownList);
             }
 
-            panel1.MouseDown -= PanelMouseDownCloseDropdown;
-            panel1.MouseDown += PanelMouseDownCloseDropdown;
+            panelMii.MouseDown -= PanelMouseDownCloseDropdown;
+            panelMii.MouseDown += PanelMouseDownCloseDropdown;
         }
 
         private void PanelMouseDownCloseDropdown(object? sender, MouseEventArgs e)
@@ -1232,51 +1238,54 @@ namespace TomoAIO
             PinLogoTopRight();
             LayoutMiiEditorControls();
             EnsureDiscordButtonVisible();
-
-            using (FolderBrowserDialog fbd = new FolderBrowserDialog())
+            string savedFolder = Properties.Settings.Default.SaveFolder;
+            if (string.IsNullOrEmpty(savedFolder))
             {
-                fbd.Description = "Select your game save folder (where Mii.sav is located)";
-
-                if (fbd.ShowDialog() == DialogResult.OK)
-                {
-                    string selectedFolder = fbd.SelectedPath;
-                    string miiSavPath = Path.Combine(selectedFolder, "Mii.sav");
-
-                    if (File.Exists(miiSavPath))
-                    {
-                        _state.CurrentMiiSavPath = miiSavPath;
-                        RefreshMiiList();
-                        MessageBox.Show("Save file found!", "TomoAIO");
-                    }
-                    else
-                    {
-                        MessageBox.Show("Could not find Mii.sav in that folder!\n\nPlease make sure you selected the correct save folder.", "Wrong Folder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    }
-                }
+                MessageBox.Show("Save folder not set! Please restart the app to trigger the First Time Setup.", "Missing Folder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            string miiSavPath = Path.Combine(savedFolder, "Mii.sav");
+            if (File.Exists(miiSavPath))
+            {
+                _state.CurrentMiiSavPath = miiSavPath;
+                RefreshMiiList();
+            }
+            else
+            {
+                MessageBox.Show($"Could not find Mii.sav in your saved folder:\n{savedFolder}\n\nPlease make sure you didn't move your game files.", "File Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
+
         private void button3_Click(object sender, EventArgs e) { ShowMainMenu(); }
         private void button2_Click(object sender, EventArgs e)
         {
-            using (FolderBrowserDialog fbd = new FolderBrowserDialog())
+            string savedUgcFolder = Properties.Settings.Default.UGCFolder;
+            if (string.IsNullOrEmpty(savedUgcFolder))
             {
-                fbd.Description = "Select your Living the Dream 'Ugc' folder";
-                if (fbd.ShowDialog() == DialogResult.OK)
+                MessageBox.Show("UGC folder not set! Please restart the app to trigger the First Time Setup.", "Missing Folder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            if (Directory.Exists(savedUgcFolder))
+            {
+                LoadUgcList(savedUgcFolder);
+
+                if (lstUGC.Items.Count > 0)
                 {
-
-                    LoadUgcList(fbd.SelectedPath);
-
-
-                    if (lstUGC.Items.Count > 0)
-                    {
-                        _ugcCreatorView?.Show();
-                        LayoutUgcEditorControls();
-                        EnsureDiscordButtonVisible();
-                    }
-
+                    _ugcCreatorView?.Show();
+                    LayoutUgcEditorControls();
+                    EnsureDiscordButtonVisible();
+                }
+                else
+                {
+                    MessageBox.Show("No UGC items were found in your saved folder.", "Empty Folder", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
+            else
+            {
+                MessageBox.Show($"Could not find your saved UGC folder:\n{savedUgcFolder}\n\nPlease make sure you didn't move or delete the folder.", "Folder Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
+
         private void button4_Click(object sender, EventArgs e)
         {
             using (FolderBrowserDialog fb = new FolderBrowserDialog())
@@ -1468,7 +1477,7 @@ namespace TomoAIO
             base.OnResize(e);
             CloseActionDropdown();
             SuspendLayout();
-            panel1.SuspendLayout();
+            panelMii.SuspendLayout();
             panelUGC.SuspendLayout();
             try
             {
@@ -1481,7 +1490,7 @@ namespace TomoAIO
             finally
             {
                 panelUGC.ResumeLayout(false);
-                panel1.ResumeLayout(false);
+                panelMii.ResumeLayout(false);
                 ResumeLayout(false);
             }
         }
@@ -1546,25 +1555,33 @@ namespace TomoAIO
 
         private void btnIslandMgmt_Click(object sender, EventArgs e)
         {
-            using (OpenFileDialog ofd = new OpenFileDialog())
+            string savedFolder = Properties.Settings.Default.SaveFolder;
+            if (string.IsNullOrEmpty(savedFolder))
             {
-                ofd.Title = "Select your Player.sav file";
-                ofd.Filter = "Tomodachi Player Save (Player.sav)|Player.sav";
+                MessageBox.Show("Save folder not set! Please restart the app to trigger the First Time Setup.", "Missing Folder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            string playerSavPath = Path.Combine(savedFolder, "Player.sav");
+            if (File.Exists(playerSavPath))
+            {
+                _state.CurrentPlayerSavPath = playerSavPath;
+                button1.Visible = false;
+                button2.Visible = false;
+                btnIslandMgmt.Visible = false;
+                pictureBox1.Visible = false;
+                btnChangeFolders.Visible = false;
 
-                if (ofd.ShowDialog() == DialogResult.OK)
-                {
-                    _state.CurrentPlayerSavPath = ofd.FileName;
-                    button1.Visible = false;
-                    button2.Visible = false;
-                    btnIslandMgmt.Visible = false;
-                    pictureBox1.Visible = false;
-                    panelIsland.Visible = true;
-                    panelIsland.Dock = DockStyle.Fill;
-                    panelIsland.BringToFront();
-                    RefreshIslandManagementUI();
-                    PinLogoTopRight();
-                    EnsureDiscordButtonVisible();
-                }
+                panelIslandMGT.Visible = true;
+                panelIslandMGT.Dock = DockStyle.Fill;
+                panelIslandMGT.BringToFront();
+
+                RefreshIslandManagementUI();
+                PinLogoTopRight();
+                EnsureDiscordButtonVisible();
+            }
+            else
+            {
+                MessageBox.Show($"Could not find Player.sav in your saved folder:\n{savedFolder}\n\nPlease make sure your save files are intact.", "File Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
         private void label3_Click(object sender, EventArgs e)
@@ -1729,7 +1746,7 @@ namespace TomoAIO
         }
         private void btnMenuBack_Click1(object sender, EventArgs e)
         {
-            panelIsland.Visible = false;
+            panelIslandMGT.Visible = false;
             ShowMainMenu();
         }
 
@@ -1768,16 +1785,16 @@ namespace TomoAIO
             Color exactBlue = ColorTranslator.FromHtml("#2F3D52");
             foreach (Button btn in unlockButtons)
             {
-                btn.Dock = DockStyle.None; 
-                btn.Anchor = AnchorStyles.None;   
-                btn.Size = new Size(370, 61);  
+                btn.Dock = DockStyle.None;
+                btn.Anchor = AnchorStyles.None;
+                btn.Size = new Size(370, 61);
                 btn.FlatStyle = FlatStyle.Flat;
                 btn.FlatAppearance.BorderSize = 0;
                 btn.BackColor = exactBlue;
                 btn.ForeColor = Color.White;
                 btn.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
                 btn.Cursor = Cursors.Hand;
-                btn.Resize -= CustomButton_Resize; 
+                btn.Resize -= CustomButton_Resize;
                 btn.Resize += CustomButton_Resize;
                 CustomButton_Resize(btn, EventArgs.Empty);
             }
@@ -1786,7 +1803,7 @@ namespace TomoAIO
         {
             if (sender is Button btn)
             {
-                int radius = 12; 
+                int radius = 12;
                 System.Drawing.Drawing2D.GraphicsPath path = new System.Drawing.Drawing2D.GraphicsPath();
                 path.AddArc(0, 0, radius, radius, 180, 90);
                 path.AddArc(btn.Width - radius, 0, radius, radius, 270, 90);
@@ -1796,10 +1813,99 @@ namespace TomoAIO
                 btn.Region = new Region(path);
             }
         }
+        private void CheckFirstBootSetup()
+        {
+            if (string.IsNullOrEmpty(Properties.Settings.Default.SaveFolder) ||
+                string.IsNullOrEmpty(Properties.Settings.Default.UGCFolder))
+            {
+                MessageBox.Show("Welcome to TomoAIO! Let's set up your folders so you don't have to select them every time.\n\n(For each window, look at the top left of your Explorer window to see which Folder you are selecting)", "First Time Setup", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                string tempSaveFolder = "";
+                string tempUgcFolder = "";
+                while (true)
+                {
+                    using (FolderBrowserDialog folderDialog = new FolderBrowserDialog())
+                    {
+                        folderDialog.Description = "Select your MAIN Save Folder (Must contain Mii.sav & Player.sav)";
+                        folderDialog.UseDescriptionForTitle = true;
+
+                        if (folderDialog.ShowDialog() == DialogResult.OK)
+                        {
+                            string miiPath = Path.Combine(folderDialog.SelectedPath, "Mii.sav");
+                            string playerPath = Path.Combine(folderDialog.SelectedPath, "Player.sav");
+
+                            if (File.Exists(miiPath) && File.Exists(playerPath))
+                            {
+                                tempSaveFolder = folderDialog.SelectedPath;
+                                break;
+                            }
+                            else
+                            {
+                                DialogResult retry = MessageBox.Show("Validation Failed!\n\nThe selected folder does not contain both 'Mii.sav' and 'Player.sav'.\n\nWould you like to try again?", "Invalid Folder", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
+
+                                if (retry == DialogResult.Cancel) return;
+                            }
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                }
+                MessageBox.Show("Mii.sav and Player.sav were successfully found!\n\nNext, please select your 'Ugc' folder so we can set up the UGC creator tool", "Step 1 Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                while (true)
+                {
+                    using (FolderBrowserDialog folderDialog = new FolderBrowserDialog())
+                    {
+                        folderDialog.Description = "Select your UGC Folder (Must contain at least one .zs file)";
+                        folderDialog.UseDescriptionForTitle = true;
+
+                        if (folderDialog.ShowDialog() == DialogResult.OK)
+                        {
+                            bool hasZsFile = Directory.EnumerateFiles(folderDialog.SelectedPath, "*.zs").Any();
+
+                            if (hasZsFile)
+                            {
+                                tempUgcFolder = folderDialog.SelectedPath;
+                                break;
+                            }
+                            else
+                            {
+                                DialogResult retry = MessageBox.Show("Validation Failed!\n\nNo '.zs' files were found in the selected folder.\n\nWould you like to try again?", "Invalid Folder", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
+
+                                if (retry == DialogResult.Cancel) return;
+                            }
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                }
+                Properties.Settings.Default.SaveFolder = tempSaveFolder;
+                Properties.Settings.Default.UGCFolder = tempUgcFolder;
+                Properties.Settings.Default.Save();
+
+                MessageBox.Show("All set! Your folders have been validated and saved.", "Setup Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
 
         private void lblCurrentMoney_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void btnChangeFolders_Click(object sender, EventArgs e)
+        {
+            DialogResult confirm = MessageBox.Show("Do you want to select new save folders?", "Change Folders", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (confirm == DialogResult.Yes)
+            {
+                Properties.Settings.Default.SaveFolder = "";
+                Properties.Settings.Default.UGCFolder = "";
+                Properties.Settings.Default.Save();
+                CheckFirstBootSetup();
+            }
         }
     }
 } 

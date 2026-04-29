@@ -31,7 +31,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             button1 = new Button();
             button2 = new Button();
-            panel1 = new Panel();
+            panelMii = new Panel();
             btnBrowseMii = new Button();
             txtMiiPath = new TextBox();
             label1 = new Label();
@@ -54,7 +54,7 @@
             panelSidebar = new Panel();
             txtSearch = new TextBox();
             lstUGC = new ListBox();
-            panelIsland = new Panel();
+            panelIslandMGT = new Panel();
             tablelayoutpanelisland = new TableLayoutPanel();
             btnUnlockInteriors = new Button();
             btnUnlockQBuilds = new Button();
@@ -69,14 +69,15 @@
             pictureBox4 = new PictureBox();
             pictureBox1 = new PictureBox();
             logo = new PictureBox();
-            panel1.SuspendLayout();
+            btnChangeFolders = new Button();
+            panelMii.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)logopanel1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).BeginInit();
             panelUGC.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
             ((System.ComponentModel.ISupportInitialize)picPreview).BeginInit();
             panelSidebar.SuspendLayout();
-            panelIsland.SuspendLayout();
+            panelIslandMGT.SuspendLayout();
             tablelayoutpanelisland.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numMoney).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
@@ -119,27 +120,27 @@
             button2.UseVisualStyleBackColor = false;
             button2.Click += button2_Click;
             // 
-            // panel1
+            // panelMii
             // 
-            panel1.Controls.Add(btnBrowseMii);
-            panel1.Controls.Add(txtMiiPath);
-            panel1.Controls.Add(label1);
-            panel1.Controls.Add(btnGo);
-            panel1.Controls.Add(cmbMiiAction);
-            panel1.Controls.Add(button4);
-            panel1.Controls.Add(button3);
-            panel1.Controls.Add(listBox1);
-            panel1.Controls.Add(logopanel1);
-            panel1.Controls.Add(pictureBox2);
-            panel1.Dock = DockStyle.Fill;
-            panel1.Location = new Point(0, 0);
-            panel1.Margin = new Padding(3, 2, 3, 2);
-            panel1.MinimumSize = new Size(700, 376);
-            panel1.Name = "panel1";
-            panel1.Size = new Size(1412, 813);
-            panel1.TabIndex = 3;
-            panel1.Visible = false;
-            panel1.Paint += panel1_Paint;
+            panelMii.Controls.Add(btnBrowseMii);
+            panelMii.Controls.Add(txtMiiPath);
+            panelMii.Controls.Add(label1);
+            panelMii.Controls.Add(btnGo);
+            panelMii.Controls.Add(cmbMiiAction);
+            panelMii.Controls.Add(button4);
+            panelMii.Controls.Add(button3);
+            panelMii.Controls.Add(listBox1);
+            panelMii.Controls.Add(logopanel1);
+            panelMii.Controls.Add(pictureBox2);
+            panelMii.Dock = DockStyle.Fill;
+            panelMii.Location = new Point(0, 0);
+            panelMii.Margin = new Padding(3, 2, 3, 2);
+            panelMii.MinimumSize = new Size(700, 376);
+            panelMii.Name = "panelMii";
+            panelMii.Size = new Size(1412, 813);
+            panelMii.TabIndex = 3;
+            panelMii.Visible = false;
+            panelMii.Paint += panel1_Paint;
             // 
             // btnBrowseMii
             // 
@@ -401,21 +402,21 @@
             lstUGC.TabIndex = 0;
             lstUGC.SelectedIndexChanged += lstUGC_SelectedIndexChanged;
             // 
-            // panelIsland
+            // panelIslandMGT
             // 
-            panelIsland.Controls.Add(tablelayoutpanelisland);
-            panelIsland.Controls.Add(lblCurrentMoney);
-            panelIsland.Controls.Add(btnMenuBack);
-            panelIsland.Controls.Add(btnSaveMoney);
-            panelIsland.Controls.Add(numMoney);
-            panelIsland.Controls.Add(IslandFund);
-            panelIsland.Controls.Add(lblIslandTitle);
-            panelIsland.Controls.Add(pictureBox4);
-            panelIsland.Location = new Point(0, 0);
-            panelIsland.Name = "panelIsland";
-            panelIsland.Size = new Size(1421, 813);
-            panelIsland.TabIndex = 13;
-            panelIsland.Visible = false;
+            panelIslandMGT.Controls.Add(tablelayoutpanelisland);
+            panelIslandMGT.Controls.Add(lblCurrentMoney);
+            panelIslandMGT.Controls.Add(btnMenuBack);
+            panelIslandMGT.Controls.Add(btnSaveMoney);
+            panelIslandMGT.Controls.Add(numMoney);
+            panelIslandMGT.Controls.Add(IslandFund);
+            panelIslandMGT.Controls.Add(lblIslandTitle);
+            panelIslandMGT.Controls.Add(pictureBox4);
+            panelIslandMGT.Location = new Point(0, 0);
+            panelIslandMGT.Name = "panelIslandMGT";
+            panelIslandMGT.Size = new Size(1421, 813);
+            panelIslandMGT.TabIndex = 13;
+            panelIslandMGT.Visible = false;
             // 
             // tablelayoutpanelisland
             // 
@@ -488,7 +489,7 @@
             lblCurrentMoney.Anchor = AnchorStyles.Top;
             lblCurrentMoney.AutoSize = true;
             lblCurrentMoney.Font = new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            lblCurrentMoney.ForeColor = Color.WhiteSmoke;
+            lblCurrentMoney.ForeColor = Color.Black;
             lblCurrentMoney.Location = new Point(608, 224);
             lblCurrentMoney.Name = "lblCurrentMoney";
             lblCurrentMoney.Size = new Size(100, 17);
@@ -498,9 +499,9 @@
             // 
             // btnMenuBack
             // 
-            btnMenuBack.Location = new Point(9, 17);
+            btnMenuBack.Location = new Point(3, 5);
             btnMenuBack.Name = "btnMenuBack";
-            btnMenuBack.Size = new Size(176, 34);
+            btnMenuBack.Size = new Size(176, 48);
             btnMenuBack.TabIndex = 5;
             btnMenuBack.Text = "Back to menu";
             btnMenuBack.UseVisualStyleBackColor = true;
@@ -538,7 +539,7 @@
             IslandFund.Anchor = AnchorStyles.Top;
             IslandFund.AutoSize = true;
             IslandFund.Font = new Font("Segoe UI", 15.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            IslandFund.ForeColor = Color.White;
+            IslandFund.ForeColor = Color.Black;
             IslandFund.Location = new Point(603, 179);
             IslandFund.Name = "IslandFund";
             IslandFund.Size = new Size(143, 30);
@@ -551,7 +552,7 @@
             lblIslandTitle.Anchor = AnchorStyles.Top;
             lblIslandTitle.AutoSize = true;
             lblIslandTitle.Font = new Font("Segoe UI", 26.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            lblIslandTitle.ForeColor = Color.White;
+            lblIslandTitle.ForeColor = Color.Black;
             lblIslandTitle.Location = new Point(486, 8);
             lblIslandTitle.Name = "lblIslandTitle";
             lblIslandTitle.Size = new Size(377, 47);
@@ -599,19 +600,31 @@
             logo.TabStop = false;
             logo.Click += pictureBox3_Click;
             // 
+            // btnChangeFolders
+            // 
+            btnChangeFolders.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnChangeFolders.Location = new Point(6, 5);
+            btnChangeFolders.Name = "btnChangeFolders";
+            btnChangeFolders.Size = new Size(193, 42);
+            btnChangeFolders.TabIndex = 13;
+            btnChangeFolders.Text = "Change Save Folders";
+            btnChangeFolders.UseVisualStyleBackColor = true;
+            btnChangeFolders.Click += btnChangeFolders_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(255, 190, 0);
             ClientSize = new Size(1412, 813);
+            Controls.Add(panelIslandMGT);
             Controls.Add(logo);
-            Controls.Add(panelIsland);
             Controls.Add(button2);
+            Controls.Add(btnChangeFolders);
             Controls.Add(button1);
             Controls.Add(btnIslandMgmt);
             Controls.Add(btnDiscord);
-            Controls.Add(panel1);
+            Controls.Add(panelMii);
             Controls.Add(pictureBox1);
             Controls.Add(panelUGC);
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -621,8 +634,8 @@
             Text = "TomoAIO - TLLTD Tool 2.0";
             Load += Form1_Load;
             Shown += Form1_Shown;
-            panel1.ResumeLayout(false);
-            panel1.PerformLayout();
+            panelMii.ResumeLayout(false);
+            panelMii.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)logopanel1).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
             panelUGC.ResumeLayout(false);
@@ -631,8 +644,8 @@
             ((System.ComponentModel.ISupportInitialize)picPreview).EndInit();
             panelSidebar.ResumeLayout(false);
             panelSidebar.PerformLayout();
-            panelIsland.ResumeLayout(false);
-            panelIsland.PerformLayout();
+            panelIslandMGT.ResumeLayout(false);
+            panelIslandMGT.PerformLayout();
             tablelayoutpanelisland.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)numMoney).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
@@ -645,7 +658,7 @@
 
         private Button button1;
         private Button button2;
-        private Panel panel1;
+        private Panel panelMii;
         private Button button3;
         private ListBox listBox1;
         private Button button4;
@@ -673,7 +686,7 @@
         private Button btnDiscord;
         private TextBox txtSearch;
         private Button btnIslandMgmt;
-        private Panel panelIsland;
+        private Panel panelIslandMGT;
         private Label lblIslandTitle;
         private NumericUpDown numMoney;
         private Button btnMenuBack;
@@ -685,5 +698,6 @@
         private Button btnUnlockInteriors;
         private PictureBox pictureBox4;
         private TableLayoutPanel tablelayoutpanelisland;
+        private Button btnChangeFolders;
     }
 }
