@@ -154,7 +154,7 @@
             Controls.Add(PathToSaveTxtBox);
             Controls.Add(SelectActionComboBox);
             Margin = new Padding(5);
-            MaximizeBox = false;
+            MinimumSize = new Size(1161, 1261);
             Name = "MiiImportForm";
             StartPosition = FormStartPosition.CenterParent;
             Text = "MiiForm";

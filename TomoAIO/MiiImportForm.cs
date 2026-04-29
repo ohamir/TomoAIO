@@ -5,7 +5,6 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Windows.Forms;
 using TomoAIO.Infrastructure;
 using TomoAIO.Models;
@@ -18,17 +17,20 @@ namespace TomoAIO
         private readonly AppState _state;
         private readonly MiiService _miiService = new();
 
-
         private readonly string[] _miiActions = { "Import Mii (.ltd)", "Export Mii (.ltd)" };
 
-        // Personality / voice / gender / birthday hashes — same order as original
         private readonly string[] persHashes =
         {
-            "43CD364F", "CD8DBAF8", "25B48224", "607BA160", "68E1134E",   // Personality P1-P5
-            "4913AE1A", "141EE086", "07B9D175", "81CF470A", "4D78E262", "FBC3FFB0", // Voice V1-V6
-            "236E2D73", "F3C3DE59", "660C5247",                            // Gender/Pronoun/Style
-            "5D7D3F45", "AB8AE08B", "2545E583", "6CF484F4"                 // Birthday B1-B4
+            "43CD364F", "CD8DBAF8", "25B48224", "607BA160", "68E1134E",
+            "4913AE1A", "141EE086", "07B9D175", "81CF470A", "4D78E262", "FBC3FFB0",
+            "236E2D73", "F3C3DE59", "660C5247",
+            "5D7D3F45", "AB8AE08B", "2545E583", "6CF484F4"
         };
+
+        // ─── Scaling ──────────────────────────────────────────────────────────
+        private SizeF _originalFormSize;
+        private readonly Dictionary<Control, RectangleF> _originalBounds = new();
+        private readonly Dictionary<Control, Font> _originalFonts = new();
 
         // ─── Constructor ──────────────────────────────────────────────────────
 
@@ -39,6 +41,60 @@ namespace TomoAIO
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
             EnableDoubleBuffer(DisplayMiiLstBox);
             ApplyStyleToButtons();
+
+            this.Load += (s, e) => CaptureOriginalBounds();
+            this.Resize += MiiImportForm_Resize;
+        }
+
+        // ─── Scaling Methods ──────────────────────────────────────────────────
+
+        private void CaptureOriginalBounds()
+        {
+            _originalFormSize = new SizeF(this.ClientSize.Width, this.ClientSize.Height);
+            CaptureControlBounds(this.Controls);
+        }
+
+        private void CaptureControlBounds(Control.ControlCollection controls)
+        {
+            foreach (Control c in controls)
+            {
+                _originalBounds[c] = new RectangleF(c.Left, c.Top, c.Width, c.Height);
+                _originalFonts[c] = c.Font;
+                if (c.Controls.Count > 0)
+                    CaptureControlBounds(c.Controls);
+            }
+        }
+
+        private void MiiImportForm_Resize(object? sender, EventArgs e)
+        {
+            if (_originalFormSize.IsEmpty) return;
+
+            float scaleX = this.ClientSize.Width / _originalFormSize.Width;
+            float scaleY = this.ClientSize.Height / _originalFormSize.Height;
+
+            ScaleControls(this.Controls, scaleX, scaleY);
+        }
+
+        private void ScaleControls(Control.ControlCollection controls, float scaleX, float scaleY)
+        {
+            foreach (Control c in controls)
+            {
+                if (!_originalBounds.TryGetValue(c, out RectangleF orig)) continue;
+
+                c.Left = (int)(orig.X * scaleX);
+                c.Top = (int)(orig.Y * scaleY);
+                c.Width = (int)(orig.Width * scaleX);
+                c.Height = (int)(orig.Height * scaleY);
+
+                if (_originalFonts.TryGetValue(c, out Font origFont))
+                {
+                    float newSize = Math.Max(6f, origFont.Size * Math.Min(scaleX, scaleY));
+                    c.Font = new Font(origFont.FontFamily, newSize, origFont.Style);
+                }
+
+                if (c.Controls.Count > 0)
+                    ScaleControls(c.Controls, scaleX, scaleY);
+            }
         }
 
         // ─── Setup ────────────────────────────────────────────────────────────
@@ -52,58 +108,55 @@ namespace TomoAIO
 
         public void ApplyButtonStyle(Button btn, bool isPrimary = false)
         {
-            // Define our Color Palettes
-            // Secondary (Load/Browse) - Dark Navy/Charcoal
             Color secMain = Color.FromArgb(44, 62, 80);
             Color secHover = Color.FromArgb(52, 73, 94);
             Color secClick = Color.FromArgb(31, 46, 61);
 
-            // Primary (Apply) - Game-Pop Teal
             Color priMain = Color.FromArgb(19, 141, 117);
             Color priHover = Color.FromArgb(22, 160, 133);
             Color priClick = Color.FromArgb(14, 102, 85);
 
-            // Choose the palette based on the parameter
             Color mainColor = isPrimary ? priMain : secMain;
             Color hoverColor = isPrimary ? priHover : secHover;
             Color clickColor = isPrimary ? priClick : secClick;
 
-            // 1. Basic Visual Setup
             btn.FlatStyle = FlatStyle.Flat;
             btn.FlatAppearance.BorderSize = 0;
             btn.BackColor = mainColor;
             btn.ForeColor = Color.White;
             btn.Font = new Font("Segoe UI Semibold", 12f);
-
-            // Create space for the "3D" movement effect
             btn.Padding = new Padding(0, 0, 0, 4);
 
-            // 2. Hover Effect
             btn.MouseEnter += (s, e) => btn.BackColor = hoverColor;
             btn.MouseLeave += (s, e) => btn.BackColor = mainColor;
 
-            // 3. The "Push" Animation
             btn.MouseDown += (s, e) => {
                 btn.BackColor = clickColor;
-                // This shifts the text down by 2 pixels to simulate a physical press
                 btn.Padding = new Padding(0, 2, 0, 0);
             };
-
             btn.MouseUp += (s, e) => {
                 btn.BackColor = hoverColor;
                 btn.Padding = new Padding(0, 0, 0, 4);
             };
 
-            // Optional: Add round corners (Requires using System.Drawing.Drawing2D)
-            GraphicsPath path = new GraphicsPath();
-            int r = 15; 
-            path.AddArc(0, 0, r, r, 180, 90);
-            path.AddArc(btn.Width - r, 0, r, r, 270, 90);
-            path.AddArc(btn.Width - r, btn.Height - r, r, r, 0, 90);
-            path.AddArc(0, btn.Height - r, r, r, 90, 90);
-            btn.Region = new Region(path);
-        }
+            // ─── Rounded corners that update on resize ────────────────────────
+            void ApplyRegion()
+            {
+                if (btn.Width <= 0 || btn.Height <= 0) return;
+                GraphicsPath path = new GraphicsPath();
+                int r = 15;
+                path.AddArc(0, 0, r, r, 180, 90);
+                path.AddArc(btn.Width - r, 0, r, r, 270, 90);
+                path.AddArc(btn.Width - r, btn.Height - r, r, r, 0, 90);
+                path.AddArc(0, btn.Height - r, r, r, 90, 90);
+                path.CloseFigure();
+                btn.Region?.Dispose();
+                btn.Region = new Region(path);
+            }
 
+            ApplyRegion();
+            btn.Resize += (s, e) => ApplyRegion();
+        }
 
         private static void EnableDoubleBuffer(Control control)
         {
@@ -111,14 +164,13 @@ namespace TomoAIO
                 .GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic)?
                 .SetValue(control, true, null);
         }
-     
+
         private void SetSelectedMiiPath(string path)
         {
             _state.SelectedMiiPath = path;
             if (PathToSaveTxtBox != null) PathToSaveTxtBox.Text = path;
         }
 
-        
         // ─── Core Logic ───────────────────────────────────────────────────────
 
         private int GetActualOffset(byte[] fileData, string hashHex)
@@ -261,7 +313,6 @@ namespace TomoAIO
                 foreach (string h in persHashes)
                     Array.Copy(br.ReadBytes(4), 0, miiBytes, GetActualOffset(miiBytes, h) + 4 + (slot * 4), 4);
 
-                // Name
                 int nameOffset = GetActualOffset(miiBytes, "2499BFDA") + 4 + (slot * 64);
                 byte[] rawName = br.ReadBytes(64);
                 Array.Clear(miiBytes, nameOffset, 64);
@@ -272,7 +323,6 @@ namespace TomoAIO
                 }
                 Array.Copy(rawName, 0, miiBytes, nameOffset, validNameLen);
 
-                // Creator
                 int creatorOffset = GetActualOffset(miiBytes, "3A5EDA05") + 4 + (slot * 128);
                 byte[] rawCreator = br.ReadBytes(128);
                 Array.Clear(miiBytes, creatorOffset, 128);
@@ -283,14 +333,12 @@ namespace TomoAIO
                 }
                 Array.Copy(rawCreator, 0, miiBytes, creatorOffset, validCreatorLen);
 
-                // Sexuality bits
                 byte[] mySx = br.ReadBytes(3); br.ReadByte();
                 int sxO = GetActualOffset(miiBytes, "DFC82223") + 4;
                 List<int> bits = DecodeSexuality(miiBytes.Skip(sxO).Take(27).ToArray());
                 for (int i = 0; i < 3; i++) bits[(slot * 3) + i] = mySx[i];
                 Array.Copy(EncodeSexuality(bits), 0, miiBytes, sxO, 27);
 
-                // Face paint
                 int cS = FindMarker(pkg, new byte[] { 0xA3, 0xA3, 0xA3, 0xA3 }) + 4;
                 int tS = FindMarker(pkg, new byte[] { 0xA4, 0xA4, 0xA4, 0xA4 }) + 4;
                 int fO = GetActualOffset(miiBytes, "5E32ADF4") + 4;
@@ -421,8 +469,8 @@ namespace TomoAIO
             return -1;
         }
 
+        // ─── Drag & Drop ──────────────────────────────────────────────────────
 
-        // Drag-and-drop support on the path display
         private void MiiImportForm_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data != null && e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -435,18 +483,18 @@ namespace TomoAIO
                 SetSelectedMiiPath(files[0]);
         }
 
+        // ─── Buttons ──────────────────────────────────────────────────────────
 
         #region Buttons
 
         private void BrowseBtn_Click(object sender, EventArgs e)
         {
-            using (OpenFileDialog ofd = new OpenFileDialog())
+            using var ofd = new OpenFileDialog
             {
-                ofd.Filter = "Mii Data Files (*.mii;*.ltd;*.sav)|*.mii;*.ltd;*.sav";
-                if (ofd.ShowDialog() == DialogResult.OK) SetSelectedMiiPath(ofd.FileName);
-            }
+                Filter = "Mii Data Files (*.mii;*.ltd;*.sav)|*.mii;*.ltd;*.sav"
+            };
+            if (ofd.ShowDialog() == DialogResult.OK) SetSelectedMiiPath(ofd.FileName);
         }
-
 
         private void ApplyChangesBtn_Click(object sender, EventArgs e)
         {
@@ -467,7 +515,6 @@ namespace TomoAIO
 
             int slot = int.Parse(sel.Split(':')[0]) - 1;
             string name = sel.Split(':')[1].Trim();
-
 
             if (selectedAction.Contains("Export"))
                 ExportMii(slot, name);
@@ -497,6 +544,7 @@ namespace TomoAIO
                     "Wrong Folder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
+
         #endregion
     }
 }
