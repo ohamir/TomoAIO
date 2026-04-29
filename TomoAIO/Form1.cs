@@ -141,7 +141,7 @@ namespace TomoAIO
             ApplyLogoStyle(logo, pictureBox1);
             ApplyLogoStyle(logopanel1, pictureBox2);
             ApplyLogoStyle(pictureBox3, panelUGC);
-            ApplyLogoStyle(logoislandmgt, panelIslandMGT);
+            ApplyLogoStyle(logoislandmgt, pictureBox4);
             pictureBox1.SendToBack();
             logo.BringToFront();
             pictureBox2.SendToBack();
@@ -217,7 +217,7 @@ namespace TomoAIO
             ApplyLogoStyle(logo, pictureBox1);
             ApplyLogoStyle(logopanel1, pictureBox2);
             ApplyLogoStyle(pictureBox3, panelUGC);
-            ApplyLogoStyle(logoislandmgt, panelIslandMGT);
+            ApplyLogoStyle(logoislandmgt, pictureBox4);
             PinLogoTopRight();
         }
 
