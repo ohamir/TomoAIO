@@ -108,7 +108,7 @@ namespace TomoAIO
         private void ImportMiiBtn_Click(object sender, EventArgs e)
         {
             var form = new MiiImportForm(_state);
-            form.ShowDialog(this);
+            form.Show();
         }
 
         #endregion
@@ -141,7 +141,7 @@ namespace TomoAIO
             {
                 _state.CurrentPlayerSavPath = ofd.FileName;
                 var form = new IslandManagerForm(_state);
-                form.ShowDialog(this);
+                form.Show();
             }
         }
         #endregion
