@@ -85,7 +85,7 @@ namespace TomoAIO
         {
             try
             {
-                string currentVersion = "1.2";
+                string currentVersion = "2.0";
                 string repoOwner = "ohamir";
                 string repoName = "TomoAIO";
                 string? latestVersion = await _updateService.GetLatestVersionAsync(repoOwner, repoName);
