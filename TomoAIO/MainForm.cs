@@ -135,6 +135,16 @@ namespace TomoAIO
             PromptForSaveFolder();
         }
 
+        private string ShortenPath(string path, int maxSegments = 3)
+        {
+            string[] parts = path.Split(Path.DirectorySeparatorChar);
+            if (parts.Length <= maxSegments)
+                return path;
+
+            return "..." + Path.DirectorySeparatorChar +
+                   string.Join(Path.DirectorySeparatorChar.ToString(), parts.TakeLast(maxSegments));
+        }
+
         private void PromptForSaveFolder()
         {
             using var fbd = new FolderBrowserDialog
@@ -160,7 +170,7 @@ namespace TomoAIO
         private void UpdateSavePathLabel()
         {
             if (lblSavePath != null)
-                lblSavePath.Text = $"{_state.SaveFolderPath}";
+                lblSavePath.Text = ShortenPath(_state.SaveFolderPath);
         }
 
         private void ChangeSaveFolderBtn_Click(object sender, EventArgs e)
@@ -203,8 +213,8 @@ namespace TomoAIO
                 return;
             }
 
-            //var form = new UgcEditorForm(_state);
-            //form.Show();
+            var form = new UgcEditorForm(_state);
+            form.Show();
         }
 
         #endregion
