@@ -42,7 +42,11 @@ namespace TomoAIO
             EnableDoubleBuffer(DisplayMiiLstBox);
             ApplyStyleToButtons();
 
-            this.Load += (s, e) => CaptureOriginalBounds();
+            this.Load += (s, e) =>
+            {
+                InitializeMiiSavPath();
+                CaptureOriginalBounds();
+            };
             this.Resize += MiiImportForm_Resize;
         }
 
@@ -97,12 +101,32 @@ namespace TomoAIO
             }
         }
 
+        // ─── Save Path ────────────────────────────────────────────────────────
+
+        private void InitializeMiiSavPath()
+        {
+            if (!string.IsNullOrWhiteSpace(_state.SaveFolderPath))
+            {
+                string miiPath = Path.Combine(_state.SaveFolderPath, "Mii.sav");
+                if (File.Exists(miiPath))
+                {
+                    _state.CurrentMiiSavPath = miiPath;
+                    RefreshMiiList();
+                    return;
+                }
+            }
+
+            // Fallback: warn the user the save folder isn't set or Mii.sav is missing
+            MessageBox.Show(
+                "Mii.sav could not be found in the configured save folder.\n\nPlease set your save folder from the main menu.",
+                "Missing Mii.sav", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+
         // ─── Setup ────────────────────────────────────────────────────────────
 
         public void ApplyStyleToButtons()
         {
             ApplyButtonStyle(LoadSaveBtn);
-            ApplyButtonStyle(BrowseBtn);
             ApplyButtonStyle(ApplyChangesBtn);
         }
 
@@ -164,13 +188,6 @@ namespace TomoAIO
                 .GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic)?
                 .SetValue(control, true, null);
         }
-
-        private void SetSelectedMiiPath(string path)
-        {
-            _state.SelectedMiiPath = path;
-            if (PathToSaveTxtBox != null) PathToSaveTxtBox.Text = path;
-        }
-
         // ─── Core Logic ───────────────────────────────────────────────────────
 
         private int GetActualOffset(byte[] fileData, string hashHex)
@@ -471,36 +488,17 @@ namespace TomoAIO
 
         // ─── Drag & Drop ──────────────────────────────────────────────────────
 
-        private void MiiImportForm_DragEnter(object sender, DragEventArgs e)
-        {
-            if (e.Data != null && e.Data.GetDataPresent(DataFormats.FileDrop))
-                e.Effect = DragDropEffects.Copy;
-        }
 
-        private void MiiImportForm_DragDrop(object sender, DragEventArgs e)
-        {
-            if (e.Data?.GetData(DataFormats.FileDrop) is string[] files && files.Length > 0)
-                SetSelectedMiiPath(files[0]);
-        }
+
 
         // ─── Buttons ──────────────────────────────────────────────────────────
 
         #region Buttons
 
-        private void BrowseBtn_Click(object sender, EventArgs e)
-        {
-            using var ofd = new OpenFileDialog
-            {
-                Filter = "Mii Data Files (*.mii;*.ltd;*.sav)|*.mii;*.ltd;*.sav"
-            };
-            if (ofd.ShowDialog() == DialogResult.OK) SetSelectedMiiPath(ofd.FileName);
-        }
-
         private void ApplyChangesBtn_Click(object sender, EventArgs e)
         {
-            string selectedAction = SelectActionComboBox.SelectedItem?.ToString() ?? "";
 
-            if (DisplayMiiLstBox.SelectedItem == null || string.IsNullOrWhiteSpace(selectedAction))
+            if (DisplayMiiLstBox.SelectedItem == null || string.IsNullOrWhiteSpace(SelectActionComboBox.SelectedItem?.ToString()))
             {
                 MessageBox.Show("Please select a Mii and an action!", "Missing Information");
                 return;
@@ -515,33 +513,49 @@ namespace TomoAIO
 
             int slot = int.Parse(sel.Split(':')[0]) - 1;
             string name = sel.Split(':')[1].Trim();
+            string action = SelectActionComboBox.SelectedItem.ToString()!;
 
-            if (selectedAction.Contains("Export"))
+            if (action.Contains("Export"))
+            {
                 ExportMii(slot, name);
+            }
             else
-                ImportMii(slot, _state.SelectedMiiPath);
+            {
+                // Open file dialog on the spot — no browse button needed
+                using var ofd = new OpenFileDialog
+                {
+                    Title = "Select a Mii file to import",
+                    Filter = "Mii Data Files (*.mii;*.ltd)|*.mii;*.ltd"
+                };
+
+                if (ofd.ShowDialog() != DialogResult.OK) return;
+
+                ImportMii(slot, ofd.FileName);
+            }
         }
 
         private void LoadSaveBtn_Click(object sender, EventArgs e)
         {
-            using var fbd = new FolderBrowserDialog
+            // Re-derive Mii.sav from the shared save folder path
+            if (string.IsNullOrWhiteSpace(_state.SaveFolderPath))
             {
-                Description = "Select your game save folder (where Mii.sav is located)"
-            };
-            if (fbd.ShowDialog() != DialogResult.OK) return;
+                MessageBox.Show("No save folder is set. Please set it from the main menu.", "TomoAIO",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
-            string miiSavPath = Path.Combine(fbd.SelectedPath, "Mii.sav");
-            if (File.Exists(miiSavPath))
+            string miiPath = Path.Combine(_state.SaveFolderPath, "Mii.sav");
+            if (File.Exists(miiPath))
             {
-                _state.CurrentMiiSavPath = miiSavPath;
+                _state.CurrentMiiSavPath = miiPath;
                 RefreshMiiList();
-                MessageBox.Show("Save file found!", "TomoAIO");
+                MessageBox.Show("Mii list refreshed!", "TomoAIO");
             }
             else
             {
                 MessageBox.Show(
-                    "Could not find Mii.sav in that folder!\n\nPlease make sure you selected the correct save folder.",
-                    "Wrong Folder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    $"Mii.sav not found in:\n{_state.SaveFolderPath}\n\nPlease check your save folder from the main menu.",
+                    "Missing Mii.sav", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 

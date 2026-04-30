@@ -21,6 +21,11 @@ namespace TomoAIO
         // Store original form size and control bounds for scaling
         private SizeF _originalFormSize;
         private readonly System.Collections.Generic.Dictionary<Control, RectangleF> _originalBounds = new();
+        private readonly System.Collections.Generic.Dictionary<Control, float> _originalFonts = new();
+
+        // Child form instances (modeless)
+        private MiiImportForm? _miiForm;
+        private IslandManagerForm? _islandForm;
 
         public MainForm()
         {
@@ -30,7 +35,11 @@ namespace TomoAIO
             CheckForUpdates();
 
             // Capture original sizes after layout is done
-            this.Load += (s, e) => CaptureOriginalBounds();
+            this.Load += (s, e) =>
+            {
+                InitializeSavePath();
+                CaptureOriginalBounds();
+            };
             this.Resize += MainForm_Resize;
         }
 
@@ -45,6 +54,7 @@ namespace TomoAIO
             foreach (Control c in controls)
             {
                 _originalBounds[c] = new RectangleF(c.Left, c.Top, c.Width, c.Height);
+                _originalFonts[c] = c.Font.Size;
                 if (c.Controls.Count > 0)
                     CaptureControlBounds(c.Controls);
             }
@@ -71,9 +81,12 @@ namespace TomoAIO
                 c.Width = (int)(orig.Width * scaleX);
                 c.Height = (int)(orig.Height * scaleY);
 
-                // Scale font too
-                float newFontSize = Math.Max(6f, c.Font.Size * Math.Min(scaleX, scaleY));
-                c.Font = new Font(c.Font.FontFamily, newFontSize, c.Font.Style);
+                // Scale font from original size (not current) to prevent drift
+                if (_originalFonts.TryGetValue(c, out float origFontSize))
+                {
+                    float newFontSize = Math.Max(6f, origFontSize * Math.Min(scaleX, scaleY));
+                    c.Font = new Font(c.Font.FontFamily, newFontSize, c.Font.Style);
+                }
 
                 if (c.Controls.Count > 0)
                     ScaleControls(c.Controls, scaleX, scaleY);
@@ -104,11 +117,78 @@ namespace TomoAIO
             catch { }
         }
 
+        #region Save Path
+
+        private void InitializeSavePath()
+        {
+            string? saved = SaveConfig.LoadSavePath();
+
+            if (!string.IsNullOrWhiteSpace(saved) && Directory.Exists(saved))
+            {
+                _state.SaveFolderPath = saved;
+                // Derive Player.sav path automatically
+                _state.CurrentPlayerSavPath = Path.Combine(saved, "Player.sav");
+                UpdateSavePathLabel();
+                return;
+            }
+
+            PromptForSaveFolder();
+        }
+
+        private void PromptForSaveFolder()
+        {
+            using var fbd = new FolderBrowserDialog
+            {
+                Description = "Select your game save folder",
+                UseDescriptionForTitle = true
+            };
+
+            if (fbd.ShowDialog() == DialogResult.OK)
+            {
+                _state.SaveFolderPath = fbd.SelectedPath;
+                _state.CurrentPlayerSavPath = Path.Combine(fbd.SelectedPath, "Player.sav");
+                SaveConfig.StoreSavePath(fbd.SelectedPath);
+                UpdateSavePathLabel();
+            }
+            else
+            {
+                MessageBox.Show("No save folder selected. Some features may not work.", "TomoAIO",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void UpdateSavePathLabel()
+        {
+            if (lblSavePath != null)
+                lblSavePath.Text = $": {_state.SaveFolderPath}";
+        }
+
+        private void ChangeSaveFolderBtn_Click(object sender, EventArgs e)
+        {
+            PromptForSaveFolder();
+        }
+
+        #endregion
+
+
         #region Mii Import Button
         private void ImportMiiBtn_Click(object sender, EventArgs e)
         {
-            var form = new MiiImportForm(_state);
-            form.Show();
+            if (string.IsNullOrWhiteSpace(_state.SaveFolderPath))
+            {
+                MessageBox.Show("Please set your save folder first.", "TomoAIO", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (_miiForm == null || _miiForm.IsDisposed)
+            {
+                _miiForm = new MiiImportForm(_state);
+                _miiForm.Show();
+            }
+            else
+            {
+                _miiForm.BringToFront();
+            }
         }
 
         #endregion
@@ -117,12 +197,14 @@ namespace TomoAIO
         #region UGC Editor Button
         private void UgcEditorBtn_Click(object sender, EventArgs e)
         {
-            using var fbd = new FolderBrowserDialog { Description = "Select your Living the Dream 'Ugc' folder" };
-            if (fbd.ShowDialog() == DialogResult.OK)
+            if (string.IsNullOrWhiteSpace(_state.SaveFolderPath))
             {
-                //var form = new UgcEditorForm(_state, fbd.SelectedPath);
-                //form.ShowDialog(this);
+                MessageBox.Show("Please set your save folder first.", "TomoAIO", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
+
+            //var form = new UgcEditorForm(_state);
+            //form.Show();
         }
 
         #endregion
@@ -132,16 +214,27 @@ namespace TomoAIO
 
         private void IslandManagerBtn_Click_1(object sender, EventArgs e)
         {
-            using var ofd = new OpenFileDialog
+            if (string.IsNullOrWhiteSpace(_state.SaveFolderPath))
             {
-                Title = "Select your Player.sav file",
-                Filter = "Tomodachi Player Save (Player.sav)|Player.sav"
-            };
-            if (ofd.ShowDialog() == DialogResult.OK)
+                MessageBox.Show("Please set your save folder first.", "TomoAIO", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (!File.Exists(_state.CurrentPlayerSavPath))
             {
-                _state.CurrentPlayerSavPath = ofd.FileName;
-                var form = new IslandManagerForm(_state);
-                form.Show();
+                MessageBox.Show($"Player.sav not found at:\n{_state.CurrentPlayerSavPath}\n\nPlease check your save folder.",
+                    "TomoAIO", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (_islandForm == null || _islandForm.IsDisposed)
+            {
+                _islandForm = new IslandManagerForm(_state);
+                _islandForm.Show();
+            }
+            else
+            {
+                _islandForm.BringToFront();
             }
         }
         #endregion
@@ -154,5 +247,10 @@ namespace TomoAIO
         }
 
         #endregion
+
+        private void lblSavePath_Click(object sender, EventArgs e)
+        {
+           PromptForSaveFolder();
+        }
     }
 }

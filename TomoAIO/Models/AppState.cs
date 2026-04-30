@@ -8,6 +8,7 @@ namespace TomoAIO.Models
 
         public string CurrentUgcPath { get; set; } = string.Empty;
 
+        public string SaveFolderPath { get; set; } = string.Empty;
         public string SelectedMiiPath { get; set; } = "Choose a Mii file here...";
 
         public string? SelectedMiiAction { get; set; }
