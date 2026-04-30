@@ -1347,7 +1347,7 @@ namespace TomoAIO
         {
             using (OpenFileDialog ofd = new OpenFileDialog())
             {
-                ofd.Filter = "Mii Data Files (*.mii;*.ltd;*.sav)|*.mii;*.ltd;*.sav";
+                ofd.Filter = "Living the Dream  (*ltd)|*.ltd";
                 if (ofd.ShowDialog() == DialogResult.OK) SetSelectedMiiPath(ofd.FileName);
             }
         }
