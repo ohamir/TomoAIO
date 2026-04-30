@@ -129,6 +129,7 @@
             // 
             lblSavePath.AutoSize = true;
             lblSavePath.BackColor = Color.Transparent;
+            lblSavePath.Cursor = Cursors.Hand;
             lblSavePath.Font = new Font("Segoe UI", 10.125F, FontStyle.Regular, GraphicsUnit.Point, 0);
             lblSavePath.Location = new Point(12, 46);
             lblSavePath.Name = "lblSavePath";

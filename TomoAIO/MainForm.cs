@@ -160,7 +160,7 @@ namespace TomoAIO
         private void UpdateSavePathLabel()
         {
             if (lblSavePath != null)
-                lblSavePath.Text = $": {_state.SaveFolderPath}";
+                lblSavePath.Text = $"{_state.SaveFolderPath}";
         }
 
         private void ChangeSaveFolderBtn_Click(object sender, EventArgs e)
