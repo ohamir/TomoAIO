@@ -21,9 +21,6 @@ namespace TomoAIO
         private static readonly Color ButtonPrimaryColor = Color.FromArgb(47, 61, 82);
         private static readonly Color ButtonPrimaryHoverColor = Color.FromArgb(61, 79, 106);
         private static readonly Color ButtonPrimaryPressedColor = Color.FromArgb(35, 46, 62);
-        private static readonly Color ButtonSecondaryColor = Color.FromArgb(84, 96, 110);
-        private static readonly Color ButtonSecondaryHoverColor = Color.FromArgb(102, 116, 132);
-        private static readonly Color ButtonSecondaryPressedColor = Color.FromArgb(66, 77, 89);
 
         public IslandManagerForm(AppState state)
         {
@@ -41,14 +38,11 @@ namespace TomoAIO
 
         private void ConfigureButtons()
         {
-            //btnMenuBack.Text = "Back to Menu";
-
             StyleActionButton(btnSaveMoney, ButtonPrimaryColor, ButtonPrimaryHoverColor, ButtonPrimaryPressedColor);
             StyleActionButton(btnUnlockInteriors, ButtonPrimaryColor, ButtonPrimaryHoverColor, ButtonPrimaryPressedColor);
             StyleActionButton(btnUnlockQBuilds, ButtonPrimaryColor, ButtonPrimaryHoverColor, ButtonPrimaryPressedColor);
             StyleActionButton(btnUnlockClothes, ButtonPrimaryColor, ButtonPrimaryHoverColor, ButtonPrimaryPressedColor);
             StyleActionButton(btnUnlockFood, ButtonPrimaryColor, ButtonPrimaryHoverColor, ButtonPrimaryPressedColor);
-            //StyleActionButton(btnMenuBack, ButtonSecondaryColor, ButtonSecondaryHoverColor, ButtonSecondaryPressedColor);
         }
 
         private void StyleActionButton(Button button, Color baseColor, Color hoverColor, Color pressedColor)
@@ -185,7 +179,7 @@ namespace TomoAIO
                     int nullIndex = islandName.IndexOf('\0');
                     if (nullIndex != -1) islandName = islandName.Substring(0, nullIndex);
                     if (lblIslandTitle != null)
-                        lblIslandTitle.Text = $"{islandName} Management";
+                        lblIslandTitle.Text = $"Managing - {islandName}";
                 }
             }
             catch (Exception ex)
@@ -338,9 +332,5 @@ namespace TomoAIO
 
         private void btnUnlockFood_Click(object sender, EventArgs e) =>
             UnlockSpecificCategory(new[] { "933DA780" }, false, "Foods");
-
-        private void numMoney_ValueChanged(object sender, EventArgs e) { }
-
-
     }
 }

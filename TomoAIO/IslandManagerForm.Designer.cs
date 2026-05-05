@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            button4 = new Button();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(IslandManagerForm));
             btnUnlockFood = new Button();
             btnUnlockClothes = new Button();
             btnUnlockQBuilds = new Button();
@@ -43,16 +43,6 @@
             panel2 = new Panel();
             ((System.ComponentModel.ISupportInitialize)txtCurrentMoney).BeginInit();
             SuspendLayout();
-            // 
-            // button4
-            // 
-            button4.Location = new Point(20, 20);
-            button4.Margin = new Padding(5);
-            button4.Name = "button4";
-            button4.Size = new Size(239, 47);
-            button4.TabIndex = 3;
-            button4.Text = "Load Save Folder";
-            button4.UseVisualStyleBackColor = true;
             // 
             // btnUnlockFood
             // 
@@ -135,7 +125,7 @@
             lblIslandTitle.AutoSize = true;
             lblIslandTitle.BackColor = Color.Transparent;
             lblIslandTitle.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point, 0);
-            lblIslandTitle.Location = new Point(593, 22);
+            lblIslandTitle.Location = new Point(548, 23);
             lblIslandTitle.Margin = new Padding(5, 0, 5, 0);
             lblIslandTitle.Name = "lblIslandTitle";
             lblIslandTitle.Size = new Size(171, 45);
@@ -147,7 +137,7 @@
             label1.AutoSize = true;
             label1.BackColor = Color.Transparent;
             label1.Font = new Font("Segoe UI", 10.125F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label1.Location = new Point(865, 115);
+            label1.Location = new Point(759, 95);
             label1.Name = "label1";
             label1.Size = new Size(291, 37);
             label1.TabIndex = 21;
@@ -158,7 +148,7 @@
             label3.AutoSize = true;
             label3.BackColor = Color.Transparent;
             label3.Font = new Font("Segoe UI", 10.125F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label3.Location = new Point(226, 127);
+            label3.Location = new Point(20, 95);
             label3.Name = "label3";
             label3.Size = new Size(246, 37);
             label3.TabIndex = 23;
@@ -167,6 +157,7 @@
             // panel1
             // 
             panel1.BackColor = Color.Transparent;
+            panel1.BorderStyle = BorderStyle.FixedSingle;
             panel1.Location = new Point(739, 115);
             panel1.Name = "panel1";
             panel1.Size = new Size(537, 295);
@@ -175,9 +166,10 @@
             // panel2
             // 
             panel2.BackColor = Color.Transparent;
-            panel2.Location = new Point(12, 115);
+            panel2.BorderStyle = BorderStyle.FixedSingle;
+            panel2.Location = new Point(5, 115);
             panel2.Name = "panel2";
-            panel2.Size = new Size(682, 295);
+            panel2.Size = new Size(689, 295);
             panel2.TabIndex = 25;
             // 
             // IslandManagerForm
@@ -185,7 +177,7 @@
             AutoScaleDimensions = new SizeF(13F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
             BackgroundImage = Properties.Resources.tomo1;
-            ClientSize = new Size(1300, 758);
+            ClientSize = new Size(1300, 476);
             Controls.Add(label3);
             Controls.Add(label1);
             Controls.Add(lblIslandTitle);
@@ -196,10 +188,11 @@
             Controls.Add(btnUnlockQBuilds);
             Controls.Add(btnUnlockClothes);
             Controls.Add(btnUnlockFood);
-            Controls.Add(button4);
-            Controls.Add(panel2);
             Controls.Add(panel1);
+            Controls.Add(panel2);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(5);
+            MinimumSize = new Size(1326, 547);
             Name = "IslandManagerForm";
             StartPosition = FormStartPosition.CenterParent;
             Text = "IslandManagerForm";
@@ -209,8 +202,6 @@
         }
 
         #endregion
-
-        private Button button4;
         private Button btnUnlockFood;
         private Button btnUnlockClothes;
         private Button btnUnlockQBuilds;
