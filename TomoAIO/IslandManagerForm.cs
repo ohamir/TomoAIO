@@ -13,6 +13,11 @@ namespace TomoAIO
         private readonly AppState _state;
         private readonly Dictionary<Control, (Size size, int radius)> _roundedCache = new();
 
+        // ─── Scaling ──────────────────────────────────────────────────────────
+        private SizeF _originalFormSize;
+        private readonly Dictionary<Control, RectangleF> _originalBounds = new();
+        private readonly Dictionary<Control, Font> _originalFonts = new();
+
         private static readonly Color ButtonPrimaryColor = Color.FromArgb(47, 61, 82);
         private static readonly Color ButtonPrimaryHoverColor = Color.FromArgb(61, 79, 106);
         private static readonly Color ButtonPrimaryPressedColor = Color.FromArgb(35, 46, 62);
@@ -26,6 +31,10 @@ namespace TomoAIO
             InitializeComponent();
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
             ConfigureButtons();
+            RefreshIslandManagementUI();
+
+            this.Load += (s, e) => CaptureOriginalBounds();
+            this.Resize += IslandManagerForm_Resize;
         }
 
         // ─── Setup ────────────────────────────────────────────────────────────
@@ -83,6 +92,57 @@ namespace TomoAIO
             _roundedCache[control] = (control.Size, radius);
         }
 
+        // ─── Scaling Methods ──────────────────────────────────────────────────
+
+        private void CaptureOriginalBounds()
+        {
+            _originalFormSize = new SizeF(this.ClientSize.Width, this.ClientSize.Height);
+            CaptureControlBounds(this.Controls);
+        }
+
+        private void CaptureControlBounds(Control.ControlCollection controls)
+        {
+            foreach (Control c in controls)
+            {
+                _originalBounds[c] = new RectangleF(c.Left, c.Top, c.Width, c.Height);
+                _originalFonts[c] = c.Font;
+                if (c.Controls.Count > 0)
+                    CaptureControlBounds(c.Controls);
+            }
+        }
+
+        private void IslandManagerForm_Resize(object? sender, EventArgs e)
+        {
+            if (_originalFormSize.IsEmpty) return;
+
+            float scaleX = this.ClientSize.Width / _originalFormSize.Width;
+            float scaleY = this.ClientSize.Height / _originalFormSize.Height;
+
+            ScaleControls(this.Controls, scaleX, scaleY);
+        }
+
+        private void ScaleControls(Control.ControlCollection controls, float scaleX, float scaleY)
+        {
+            foreach (Control c in controls)
+            {
+                if (!_originalBounds.TryGetValue(c, out RectangleF orig)) continue;
+
+                c.Left = (int)(orig.X * scaleX);
+                c.Top = (int)(orig.Y * scaleY);
+                c.Width = (int)(orig.Width * scaleX);
+                c.Height = (int)(orig.Height * scaleY);
+
+                if (_originalFonts.TryGetValue(c, out Font origFont))
+                {
+                    float newSize = Math.Max(6f, origFont.Size * Math.Min(scaleX, scaleY));
+                    c.Font = new Font(origFont.FontFamily, newSize, origFont.Style);
+                }
+
+                if (c.Controls.Count > 0)
+                    ScaleControls(c.Controls, scaleX, scaleY);
+            }
+        }
+
         // ─── Core Logic ───────────────────────────────────────────────────────
 
         private int GetActualOffset(byte[] fileData, string hashHex)
@@ -112,8 +172,8 @@ namespace TomoAIO
                 if (totalCents >= 0)
                 {
                     decimal dollars = (decimal)totalCents / 100;
-                    lblCurrentMoney.Text = $"Balance: {dollars:C2}";
-                    numMoney.Value = Math.Min(numMoney.Maximum, dollars);
+                    txtCurrentMoney.Text = dollars.ToString("F2");
+                    txtCurrentMoney.Value = Math.Min(txtCurrentMoney.Maximum, dollars);
                 }
 
                 // Island name → form title
@@ -253,10 +313,10 @@ namespace TomoAIO
 
                 if (valueIndex != -1)
                 {
-                    int totalCents = (int)(numMoney.Value * 100);
+                    int totalCents = (int)(txtCurrentMoney.Value * 100);
                     Array.Copy(BitConverter.GetBytes(totalCents), 0, pBytes, valueIndex, 4);
                     File.WriteAllBytes(_state.CurrentPlayerSavPath, pBytes);
-                    MessageBox.Show($"Success! Your island funds have been set to ${numMoney.Value:N2}", "Bank Updated");
+                    MessageBox.Show($"Success! Your island funds have been set to ${txtCurrentMoney.Value:N2}", "Bank Updated");
                     RefreshIslandManagementUI();
                 }
             }
@@ -266,10 +326,6 @@ namespace TomoAIO
             }
         }
 
-        private void btnMenuBack_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
 
         private void btnUnlockInteriors_Click(object sender, EventArgs e) =>
             UnlockSpecificCategory(null, true, "Interiors");
@@ -284,5 +340,7 @@ namespace TomoAIO
             UnlockSpecificCategory(new[] { "933DA780" }, false, "Foods");
 
         private void numMoney_ValueChanged(object sender, EventArgs e) { }
+
+
     }
 }

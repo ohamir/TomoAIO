@@ -632,8 +632,6 @@
         private Button btnUgcImport;
         private Label IslandFund;
         private Button btnUgcBack;
-        private Button discord;
-        private Button discsord2;
         private PictureBox pictureBox3;
         private Button btnDiscord;
         private TextBox txtSearch;
