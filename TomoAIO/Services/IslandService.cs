@@ -112,12 +112,11 @@ namespace TomoAIO.Services
             if (unlockRooms)
             {
                 string csvPath = Path.Combine(
-                    Application.StartupPath, "services", "room_hashes.csv");
+                    Application.StartupPath, "Resources", "room_hashes.csv");
 
                 if (!_repo.FileExists(csvPath))
                     throw new FileNotFoundException(
-                        "'services\\room_hashes.csv' was not found.", csvPath);
-
+                        "'Resources\\room_hashes.csv' was not found.", csvPath);
                 foreach (string line in _repo.ReadAllLines(csvPath))
                 {
                     string h = line.Trim();
