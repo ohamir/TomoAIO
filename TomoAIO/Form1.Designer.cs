@@ -66,8 +66,8 @@
             numMoney = new NumericUpDown();
             IslandFund = new Label();
             lblIslandTitle = new Label();
-            pictureBox4 = new PictureBox();
             logoislandmgt = new PictureBox();
+            pictureBox4 = new PictureBox();
             pictureBox1 = new PictureBox();
             logo = new PictureBox();
             btnChangeFolders = new Button();
@@ -81,8 +81,8 @@
             panelIslandMGT.SuspendLayout();
             tablelayoutpanelisland.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numMoney).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
             ((System.ComponentModel.ISupportInitialize)logoislandmgt).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox4).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)logo).BeginInit();
             SuspendLayout();
@@ -97,10 +97,9 @@
             button1.Cursor = Cursors.Hand;
             button1.FlatAppearance.BorderSize = 0;
             button1.FlatStyle = FlatStyle.Flat;
-            button1.Location = new Point(77, 254);
-            button1.Margin = new Padding(3, 2, 3, 2);
+            button1.Location = new Point(83, 229);
             button1.Name = "button1";
-            button1.Size = new Size(366, 285);
+            button1.Size = new Size(418, 361);
             button1.TabIndex = 0;
             button1.UseVisualStyleBackColor = false;
             button1.Click += button1_Click;
@@ -114,10 +113,9 @@
             button2.Cursor = Cursors.Hand;
             button2.FlatAppearance.BorderSize = 0;
             button2.FlatStyle = FlatStyle.Flat;
-            button2.Location = new Point(520, 254);
-            button2.Margin = new Padding(3, 2, 3, 2);
+            button2.Location = new Point(589, 229);
             button2.Name = "button2";
-            button2.Size = new Size(366, 285);
+            button2.Size = new Size(418, 361);
             button2.TabIndex = 1;
             button2.UseVisualStyleBackColor = false;
             button2.Click += button2_Click;
@@ -136,10 +134,9 @@
             panelMii.Controls.Add(pictureBox2);
             panelMii.Dock = DockStyle.Fill;
             panelMii.Location = new Point(0, 0);
-            panelMii.Margin = new Padding(3, 2, 3, 2);
-            panelMii.MinimumSize = new Size(700, 376);
+            panelMii.MinimumSize = new Size(800, 476);
             panelMii.Name = "panelMii";
-            panelMii.Size = new Size(1412, 813);
+            panelMii.Size = new Size(1605, 845);
             panelMii.TabIndex = 3;
             panelMii.Visible = false;
             panelMii.Paint += panel1_Paint;
@@ -147,9 +144,10 @@
             // btnBrowseMii
             // 
             btnBrowseMii.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnBrowseMii.Location = new Point(975, 130);
+            btnBrowseMii.Location = new Point(1105, 165);
+            btnBrowseMii.Margin = new Padding(3, 4, 3, 4);
             btnBrowseMii.Name = "btnBrowseMii";
-            btnBrowseMii.Size = new Size(75, 23);
+            btnBrowseMii.Size = new Size(86, 29);
             btnBrowseMii.TabIndex = 10;
             btnBrowseMii.Text = "Browse..";
             btnBrowseMii.UseVisualStyleBackColor = true;
@@ -159,10 +157,11 @@
             // 
             txtMiiPath.AllowDrop = true;
             txtMiiPath.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            txtMiiPath.Location = new Point(298, 131);
+            txtMiiPath.Location = new Point(341, 166);
+            txtMiiPath.Margin = new Padding(3, 4, 3, 4);
             txtMiiPath.Name = "txtMiiPath";
             txtMiiPath.ReadOnly = true;
-            txtMiiPath.Size = new Size(671, 23);
+            txtMiiPath.Size = new Size(757, 26);
             txtMiiPath.TabIndex = 9;
             txtMiiPath.Text = "Choose a Mii file here...";
             txtMiiPath.TextChanged += txtMiiPath_TextChanged;
@@ -171,18 +170,17 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(298, 112);
+            label1.Location = new Point(341, 142);
             label1.Name = "label1";
-            label1.Size = new Size(108, 15);
+            label1.Size = new Size(127, 19);
             label1.TabIndex = 8;
             label1.Text = "Open / Save as Mii:";
             // 
             // btnGo
             // 
-            btnGo.Location = new Point(570, 177);
-            btnGo.Margin = new Padding(3, 2, 3, 2);
+            btnGo.Location = new Point(651, 224);
             btnGo.Name = "btnGo";
-            btnGo.Size = new Size(103, 33);
+            btnGo.Size = new Size(118, 42);
             btnGo.TabIndex = 5;
             btnGo.Text = "Go";
             btnGo.UseVisualStyleBackColor = true;
@@ -192,19 +190,17 @@
             // 
             cmbMiiAction.FormattingEnabled = true;
             cmbMiiAction.Items.AddRange(new object[] { "Import Mii (.ltd)", "Export Mii (.ltd)" });
-            cmbMiiAction.Location = new Point(156, 82);
-            cmbMiiAction.Margin = new Padding(3, 2, 3, 2);
+            cmbMiiAction.Location = new Point(178, 104);
             cmbMiiAction.Name = "cmbMiiAction";
-            cmbMiiAction.Size = new Size(129, 23);
+            cmbMiiAction.Size = new Size(147, 27);
             cmbMiiAction.TabIndex = 4;
             cmbMiiAction.Text = "Select Action..";
             // 
             // button4
             // 
-            button4.Location = new Point(156, 56);
-            button4.Margin = new Padding(3, 2, 3, 2);
+            button4.Location = new Point(178, 71);
             button4.Name = "button4";
-            button4.Size = new Size(129, 22);
+            button4.Size = new Size(147, 28);
             button4.TabIndex = 2;
             button4.Text = "Load Save Folder";
             button4.UseVisualStyleBackColor = true;
@@ -212,10 +208,9 @@
             // 
             // button3
             // 
-            button3.Location = new Point(9, 8);
-            button3.Margin = new Padding(3, 2, 3, 2);
+            button3.Location = new Point(10, 10);
             button3.Name = "button3";
-            button3.Size = new Size(118, 22);
+            button3.Size = new Size(135, 28);
             button3.TabIndex = 1;
             button3.Text = "<- Back to menu";
             button3.UseVisualStyleBackColor = true;
@@ -225,10 +220,9 @@
             // 
             listBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             listBox1.FormattingEnabled = true;
-            listBox1.Location = new Point(152, 214);
-            listBox1.Margin = new Padding(3, 2, 3, 2);
+            listBox1.Location = new Point(174, 271);
             listBox1.Name = "listBox1";
-            listBox1.Size = new Size(1109, 514);
+            listBox1.Size = new Size(1258, 460);
             listBox1.TabIndex = 0;
             // 
             // logopanel1
@@ -237,9 +231,10 @@
             logopanel1.BackColor = Color.Transparent;
             logopanel1.BackgroundImage = Properties.Resources.tomoaio_logo;
             logopanel1.BackgroundImageLayout = ImageLayout.Stretch;
-            logopanel1.Location = new Point(1235, 3);
+            logopanel1.Location = new Point(1402, 4);
+            logopanel1.Margin = new Padding(3, 4, 3, 4);
             logopanel1.Name = "logopanel1";
-            logopanel1.Size = new Size(175, 160);
+            logopanel1.Size = new Size(200, 203);
             logopanel1.TabIndex = 12;
             logopanel1.TabStop = false;
             // 
@@ -249,8 +244,9 @@
             pictureBox2.Dock = DockStyle.Fill;
             pictureBox2.Image = Properties.Resources.tomo1;
             pictureBox2.Location = new Point(0, 0);
+            pictureBox2.Margin = new Padding(3, 4, 3, 4);
             pictureBox2.Name = "pictureBox2";
-            pictureBox2.Size = new Size(1412, 813);
+            pictureBox2.Size = new Size(1605, 845);
             pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox2.TabIndex = 7;
             pictureBox2.TabStop = false;
@@ -264,10 +260,9 @@
             btnIslandMgmt.Cursor = Cursors.Hand;
             btnIslandMgmt.FlatAppearance.BorderSize = 0;
             btnIslandMgmt.FlatStyle = FlatStyle.Flat;
-            btnIslandMgmt.Location = new Point(950, 254);
-            btnIslandMgmt.Margin = new Padding(3, 2, 3, 2);
+            btnIslandMgmt.Location = new Point(1081, 229);
             btnIslandMgmt.Name = "btnIslandMgmt";
-            btnIslandMgmt.Size = new Size(366, 285);
+            btnIslandMgmt.Size = new Size(418, 361);
             btnIslandMgmt.TabIndex = 15;
             btnIslandMgmt.UseVisualStyleBackColor = false;
             btnIslandMgmt.Click += btnIslandMgmt_Click;
@@ -276,9 +271,10 @@
             // 
             btnDiscord.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnDiscord.BackColor = Color.Transparent;
-            btnDiscord.Location = new Point(1335, 745);
+            btnDiscord.Location = new Point(1517, 759);
+            btnDiscord.Margin = new Padding(3, 4, 3, 4);
             btnDiscord.Name = "btnDiscord";
-            btnDiscord.Size = new Size(75, 65);
+            btnDiscord.Size = new Size(86, 82);
             btnDiscord.TabIndex = 14;
             btnDiscord.UseVisualStyleBackColor = true;
             btnDiscord.Click += btnDiscord_Click;
@@ -295,8 +291,9 @@
             panelUGC.Controls.Add(panelSidebar);
             panelUGC.Dock = DockStyle.Fill;
             panelUGC.Location = new Point(0, 0);
+            panelUGC.Margin = new Padding(3, 4, 3, 4);
             panelUGC.Name = "panelUGC";
-            panelUGC.Size = new Size(1412, 813);
+            panelUGC.Size = new Size(1605, 845);
             panelUGC.TabIndex = 13;
             panelUGC.Visible = false;
             // 
@@ -306,17 +303,19 @@
             pictureBox3.BackColor = Color.Transparent;
             pictureBox3.BackgroundImage = Properties.Resources.tomoaio_logo;
             pictureBox3.BackgroundImageLayout = ImageLayout.Stretch;
-            pictureBox3.Location = new Point(1234, 3);
+            pictureBox3.Location = new Point(1401, 4);
+            pictureBox3.Margin = new Padding(3, 4, 3, 4);
             pictureBox3.Name = "pictureBox3";
-            pictureBox3.Size = new Size(175, 160);
+            pictureBox3.Size = new Size(200, 203);
             pictureBox3.TabIndex = 12;
             pictureBox3.TabStop = false;
             // 
             // btnUgcBack
             // 
-            btnUgcBack.Location = new Point(256, 28);
+            btnUgcBack.Location = new Point(293, 35);
+            btnUgcBack.Margin = new Padding(3, 4, 3, 4);
             btnUgcBack.Name = "btnUgcBack";
-            btnUgcBack.Size = new Size(60, 68);
+            btnUgcBack.Size = new Size(69, 86);
             btnUgcBack.TabIndex = 5;
             btnUgcBack.Text = "Back to menu";
             btnUgcBack.UseVisualStyleBackColor = true;
@@ -325,9 +324,10 @@
             // btnUgcExport
             // 
             btnUgcExport.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            btnUgcExport.Location = new Point(1081, 742);
+            btnUgcExport.Location = new Point(1226, 755);
+            btnUgcExport.Margin = new Padding(3, 4, 3, 4);
             btnUgcExport.Name = "btnUgcExport";
-            btnUgcExport.Size = new Size(301, 65);
+            btnUgcExport.Size = new Size(344, 82);
             btnUgcExport.TabIndex = 4;
             btnUgcExport.Text = "Export (.png / .zs)";
             btnUgcExport.UseVisualStyleBackColor = true;
@@ -336,9 +336,10 @@
             // btnUgcImport
             // 
             btnUgcImport.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            btnUgcImport.Location = new Point(322, 742);
+            btnUgcImport.Location = new Point(368, 755);
+            btnUgcImport.Margin = new Padding(3, 4, 3, 4);
             btnUgcImport.Name = "btnUgcImport";
-            btnUgcImport.Size = new Size(301, 65);
+            btnUgcImport.Size = new Size(344, 82);
             btnUgcImport.TabIndex = 3;
             btnUgcImport.Text = "Import (.png / .zs)";
             btnUgcImport.UseVisualStyleBackColor = true;
@@ -348,9 +349,9 @@
             // 
             lblImageInfo.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             lblImageInfo.AutoSize = true;
-            lblImageInfo.Location = new Point(647, 767);
+            lblImageInfo.Location = new Point(739, 787);
             lblImageInfo.Name = "lblImageInfo";
-            lblImageInfo.Size = new Size(38, 15);
+            lblImageInfo.Size = new Size(45, 19);
             lblImageInfo.TabIndex = 2;
             lblImageInfo.Text = "label2";
             lblImageInfo.Click += lblImageInfo_Click;
@@ -359,9 +360,10 @@
             // 
             picPreview.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             picPreview.BackColor = Color.White;
-            picPreview.Location = new Point(322, 8);
+            picPreview.Location = new Point(368, 10);
+            picPreview.Margin = new Padding(3, 4, 3, 4);
             picPreview.Name = "picPreview";
-            picPreview.Size = new Size(1060, 728);
+            picPreview.Size = new Size(1202, 737);
             picPreview.SizeMode = PictureBoxSizeMode.Zoom;
             picPreview.TabIndex = 1;
             picPreview.TabStop = false;
@@ -375,17 +377,17 @@
             panelSidebar.Controls.Add(lstUGC);
             panelSidebar.Dock = DockStyle.Left;
             panelSidebar.Location = new Point(0, 0);
+            panelSidebar.Margin = new Padding(3, 4, 3, 4);
             panelSidebar.Name = "panelSidebar";
-            panelSidebar.Padding = new Padding(0, 28, 0, 0);
-            panelSidebar.Size = new Size(250, 813);
+            panelSidebar.Padding = new Padding(0, 35, 0, 0);
+            panelSidebar.Size = new Size(286, 845);
             panelSidebar.TabIndex = 0;
             // 
             // txtSearch
             // 
-            txtSearch.Location = new Point(2, 4);
-            txtSearch.Margin = new Padding(3, 2, 3, 2);
+            txtSearch.Location = new Point(2, 5);
             txtSearch.Name = "txtSearch";
-            txtSearch.Size = new Size(247, 23);
+            txtSearch.Size = new Size(282, 26);
             txtSearch.TabIndex = 2;
             txtSearch.Text = "Search...";
             txtSearch.TextChanged += txtSearch_TextChanged;
@@ -398,9 +400,10 @@
             lstUGC.Dock = DockStyle.Fill;
             lstUGC.ForeColor = Color.Black;
             lstUGC.FormattingEnabled = true;
-            lstUGC.Location = new Point(0, 28);
+            lstUGC.Location = new Point(0, 35);
+            lstUGC.Margin = new Padding(3, 4, 3, 4);
             lstUGC.Name = "lstUGC";
-            lstUGC.Size = new Size(250, 785);
+            lstUGC.Size = new Size(286, 810);
             lstUGC.TabIndex = 0;
             lstUGC.SelectedIndexChanged += lstUGC_SelectedIndexChanged;
             // 
@@ -416,8 +419,9 @@
             panelIslandMGT.Controls.Add(logoislandmgt);
             panelIslandMGT.Controls.Add(pictureBox4);
             panelIslandMGT.Location = new Point(0, 0);
+            panelIslandMGT.Margin = new Padding(3, 4, 3, 4);
             panelIslandMGT.Name = "panelIslandMGT";
-            panelIslandMGT.Size = new Size(1421, 813);
+            panelIslandMGT.Size = new Size(1624, 1030);
             panelIslandMGT.TabIndex = 13;
             panelIslandMGT.Visible = false;
             // 
@@ -431,21 +435,23 @@
             tablelayoutpanelisland.Controls.Add(btnUnlockQBuilds, 0, 1);
             tablelayoutpanelisland.Controls.Add(btnUnlockClothes, 1, 0);
             tablelayoutpanelisland.Controls.Add(btnUnlockFood, 0, 0);
-            tablelayoutpanelisland.Location = new Point(298, 404);
+            tablelayoutpanelisland.Location = new Point(341, 512);
+            tablelayoutpanelisland.Margin = new Padding(3, 4, 3, 4);
             tablelayoutpanelisland.Name = "tablelayoutpanelisland";
             tablelayoutpanelisland.RowCount = 2;
             tablelayoutpanelisland.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
             tablelayoutpanelisland.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tablelayoutpanelisland.Size = new Size(752, 136);
+            tablelayoutpanelisland.Size = new Size(859, 172);
             tablelayoutpanelisland.TabIndex = 15;
             // 
             // btnUnlockInteriors
             // 
             btnUnlockInteriors.Dock = DockStyle.Fill;
-            btnUnlockInteriors.Location = new Point(379, 71);
+            btnUnlockInteriors.Location = new Point(432, 90);
+            btnUnlockInteriors.Margin = new Padding(3, 4, 3, 4);
             btnUnlockInteriors.Name = "btnUnlockInteriors";
-            btnUnlockInteriors.Padding = new Padding(15);
-            btnUnlockInteriors.Size = new Size(370, 62);
+            btnUnlockInteriors.Padding = new Padding(17, 19, 17, 19);
+            btnUnlockInteriors.Size = new Size(424, 78);
             btnUnlockInteriors.TabIndex = 9;
             btnUnlockInteriors.Text = "Unlock all Interiors";
             btnUnlockInteriors.UseVisualStyleBackColor = true;
@@ -454,10 +460,11 @@
             // btnUnlockQBuilds
             // 
             btnUnlockQBuilds.Dock = DockStyle.Fill;
-            btnUnlockQBuilds.Location = new Point(3, 71);
+            btnUnlockQBuilds.Location = new Point(3, 90);
+            btnUnlockQBuilds.Margin = new Padding(3, 4, 3, 4);
             btnUnlockQBuilds.Name = "btnUnlockQBuilds";
-            btnUnlockQBuilds.Padding = new Padding(15);
-            btnUnlockQBuilds.Size = new Size(370, 62);
+            btnUnlockQBuilds.Padding = new Padding(17, 19, 17, 19);
+            btnUnlockQBuilds.Size = new Size(423, 78);
             btnUnlockQBuilds.TabIndex = 10;
             btnUnlockQBuilds.Text = "Unlock all Quik Builds";
             btnUnlockQBuilds.UseVisualStyleBackColor = true;
@@ -466,10 +473,11 @@
             // btnUnlockClothes
             // 
             btnUnlockClothes.Dock = DockStyle.Fill;
-            btnUnlockClothes.Location = new Point(379, 3);
+            btnUnlockClothes.Location = new Point(432, 4);
+            btnUnlockClothes.Margin = new Padding(3, 4, 3, 4);
             btnUnlockClothes.Name = "btnUnlockClothes";
-            btnUnlockClothes.Padding = new Padding(15);
-            btnUnlockClothes.Size = new Size(370, 62);
+            btnUnlockClothes.Padding = new Padding(17, 19, 17, 19);
+            btnUnlockClothes.Size = new Size(424, 78);
             btnUnlockClothes.TabIndex = 12;
             btnUnlockClothes.Text = "Unlock all Clothing";
             btnUnlockClothes.UseVisualStyleBackColor = true;
@@ -478,10 +486,11 @@
             // btnUnlockFood
             // 
             btnUnlockFood.Dock = DockStyle.Fill;
-            btnUnlockFood.Location = new Point(3, 3);
+            btnUnlockFood.Location = new Point(3, 4);
+            btnUnlockFood.Margin = new Padding(3, 4, 3, 4);
             btnUnlockFood.Name = "btnUnlockFood";
-            btnUnlockFood.Padding = new Padding(15);
-            btnUnlockFood.Size = new Size(370, 62);
+            btnUnlockFood.Padding = new Padding(17, 19, 17, 19);
+            btnUnlockFood.Size = new Size(423, 78);
             btnUnlockFood.TabIndex = 11;
             btnUnlockFood.Text = "Unlock all Food";
             btnUnlockFood.UseVisualStyleBackColor = true;
@@ -493,18 +502,19 @@
             lblCurrentMoney.AutoSize = true;
             lblCurrentMoney.Font = new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
             lblCurrentMoney.ForeColor = Color.Black;
-            lblCurrentMoney.Location = new Point(608, 224);
+            lblCurrentMoney.Location = new Point(695, 284);
             lblCurrentMoney.Name = "lblCurrentMoney";
-            lblCurrentMoney.Size = new Size(100, 17);
+            lblCurrentMoney.Size = new Size(124, 21);
             lblCurrentMoney.TabIndex = 6;
             lblCurrentMoney.Text = "Current money";
             lblCurrentMoney.Click += lblCurrentMoney_Click;
             // 
             // btnMenuBack
             // 
-            btnMenuBack.Location = new Point(3, 5);
+            btnMenuBack.Location = new Point(3, 6);
+            btnMenuBack.Margin = new Padding(3, 4, 3, 4);
             btnMenuBack.Name = "btnMenuBack";
-            btnMenuBack.Size = new Size(176, 48);
+            btnMenuBack.Size = new Size(201, 61);
             btnMenuBack.TabIndex = 5;
             btnMenuBack.Text = "Back to menu";
             btnMenuBack.UseVisualStyleBackColor = true;
@@ -519,9 +529,10 @@
             btnSaveMoney.FlatStyle = FlatStyle.Flat;
             btnSaveMoney.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
             btnSaveMoney.ForeColor = Color.White;
-            btnSaveMoney.Location = new Point(603, 314);
+            btnSaveMoney.Location = new Point(689, 398);
+            btnSaveMoney.Margin = new Padding(3, 4, 3, 4);
             btnSaveMoney.Name = "btnSaveMoney";
-            btnSaveMoney.Size = new Size(143, 39);
+            btnSaveMoney.Size = new Size(163, 49);
             btnSaveMoney.TabIndex = 3;
             btnSaveMoney.Text = "Change Funds";
             btnSaveMoney.UseVisualStyleBackColor = false;
@@ -530,10 +541,11 @@
             // numMoney
             // 
             numMoney.Anchor = AnchorStyles.Top;
-            numMoney.Location = new Point(603, 269);
+            numMoney.Location = new Point(689, 341);
+            numMoney.Margin = new Padding(3, 4, 3, 4);
             numMoney.Maximum = new decimal(new int[] { 999999, 0, 0, 0 });
             numMoney.Name = "numMoney";
-            numMoney.Size = new Size(143, 23);
+            numMoney.Size = new Size(163, 26);
             numMoney.TabIndex = 2;
             numMoney.ValueChanged += numMoney_ValueChanged;
             // 
@@ -543,9 +555,9 @@
             IslandFund.AutoSize = true;
             IslandFund.Font = new Font("Segoe UI", 15.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
             IslandFund.ForeColor = Color.Black;
-            IslandFund.Location = new Point(603, 179);
+            IslandFund.Location = new Point(689, 227);
             IslandFund.Name = "IslandFund";
-            IslandFund.Size = new Size(143, 30);
+            IslandFund.Size = new Size(167, 35);
             IslandFund.TabIndex = 1;
             IslandFund.Text = "Island Funds:";
             IslandFund.Click += IslandFund_Click;
@@ -556,12 +568,26 @@
             lblIslandTitle.AutoSize = true;
             lblIslandTitle.Font = new Font("Segoe UI", 26.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
             lblIslandTitle.ForeColor = Color.Black;
-            lblIslandTitle.Location = new Point(486, 8);
+            lblIslandTitle.Location = new Point(555, 10);
             lblIslandTitle.Name = "lblIslandTitle";
-            lblIslandTitle.Size = new Size(377, 47);
+            lblIslandTitle.Size = new Size(452, 57);
             lblIslandTitle.TabIndex = 0;
             lblIslandTitle.Text = "Island name Manager";
             lblIslandTitle.Click += label3_Click;
+            // 
+            // logoislandmgt
+            // 
+            logoislandmgt.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            logoislandmgt.BackColor = Color.Transparent;
+            logoislandmgt.BackgroundImage = Properties.Resources.tomoaio_logo;
+            logoislandmgt.BackgroundImageLayout = ImageLayout.Zoom;
+            logoislandmgt.Location = new Point(1400, 15);
+            logoislandmgt.Margin = new Padding(3, 4, 3, 4);
+            logoislandmgt.Name = "logoislandmgt";
+            logoislandmgt.Size = new Size(200, 203);
+            logoislandmgt.TabIndex = 16;
+            logoislandmgt.TabStop = false;
+            logoislandmgt.Click += logoislandmgt_Click;
             // 
             // pictureBox4
             // 
@@ -570,25 +596,13 @@
             pictureBox4.Dock = DockStyle.Fill;
             pictureBox4.Image = Properties.Resources.tomo1;
             pictureBox4.Location = new Point(0, 0);
+            pictureBox4.Margin = new Padding(3, 4, 3, 4);
             pictureBox4.Name = "pictureBox4";
-            pictureBox4.Size = new Size(1421, 813);
+            pictureBox4.Size = new Size(1624, 1030);
             pictureBox4.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox4.TabIndex = 13;
             pictureBox4.TabStop = false;
             pictureBox4.Click += pictureBox4_Click;
-            // 
-            // logoislandmgt
-            // 
-            logoislandmgt.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            logoislandmgt.BackColor = Color.Transparent;
-            logoislandmgt.BackgroundImage = Properties.Resources.tomoaio_logo;
-            logoislandmgt.BackgroundImageLayout = ImageLayout.Zoom;
-            logoislandmgt.Location = new Point(1225, 12);
-            logoislandmgt.Name = "logoislandmgt";
-            logoislandmgt.Size = new Size(175, 160);
-            logoislandmgt.TabIndex = 16;
-            logoislandmgt.TabStop = false;
-            logoislandmgt.Click += logoislandmgt_Click;
             // 
             // pictureBox1
             // 
@@ -596,8 +610,9 @@
             pictureBox1.Dock = DockStyle.Fill;
             pictureBox1.Image = Properties.Resources.tomo1;
             pictureBox1.Location = new Point(0, 0);
+            pictureBox1.Margin = new Padding(3, 4, 3, 4);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(1412, 813);
+            pictureBox1.Size = new Size(1605, 845);
             pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox1.TabIndex = 6;
             pictureBox1.TabStop = false;
@@ -609,9 +624,10 @@
             logo.BackColor = Color.Transparent;
             logo.BackgroundImage = Properties.Resources.tomoaio_logo;
             logo.BackgroundImageLayout = ImageLayout.Stretch;
-            logo.Location = new Point(1235, 3);
+            logo.Location = new Point(1402, 4);
+            logo.Margin = new Padding(3, 4, 3, 4);
             logo.Name = "logo";
-            logo.Size = new Size(175, 160);
+            logo.Size = new Size(200, 203);
             logo.TabIndex = 11;
             logo.TabStop = false;
             logo.Click += pictureBox3_Click;
@@ -619,9 +635,10 @@
             // btnChangeFolders
             // 
             btnChangeFolders.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            btnChangeFolders.Location = new Point(6, 5);
+            btnChangeFolders.Location = new Point(7, 6);
+            btnChangeFolders.Margin = new Padding(3, 4, 3, 4);
             btnChangeFolders.Name = "btnChangeFolders";
-            btnChangeFolders.Size = new Size(193, 42);
+            btnChangeFolders.Size = new Size(221, 53);
             btnChangeFolders.TabIndex = 13;
             btnChangeFolders.Text = "Change Save Folders";
             btnChangeFolders.UseVisualStyleBackColor = true;
@@ -629,10 +646,10 @@
             // 
             // Form1
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 19F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(255, 190, 0);
-            ClientSize = new Size(1412, 813);
+            ClientSize = new Size(1605, 845);
             Controls.Add(panelIslandMGT);
             Controls.Add(logo);
             Controls.Add(button2);
@@ -644,7 +661,7 @@
             Controls.Add(panelMii);
             Controls.Add(panelUGC);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            Margin = new Padding(3, 2, 3, 2);
+            MinimumSize = new Size(1623, 890);
             Name = "Form1";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "TomoAIO - TLLTD Tool 2.0";
@@ -664,8 +681,8 @@
             panelIslandMGT.PerformLayout();
             tablelayoutpanelisland.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)numMoney).EndInit();
-            ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
             ((System.ComponentModel.ISupportInitialize)logoislandmgt).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox4).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ((System.ComponentModel.ISupportInitialize)logo).EndInit();
             ResumeLayout(false);
