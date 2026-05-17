@@ -48,7 +48,6 @@
             btnBrushMode = new Button();
             trkOpacity = new TrackBar();
             labelOpac = new Label();
-            button1 = new Button();
             btn_SaveChanges = new Button();
             ((System.ComponentModel.ISupportInitialize)picPreview).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trkBrushSize).BeginInit();
@@ -235,15 +234,6 @@
             labelOpac.TabIndex = 18;
             labelOpac.Text = "Opacity";
             // 
-            // button1
-            // 
-            button1.Location = new Point(0, 0);
-            button1.Name = "button1";
-            button1.Size = new Size(89, 27);
-            button1.TabIndex = 19;
-            button1.Text = "button1";
-            button1.UseVisualStyleBackColor = true;
-            // 
             // btn_SaveChanges
             // 
             btn_SaveChanges.Font = new Font("Segoe UI", 8.842105F, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -262,7 +252,6 @@
             BackgroundImage = Properties.Resources.tomo1;
             ClientSize = new Size(1093, 732);
             Controls.Add(btn_SaveChanges);
-            Controls.Add(button1);
             Controls.Add(labelOpac);
             Controls.Add(trkOpacity);
             Controls.Add(btnBrushMode);
@@ -314,7 +303,6 @@
         private Button btnBrushMode;
         private TrackBar trkOpacity;
         private Label labelOpac;
-        private Button button1;
         private Button btn_SaveChanges;
     }
 }
