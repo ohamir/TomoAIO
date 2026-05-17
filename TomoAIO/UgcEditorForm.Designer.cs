@@ -105,15 +105,17 @@
             // lblImageInfo
             // 
             lblImageInfo.AutoSize = true;
+            lblImageInfo.BackColor = Color.Transparent;
+            lblImageInfo.Font = new Font("Segoe UI", 8.842105F, FontStyle.Bold, GraphicsUnit.Point, 0);
             lblImageInfo.Location = new Point(283, 658);
             lblImageInfo.Name = "lblImageInfo";
-            lblImageInfo.Size = new Size(97, 19);
+            lblImageInfo.Size = new Size(105, 19);
             lblImageInfo.TabIndex = 5;
             lblImageInfo.Text = "Current image";
             // 
             // btnPickColor
             // 
-            btnPickColor.Location = new Point(910, 246);
+            btnPickColor.Location = new Point(918, 244);
             btnPickColor.Name = "btnPickColor";
             btnPickColor.Size = new Size(154, 40);
             btnPickColor.TabIndex = 6;
@@ -123,7 +125,7 @@
             // 
             // btnEraser
             // 
-            btnEraser.Location = new Point(910, 552);
+            btnEraser.Location = new Point(918, 550);
             btnEraser.Name = "btnEraser";
             btnEraser.Size = new Size(154, 40);
             btnEraser.TabIndex = 7;
@@ -156,7 +158,7 @@
             lblBrushSize.AutoSize = true;
             lblBrushSize.BackColor = Color.Transparent;
             lblBrushSize.Font = new Font("Segoe UI", 8.842105F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            lblBrushSize.Location = new Point(910, 165);
+            lblBrushSize.Location = new Point(918, 163);
             lblBrushSize.Name = "lblBrushSize";
             lblBrushSize.Size = new Size(75, 19);
             lblBrushSize.TabIndex = 10;
@@ -164,8 +166,9 @@
             // 
             // trkBrushSize
             // 
+            trkBrushSize.BackColor = SystemColors.Control;
             trkBrushSize.LargeChange = 2;
-            trkBrushSize.Location = new Point(910, 187);
+            trkBrushSize.Location = new Point(918, 185);
             trkBrushSize.Maximum = 50;
             trkBrushSize.Minimum = 1;
             trkBrushSize.Name = "trkBrushSize";
@@ -176,7 +179,7 @@
             // 
             // btnEyeDropper
             // 
-            btnEyeDropper.Location = new Point(910, 368);
+            btnEyeDropper.Location = new Point(918, 366);
             btnEyeDropper.Name = "btnEyeDropper";
             btnEyeDropper.Size = new Size(154, 40);
             btnEyeDropper.TabIndex = 12;
@@ -185,7 +188,7 @@
             // 
             // btnRect
             // 
-            btnRect.Location = new Point(910, 506);
+            btnRect.Location = new Point(918, 504);
             btnRect.Name = "btnRect";
             btnRect.Size = new Size(154, 40);
             btnRect.TabIndex = 13;
@@ -194,7 +197,7 @@
             // 
             // btnCircle
             // 
-            btnCircle.Location = new Point(910, 460);
+            btnCircle.Location = new Point(918, 458);
             btnCircle.Name = "btnCircle";
             btnCircle.Size = new Size(154, 40);
             btnCircle.TabIndex = 14;
@@ -203,7 +206,7 @@
             // 
             // btnLine
             // 
-            btnLine.Location = new Point(910, 414);
+            btnLine.Location = new Point(918, 412);
             btnLine.Name = "btnLine";
             btnLine.Size = new Size(154, 40);
             btnLine.TabIndex = 15;
@@ -212,7 +215,7 @@
             // 
             // btnBrushMode
             // 
-            btnBrushMode.Location = new Point(910, 122);
+            btnBrushMode.Location = new Point(918, 120);
             btnBrushMode.Name = "btnBrushMode";
             btnBrushMode.Size = new Size(154, 40);
             btnBrushMode.TabIndex = 16;
@@ -221,18 +224,19 @@
             // 
             // trkOpacity
             // 
-            trkOpacity.Location = new Point(910, 309);
+            trkOpacity.Location = new Point(918, 307);
             trkOpacity.Maximum = 255;
             trkOpacity.Name = "trkOpacity";
             trkOpacity.Size = new Size(154, 53);
             trkOpacity.TabIndex = 17;
+            trkOpacity.Value = 255;
             // 
             // labelOpac
             // 
             labelOpac.AutoSize = true;
             labelOpac.BackColor = Color.Transparent;
             labelOpac.Font = new Font("Segoe UI", 8.842105F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            labelOpac.Location = new Point(910, 287);
+            labelOpac.Location = new Point(918, 285);
             labelOpac.Name = "labelOpac";
             labelOpac.Size = new Size(61, 19);
             labelOpac.TabIndex = 18;
