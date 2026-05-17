@@ -251,24 +251,44 @@ namespace TomoAIO
 
         private void txtSearch_TextChanged(object sender, EventArgs e)
         {
+            string term = txtSearch.Text.Trim().ToLower();
+            bool isEmpty = string.IsNullOrWhiteSpace(term) || term == "search...";
+
+            lstUGC.BeginUpdate();
             lstUGC.Items.Clear();
             _ugcDisplayToFile.Clear();
-            var term = txtSearch.Text.ToLower();
-            var source = (string.IsNullOrWhiteSpace(term) || term == "search...")
-                ? _state.UgcFiles
-                : _state.UgcFiles.Where(f => f.DisplayName.ToLower().Contains(term));
 
-            foreach (var file in source) AddUgcListEntry(file);
+            var filtered = isEmpty
+                ? _state.UgcFiles
+                : _state.UgcFiles
+                        .Where(f =>
+                            f.DisplayName.ToLower().Contains(term) ||
+                            f.FileName.ToLower().Contains(term))
+        .               ToList();
+
+            foreach (var file in filtered)
+                AddUgcListEntry(file);
+
+            lstUGC.EndUpdate();
         }
 
         private void txtSearch_Enter(object sender, EventArgs e)
         {
-            if (txtSearch.Text == "Search...") { txtSearch.Text = ""; txtSearch.ForeColor = Color.Black; }
+            if (txtSearch.Text == "Search...")
+            {
+                txtSearch.Text = "";
+                txtSearch.ForeColor = Color.Black;
+            }
         }
 
         private void txtSearch_Leave(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtSearch.Text)) { txtSearch.Text = "Search..."; txtSearch.ForeColor = Color.Gray; }
+            if (string.IsNullOrWhiteSpace(txtSearch.Text))
+            {
+                txtSearch.Text = "Search...";
+                txtSearch.ForeColor = Color.Gray;
+                txtSearch_TextChanged(sender, e); // restore full list
+            }
         }
 
         // ─── Preview & Painting ───────────────────────────────────────────────

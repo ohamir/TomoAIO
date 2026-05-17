@@ -95,8 +95,12 @@
             // 
             txtSearch.Location = new Point(12, 12);
             txtSearch.Name = "txtSearch";
-            txtSearch.Size = new Size(119, 26);
+            txtSearch.Size = new Size(248, 26);
             txtSearch.TabIndex = 4;
+            txtSearch.Text = "Search...";
+            txtSearch.TextChanged += txtSearch_TextChanged;
+            txtSearch.Enter += txtSearch_Enter;
+            txtSearch.Leave += txtSearch_Leave;
             // 
             // lblImageInfo
             // 
