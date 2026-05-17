@@ -80,7 +80,8 @@ namespace TomoAIO
             btnLine.Click += (s, e) => _currentMode = EditMode.Line;
 
             // Opacity slider
-            trkOpacity.Scroll += (s, e) => {
+            trkOpacity.Scroll += (s, e) =>
+            {
                 _opacity = trkOpacity.Value;
                 trkOpacity.Text = $"Alpha: {_opacity}";
             };
@@ -156,6 +157,7 @@ namespace TomoAIO
             ApplyButtonStyle(btnRect, isSecondary: true);
             ApplyButtonStyle(btnCircle, isSecondary: true);
             ApplyButtonStyle(btnLine, isSecondary: true);
+            ApplyButtonStyle(btn_SaveChanges, isSecondary: true);
         }
 
         private void ApplyButtonStyle(Button btn, bool isSecondary = false)
@@ -599,6 +601,54 @@ namespace TomoAIO
                 MessageBox.Show("Export Successful!");
             }
             catch (Exception ex) { MessageBox.Show("Export Error: " + ex.Message); }
+        }
+
+        private void btn_SaveChanges_Click(object sender, EventArgs e)
+        {
+            string? selectedFile = GetSelectedUgcFileName();
+            if (string.IsNullOrWhiteSpace(selectedFile)) return;
+
+            string fullPath = Path.Combine(_state.CurrentUgcPath, selectedFile);
+
+            try
+            {
+                using Bitmap flat = GetFlattenedImage();
+
+                string tmp = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".png");
+                flat.Save(tmp, System.Drawing.Imaging.ImageFormat.Png);
+
+                string stem = fullPath.Replace(".canvas.zs", "").Replace(".ugctex.zs", "");
+                bool hasTexFile = File.Exists(stem + ".ugctex.zs");
+
+                TextureProcessor.ImportPng(tmp, stem,
+                    !stem.EndsWith("_Thumb"), !stem.EndsWith("_Thumb"),
+                    false, hasTexFile ? stem + ".ugctex.zs" : null);
+
+                if (File.Exists(tmp)) File.Delete(tmp);
+
+                // Merge overlay into base so further edits build on saved state
+                _paintOverlay?.Dispose();
+                _paintOverlay = new Bitmap(flat.Width, flat.Height,
+                    System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                _paintOverlay.SetResolution(flat.HorizontalResolution, flat.VerticalResolution);
+
+                _baseImage?.Dispose();
+                _baseImage = new Bitmap(flat.Width, flat.Height,
+                    System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                _baseImage.SetResolution(flat.HorizontalResolution, flat.VerticalResolution);
+                using (var g = Graphics.FromImage(_baseImage))
+                    g.DrawImageUnscaled(flat, 0, 0);
+
+                picPreview.Image = _baseImage;
+                _undoStack.Clear();
+                picPreview.Invalidate();
+
+                MessageBox.Show("Saved successfully!", "TomoAIO");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Save Error: " + ex.Message, "TomoAIO");
+            }
         }
     }
 }

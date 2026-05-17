@@ -48,6 +48,8 @@
             btnBrushMode = new Button();
             trkOpacity = new TrackBar();
             labelOpac = new Label();
+            button1 = new Button();
+            btn_SaveChanges = new Button();
             ((System.ComponentModel.ISupportInitialize)picPreview).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trkBrushSize).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trkOpacity).BeginInit();
@@ -56,28 +58,25 @@
             // lstUGC
             // 
             lstUGC.FormattingEnabled = true;
-            lstUGC.Location = new Point(20, 94);
-            lstUGC.Margin = new Padding(5, 5, 5, 5);
+            lstUGC.Location = new Point(12, 56);
             lstUGC.Name = "lstUGC";
-            lstUGC.Size = new Size(400, 1124);
+            lstUGC.Size = new Size(248, 669);
             lstUGC.TabIndex = 0;
             // 
             // picPreview
             // 
             picPreview.BackgroundImageLayout = ImageLayout.Zoom;
-            picPreview.Location = new Point(507, 126);
-            picPreview.Margin = new Padding(5, 5, 5, 5);
+            picPreview.Location = new Point(283, 58);
             picPreview.Name = "picPreview";
-            picPreview.Size = new Size(960, 977);
+            picPreview.Size = new Size(609, 599);
             picPreview.TabIndex = 1;
             picPreview.TabStop = false;
             // 
             // btnUgcImport
             // 
-            btnUgcImport.Location = new Point(507, 1145);
-            btnUgcImport.Margin = new Padding(5, 5, 5, 5);
+            btnUgcImport.Location = new Point(283, 680);
             btnUgcImport.Name = "btnUgcImport";
-            btnUgcImport.Size = new Size(292, 67);
+            btnUgcImport.Size = new Size(180, 40);
             btnUgcImport.TabIndex = 2;
             btnUgcImport.Text = "Import (.png/ .zs)";
             btnUgcImport.UseVisualStyleBackColor = true;
@@ -85,10 +84,9 @@
             // 
             // btnUgcExport
             // 
-            btnUgcExport.Location = new Point(1175, 1145);
-            btnUgcExport.Margin = new Padding(5, 5, 5, 5);
+            btnUgcExport.Location = new Point(712, 680);
             btnUgcExport.Name = "btnUgcExport";
-            btnUgcExport.Size = new Size(292, 67);
+            btnUgcExport.Size = new Size(180, 40);
             btnUgcExport.TabIndex = 3;
             btnUgcExport.Text = "Export (.png/ .zs)";
             btnUgcExport.UseVisualStyleBackColor = true;
@@ -96,28 +94,25 @@
             // 
             // txtSearch
             // 
-            txtSearch.Location = new Point(20, 20);
-            txtSearch.Margin = new Padding(5, 5, 5, 5);
+            txtSearch.Location = new Point(12, 12);
             txtSearch.Name = "txtSearch";
-            txtSearch.Size = new Size(191, 39);
+            txtSearch.Size = new Size(119, 26);
             txtSearch.TabIndex = 4;
             // 
             // lblImageInfo
             // 
             lblImageInfo.AutoSize = true;
-            lblImageInfo.Location = new Point(512, 1108);
-            lblImageInfo.Margin = new Padding(5, 0, 5, 0);
+            lblImageInfo.Location = new Point(283, 658);
             lblImageInfo.Name = "lblImageInfo";
-            lblImageInfo.Size = new Size(167, 32);
+            lblImageInfo.Size = new Size(97, 19);
             lblImageInfo.TabIndex = 5;
             lblImageInfo.Text = "Current image";
             // 
             // btnPickColor
             // 
-            btnPickColor.Location = new Point(507, 20);
-            btnPickColor.Margin = new Padding(5, 5, 5, 5);
+            btnPickColor.Location = new Point(910, 246);
             btnPickColor.Name = "btnPickColor";
-            btnPickColor.Size = new Size(162, 67);
+            btnPickColor.Size = new Size(154, 40);
             btnPickColor.TabIndex = 6;
             btnPickColor.Text = "pick color";
             btnPickColor.UseVisualStyleBackColor = true;
@@ -125,10 +120,9 @@
             // 
             // btnEraser
             // 
-            btnEraser.Location = new Point(699, 20);
-            btnEraser.Margin = new Padding(5, 5, 5, 5);
+            btnEraser.Location = new Point(910, 552);
             btnEraser.Name = "btnEraser";
-            btnEraser.Size = new Size(162, 67);
+            btnEraser.Size = new Size(154, 40);
             btnEraser.TabIndex = 7;
             btnEraser.Text = "Erasor";
             btnEraser.UseVisualStyleBackColor = true;
@@ -136,10 +130,9 @@
             // 
             // btnUndo
             // 
-            btnUndo.Location = new Point(889, 20);
-            btnUndo.Margin = new Padding(5, 5, 5, 5);
+            btnUndo.Location = new Point(524, 12);
             btnUndo.Name = "btnUndo";
-            btnUndo.Size = new Size(162, 67);
+            btnUndo.Size = new Size(100, 40);
             btnUndo.TabIndex = 8;
             btnUndo.Text = "Undo";
             btnUndo.UseVisualStyleBackColor = true;
@@ -147,113 +140,129 @@
             // 
             // btnClearPaint
             // 
-            btnClearPaint.Location = new Point(1081, 20);
-            btnClearPaint.Margin = new Padding(5, 5, 5, 5);
+            btnClearPaint.Location = new Point(630, 12);
             btnClearPaint.Name = "btnClearPaint";
-            btnClearPaint.Size = new Size(162, 67);
+            btnClearPaint.Size = new Size(100, 40);
             btnClearPaint.TabIndex = 9;
-            btnClearPaint.Text = "Clear paint";
+            btnClearPaint.Text = "Clear";
             btnClearPaint.UseVisualStyleBackColor = true;
             btnClearPaint.Click += btnClearPaint_Click;
             // 
             // lblBrushSize
             // 
             lblBrushSize.AutoSize = true;
-            lblBrushSize.Location = new Point(1506, 155);
-            lblBrushSize.Margin = new Padding(5, 0, 5, 0);
+            lblBrushSize.BackColor = Color.Transparent;
+            lblBrushSize.Font = new Font("Segoe UI", 8.842105F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblBrushSize.Location = new Point(910, 165);
             lblBrushSize.Name = "lblBrushSize";
-            lblBrushSize.Size = new Size(121, 32);
+            lblBrushSize.Size = new Size(75, 19);
             lblBrushSize.TabIndex = 10;
             lblBrushSize.Text = "Brush size";
             // 
             // trkBrushSize
             // 
             trkBrushSize.LargeChange = 2;
-            trkBrushSize.Location = new Point(1506, 192);
-            trkBrushSize.Margin = new Padding(5, 5, 5, 5);
+            trkBrushSize.Location = new Point(910, 187);
             trkBrushSize.Maximum = 50;
             trkBrushSize.Minimum = 1;
             trkBrushSize.Name = "trkBrushSize";
-            trkBrushSize.Size = new Size(250, 90);
+            trkBrushSize.Size = new Size(154, 53);
             trkBrushSize.TabIndex = 11;
             trkBrushSize.Value = 10;
             trkBrushSize.Scroll += trkBrushSize_Scroll;
             // 
             // btnEyeDropper
             // 
-            btnEyeDropper.Location = new Point(1506, 307);
-            btnEyeDropper.Margin = new Padding(5, 5, 5, 5);
+            btnEyeDropper.Location = new Point(910, 368);
             btnEyeDropper.Name = "btnEyeDropper";
-            btnEyeDropper.Size = new Size(250, 67);
+            btnEyeDropper.Size = new Size(154, 40);
             btnEyeDropper.TabIndex = 12;
-            btnEyeDropper.Text = "Eye Dropper";
+            btnEyeDropper.Text = "Color Picker";
             btnEyeDropper.UseVisualStyleBackColor = true;
             // 
             // btnRect
             // 
-            btnRect.Location = new Point(1506, 384);
-            btnRect.Margin = new Padding(5, 5, 5, 5);
+            btnRect.Location = new Point(910, 506);
             btnRect.Name = "btnRect";
-            btnRect.Size = new Size(250, 67);
+            btnRect.Size = new Size(154, 40);
             btnRect.TabIndex = 13;
             btnRect.Text = "Rectangle";
             btnRect.UseVisualStyleBackColor = true;
             // 
             // btnCircle
             // 
-            btnCircle.Location = new Point(1506, 461);
-            btnCircle.Margin = new Padding(5, 5, 5, 5);
+            btnCircle.Location = new Point(910, 460);
             btnCircle.Name = "btnCircle";
-            btnCircle.Size = new Size(250, 67);
+            btnCircle.Size = new Size(154, 40);
             btnCircle.TabIndex = 14;
             btnCircle.Text = "Circle";
             btnCircle.UseVisualStyleBackColor = true;
             // 
             // btnLine
             // 
-            btnLine.Location = new Point(1506, 539);
-            btnLine.Margin = new Padding(5, 5, 5, 5);
+            btnLine.Location = new Point(910, 414);
             btnLine.Name = "btnLine";
-            btnLine.Size = new Size(250, 67);
+            btnLine.Size = new Size(154, 40);
             btnLine.TabIndex = 15;
             btnLine.Text = "Line";
             btnLine.UseVisualStyleBackColor = true;
             // 
             // btnBrushMode
             // 
-            btnBrushMode.Location = new Point(1506, 616);
-            btnBrushMode.Margin = new Padding(5, 5, 5, 5);
+            btnBrushMode.Location = new Point(910, 122);
             btnBrushMode.Name = "btnBrushMode";
-            btnBrushMode.Size = new Size(250, 67);
+            btnBrushMode.Size = new Size(154, 40);
             btnBrushMode.TabIndex = 16;
             btnBrushMode.Text = "Brush Mode";
             btnBrushMode.UseVisualStyleBackColor = true;
             // 
             // trkOpacity
             // 
-            trkOpacity.Location = new Point(1506, 812);
-            trkOpacity.Margin = new Padding(5, 5, 5, 5);
+            trkOpacity.Location = new Point(910, 309);
             trkOpacity.Maximum = 255;
             trkOpacity.Name = "trkOpacity";
-            trkOpacity.Size = new Size(250, 90);
+            trkOpacity.Size = new Size(154, 53);
             trkOpacity.TabIndex = 17;
             // 
             // labelOpac
             // 
             labelOpac.AutoSize = true;
-            labelOpac.Location = new Point(1506, 775);
-            labelOpac.Margin = new Padding(5, 0, 5, 0);
+            labelOpac.BackColor = Color.Transparent;
+            labelOpac.Font = new Font("Segoe UI", 8.842105F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            labelOpac.Location = new Point(910, 287);
             labelOpac.Name = "labelOpac";
-            labelOpac.Size = new Size(95, 32);
+            labelOpac.Size = new Size(61, 19);
             labelOpac.TabIndex = 18;
             labelOpac.Text = "Opacity";
             // 
+            // button1
+            // 
+            button1.Location = new Point(0, 0);
+            button1.Name = "button1";
+            button1.Size = new Size(89, 27);
+            button1.TabIndex = 19;
+            button1.Text = "button1";
+            button1.UseVisualStyleBackColor = true;
+            // 
+            // btn_SaveChanges
+            // 
+            btn_SaveChanges.Font = new Font("Segoe UI", 8.842105F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            btn_SaveChanges.Location = new Point(418, 12);
+            btn_SaveChanges.Name = "btn_SaveChanges";
+            btn_SaveChanges.Size = new Size(100, 40);
+            btn_SaveChanges.TabIndex = 20;
+            btn_SaveChanges.Text = "Save";
+            btn_SaveChanges.UseVisualStyleBackColor = true;
+            btn_SaveChanges.Click += btn_SaveChanges_Click;
+            // 
             // UgcEditorForm
             // 
-            AutoScaleDimensions = new SizeF(13F, 32F);
+            AutoScaleDimensions = new SizeF(8F, 19F);
             AutoScaleMode = AutoScaleMode.Font;
             BackgroundImage = Properties.Resources.tomo1;
-            ClientSize = new Size(1776, 1233);
+            ClientSize = new Size(1093, 732);
+            Controls.Add(btn_SaveChanges);
+            Controls.Add(button1);
             Controls.Add(labelOpac);
             Controls.Add(trkOpacity);
             Controls.Add(btnBrushMode);
@@ -274,8 +283,7 @@
             Controls.Add(picPreview);
             Controls.Add(lstUGC);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            Margin = new Padding(5, 5, 5, 5);
-            MinimumSize = new Size(1789, 1260);
+            MinimumSize = new Size(1108, 766);
             Name = "UgcEditorForm";
             Text = "UgcEditorForm";
             ((System.ComponentModel.ISupportInitialize)picPreview).EndInit();
@@ -306,5 +314,7 @@
         private Button btnBrushMode;
         private TrackBar trkOpacity;
         private Label labelOpac;
+        private Button button1;
+        private Button btn_SaveChanges;
     }
 }
