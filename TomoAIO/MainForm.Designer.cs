@@ -50,9 +50,9 @@
             ImportMiiBtn.FlatAppearance.BorderSize = 0;
             ImportMiiBtn.FlatAppearance.MouseOverBackColor = Color.FromArgb(255, 255, 192);
             ImportMiiBtn.FlatStyle = FlatStyle.Flat;
-            ImportMiiBtn.Location = new Point(12, 199);
+            ImportMiiBtn.Location = new Point(12, 201);
             ImportMiiBtn.Name = "ImportMiiBtn";
-            ImportMiiBtn.Size = new Size(210, 172);
+            ImportMiiBtn.Size = new Size(250, 200);
             ImportMiiBtn.TabIndex = 1;
             ImportMiiBtn.UseVisualStyleBackColor = false;
             ImportMiiBtn.Click += ImportMiiBtn_Click;
@@ -67,9 +67,9 @@
             UgcEditorBtn.FlatAppearance.BorderSize = 0;
             UgcEditorBtn.FlatAppearance.MouseOverBackColor = Color.FromArgb(255, 255, 192);
             UgcEditorBtn.FlatStyle = FlatStyle.Flat;
-            UgcEditorBtn.Location = new Point(228, 198);
+            UgcEditorBtn.Location = new Point(268, 201);
             UgcEditorBtn.Name = "UgcEditorBtn";
-            UgcEditorBtn.Size = new Size(210, 172);
+            UgcEditorBtn.Size = new Size(250, 200);
             UgcEditorBtn.TabIndex = 2;
             UgcEditorBtn.UseVisualStyleBackColor = false;
             UgcEditorBtn.Click += UgcEditorBtn_Click;
@@ -80,10 +80,10 @@
             logo.BackColor = Color.Transparent;
             logo.BackgroundImage = Properties.Resources.tomoaio_logo;
             logo.BackgroundImageLayout = ImageLayout.Zoom;
-            logo.Location = new Point(246, -2);
+            logo.Location = new Point(268, 5);
             logo.Margin = new Padding(3, 4, 3, 4);
             logo.Name = "logo";
-            logo.Size = new Size(185, 185);
+            logo.Size = new Size(250, 200);
             logo.TabIndex = 12;
             logo.TabStop = false;
             // 
@@ -98,9 +98,9 @@
             IslandManagerBtn.FlatAppearance.BorderSize = 0;
             IslandManagerBtn.FlatAppearance.MouseOverBackColor = Color.FromArgb(255, 255, 192);
             IslandManagerBtn.FlatStyle = FlatStyle.Flat;
-            IslandManagerBtn.Location = new Point(455, 199);
+            IslandManagerBtn.Location = new Point(524, 201);
             IslandManagerBtn.Name = "IslandManagerBtn";
-            IslandManagerBtn.Size = new Size(210, 172);
+            IslandManagerBtn.Size = new Size(250, 200);
             IslandManagerBtn.TabIndex = 16;
             IslandManagerBtn.UseVisualStyleBackColor = false;
             IslandManagerBtn.Click += IslandManagerBtn_Click_1;
@@ -114,9 +114,9 @@
             DiscordJoinBtn.FlatAppearance.MouseDownBackColor = Color.Transparent;
             DiscordJoinBtn.FlatAppearance.MouseOverBackColor = Color.FromArgb(255, 255, 192);
             DiscordJoinBtn.FlatStyle = FlatStyle.Flat;
-            DiscordJoinBtn.Location = new Point(616, 377);
+            DiscordJoinBtn.Location = new Point(729, 407);
             DiscordJoinBtn.Name = "DiscordJoinBtn";
-            DiscordJoinBtn.Size = new Size(65, 43);
+            DiscordJoinBtn.Size = new Size(64, 47);
             DiscordJoinBtn.TabIndex = 18;
             DiscordJoinBtn.UseVisualStyleBackColor = false;
             DiscordJoinBtn.Click += DiscordJoinBtn_Click;
@@ -152,7 +152,7 @@
             AutoScaleDimensions = new SizeF(8F, 19F);
             AutoScaleMode = AutoScaleMode.Font;
             BackgroundImage = Properties.Resources.tomo1;
-            ClientSize = new Size(677, 420);
+            ClientSize = new Size(791, 453);
             Controls.Add(label1);
             Controls.Add(lblSavePath);
             Controls.Add(DiscordJoinBtn);
@@ -161,7 +161,7 @@
             Controls.Add(UgcEditorBtn);
             Controls.Add(ImportMiiBtn);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            MinimumSize = new Size(689, 445);
+            MinimumSize = new Size(809, 498);
             Name = "MainForm";
             SizeGripStyle = SizeGripStyle.Show;
             StartPosition = FormStartPosition.CenterScreen;
