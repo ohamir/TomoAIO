@@ -282,7 +282,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(1108, 766);
             Name = "UgcEditorForm";
-            Text = "UgcEditorForm";
+            Text = "TomoAIO! UGC Editor";
             ((System.ComponentModel.ISupportInitialize)picPreview).EndInit();
             ((System.ComponentModel.ISupportInitialize)trkBrushSize).EndInit();
             ((System.ComponentModel.ISupportInitialize)trkOpacity).EndInit();

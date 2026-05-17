@@ -46,10 +46,10 @@
             // 
             // btnUnlockFood
             // 
-            btnUnlockFood.Location = new Point(340, 178);
-            btnUnlockFood.Margin = new Padding(5, 7, 5, 7);
+            btnUnlockFood.Location = new Point(209, 106);
+            btnUnlockFood.Margin = new Padding(3, 4, 3, 4);
             btnUnlockFood.Name = "btnUnlockFood";
-            btnUnlockFood.Size = new Size(292, 67);
+            btnUnlockFood.Size = new Size(180, 40);
             btnUnlockFood.TabIndex = 12;
             btnUnlockFood.Text = "Unlock all Food";
             btnUnlockFood.UseVisualStyleBackColor = true;
@@ -57,10 +57,10 @@
             // 
             // btnUnlockClothes
             // 
-            btnUnlockClothes.Location = new Point(20, 178);
-            btnUnlockClothes.Margin = new Padding(5, 7, 5, 7);
+            btnUnlockClothes.Location = new Point(12, 106);
+            btnUnlockClothes.Margin = new Padding(3, 4, 3, 4);
             btnUnlockClothes.Name = "btnUnlockClothes";
-            btnUnlockClothes.Size = new Size(292, 67);
+            btnUnlockClothes.Size = new Size(180, 40);
             btnUnlockClothes.TabIndex = 13;
             btnUnlockClothes.Text = "Unlock all Clothing";
             btnUnlockClothes.UseVisualStyleBackColor = true;
@@ -68,10 +68,10 @@
             // 
             // btnUnlockQBuilds
             // 
-            btnUnlockQBuilds.Location = new Point(20, 281);
-            btnUnlockQBuilds.Margin = new Padding(5, 7, 5, 7);
+            btnUnlockQBuilds.Location = new Point(12, 167);
+            btnUnlockQBuilds.Margin = new Padding(3, 4, 3, 4);
             btnUnlockQBuilds.Name = "btnUnlockQBuilds";
-            btnUnlockQBuilds.Size = new Size(292, 67);
+            btnUnlockQBuilds.Size = new Size(180, 40);
             btnUnlockQBuilds.TabIndex = 14;
             btnUnlockQBuilds.Text = "Unlock all Quik Builds";
             btnUnlockQBuilds.UseVisualStyleBackColor = true;
@@ -79,10 +79,10 @@
             // 
             // btnUnlockInteriors
             // 
-            btnUnlockInteriors.Location = new Point(340, 281);
-            btnUnlockInteriors.Margin = new Padding(5, 7, 5, 7);
+            btnUnlockInteriors.Location = new Point(209, 167);
+            btnUnlockInteriors.Margin = new Padding(3, 4, 3, 4);
             btnUnlockInteriors.Name = "btnUnlockInteriors";
-            btnUnlockInteriors.Size = new Size(292, 67);
+            btnUnlockInteriors.Size = new Size(180, 40);
             btnUnlockInteriors.TabIndex = 15;
             btnUnlockInteriors.Text = "Unlock all Interiors";
             btnUnlockInteriors.UseVisualStyleBackColor = true;
@@ -90,10 +90,10 @@
             // 
             // btnSaveMoney
             // 
-            btnSaveMoney.Location = new Point(1037, 240);
-            btnSaveMoney.Margin = new Padding(5, 7, 5, 7);
+            btnSaveMoney.Location = new Point(638, 142);
+            btnSaveMoney.Margin = new Padding(3, 4, 3, 4);
             btnSaveMoney.Name = "btnSaveMoney";
-            btnSaveMoney.Size = new Size(227, 67);
+            btnSaveMoney.Size = new Size(140, 40);
             btnSaveMoney.TabIndex = 16;
             btnSaveMoney.Text = "Update";
             btnSaveMoney.UseVisualStyleBackColor = true;
@@ -101,11 +101,11 @@
             // 
             // txtCurrentMoney
             // 
-            txtCurrentMoney.Location = new Point(759, 255);
-            txtCurrentMoney.Margin = new Padding(5, 7, 5, 7);
+            txtCurrentMoney.Location = new Point(467, 151);
+            txtCurrentMoney.Margin = new Padding(3, 4, 3, 4);
             txtCurrentMoney.Maximum = new decimal(new int[] { 999999, 0, 0, 0 });
             txtCurrentMoney.Name = "txtCurrentMoney";
-            txtCurrentMoney.Size = new Size(223, 39);
+            txtCurrentMoney.Size = new Size(137, 26);
             txtCurrentMoney.TabIndex = 17;
             // 
             // lblCurrentMoney
@@ -113,10 +113,9 @@
             lblCurrentMoney.AutoSize = true;
             lblCurrentMoney.BackColor = Color.Transparent;
             lblCurrentMoney.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            lblCurrentMoney.Location = new Point(759, 195);
-            lblCurrentMoney.Margin = new Padding(5, 0, 5, 0);
+            lblCurrentMoney.Location = new Point(467, 116);
             lblCurrentMoney.Name = "lblCurrentMoney";
-            lblCurrentMoney.Size = new Size(196, 32);
+            lblCurrentMoney.Size = new Size(120, 20);
             lblCurrentMoney.TabIndex = 19;
             lblCurrentMoney.Text = "Current Balance";
             // 
@@ -125,10 +124,9 @@
             lblIslandTitle.AutoSize = true;
             lblIslandTitle.BackColor = Color.Transparent;
             lblIslandTitle.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point, 0);
-            lblIslandTitle.Location = new Point(548, 23);
-            lblIslandTitle.Margin = new Padding(5, 0, 5, 0);
+            lblIslandTitle.Location = new Point(337, 14);
             lblIslandTitle.Name = "lblIslandTitle";
-            lblIslandTitle.Size = new Size(171, 45);
+            lblIslandTitle.Size = new Size(103, 25);
             lblIslandTitle.TabIndex = 20;
             lblIslandTitle.Text = "Island title";
             // 
@@ -137,9 +135,10 @@
             label1.AutoSize = true;
             label1.BackColor = Color.Transparent;
             label1.Font = new Font("Segoe UI", 10.125F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label1.Location = new Point(759, 95);
+            label1.Location = new Point(467, 56);
+            label1.Margin = new Padding(2, 0, 2, 0);
             label1.Name = "label1";
-            label1.Size = new Size(291, 37);
+            label1.Size = new Size(181, 23);
             label1.TabIndex = 21;
             label1.Text = "Change island money";
             // 
@@ -148,9 +147,10 @@
             label3.AutoSize = true;
             label3.BackColor = Color.Transparent;
             label3.Font = new Font("Segoe UI", 10.125F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label3.Location = new Point(20, 95);
+            label3.Location = new Point(12, 56);
+            label3.Margin = new Padding(2, 0, 2, 0);
             label3.Name = "label3";
-            label3.Size = new Size(246, 37);
+            label3.Size = new Size(153, 23);
             label3.TabIndex = 23;
             label3.Text = "Unlockable items:";
             // 
@@ -158,26 +158,28 @@
             // 
             panel1.BackColor = Color.Transparent;
             panel1.BorderStyle = BorderStyle.FixedSingle;
-            panel1.Location = new Point(739, 115);
+            panel1.Location = new Point(455, 68);
+            panel1.Margin = new Padding(2);
             panel1.Name = "panel1";
-            panel1.Size = new Size(537, 295);
+            panel1.Size = new Size(331, 176);
             panel1.TabIndex = 24;
             // 
             // panel2
             // 
             panel2.BackColor = Color.Transparent;
             panel2.BorderStyle = BorderStyle.FixedSingle;
-            panel2.Location = new Point(5, 115);
+            panel2.Location = new Point(3, 68);
+            panel2.Margin = new Padding(2);
             panel2.Name = "panel2";
-            panel2.Size = new Size(689, 295);
+            panel2.Size = new Size(425, 176);
             panel2.TabIndex = 25;
             // 
             // IslandManagerForm
             // 
-            AutoScaleDimensions = new SizeF(13F, 32F);
+            AutoScaleDimensions = new SizeF(8F, 19F);
             AutoScaleMode = AutoScaleMode.Font;
             BackgroundImage = Properties.Resources.tomo1;
-            ClientSize = new Size(1300, 476);
+            ClientSize = new Size(805, 298);
             Controls.Add(label3);
             Controls.Add(label1);
             Controls.Add(lblIslandTitle);
@@ -191,11 +193,10 @@
             Controls.Add(panel1);
             Controls.Add(panel2);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            Margin = new Padding(5);
-            MinimumSize = new Size(1326, 547);
+            MinimumSize = new Size(823, 343);
             Name = "IslandManagerForm";
             StartPosition = FormStartPosition.CenterParent;
-            Text = "IslandManagerForm";
+            Text = "TomoAIO! Island Manager";
             ((System.ComponentModel.ISupportInitialize)txtCurrentMoney).EndInit();
             ResumeLayout(false);
             PerformLayout();
